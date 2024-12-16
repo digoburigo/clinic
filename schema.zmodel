@@ -19,27 +19,44 @@ plugin trpc {
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
+  id        String      @id @default(cuid(2))
+  title     String
+  slug      String
+  description String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([name])
+  ownerId String @default(auth().id)
+  owner   User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  @@allow('read', true)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([slug])
+
+  @@allow('all', auth() == owner)
+
+  @@allow('read', organization.members?[user == auth()])
 }
 
 model User {
-  id            String    @id
+  id            String       @id @default(cuid(2))
   name          String
   email         String
   emailVerified Boolean
   image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   sessions      Session[]
   accounts      Account[]
+  members       Member[]
+  invitations   Invitation[]
+  posts         Post[]
 
+  role       String?
+  banned     Boolean?
+  banReason  String?
+  banExpires DateTime?
 
   @@allow('create,read', true)
   
@@ -51,22 +68,25 @@ model User {
 }
 
 model Session {
-  id        String   @id
+  id        String   @id @default(cuid(2))
   expiresAt DateTime
   token     String
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   ipAddress String?
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  impersonatedBy       String?
+  activeOrganizationId String?
 
   @@unique([token])
   @@map("session")
 }
 
 model Account {
-  id                    String    @id
+  id                    String    @id @default(cuid(2))
   accountId             String
   providerId            String
   userId                String
@@ -78,19 +98,67 @@ model Account {
   refreshTokenExpiresAt DateTime?
   scope                 String?
   password              String? @omit
-  createdAt             DateTime
-  updatedAt             DateTime
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   @@map("account")
 }
 
 model Verification {
-  id         String    @id
+  id         String    @id @default(cuid(2))
   identifier String
   value      String
   expiresAt  DateTime
-  createdAt  DateTime?
-  updatedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("verification")
+}
+
+model Organization {
+  id          String       @id @default(cuid(2))
+  name        String
+  slug        String?
+  logo        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  metadata    String?
+
+  members     Member[]
+  invitations Invitation[]
+
+  posts Post[]
+
+  @@unique([slug])
+  @@map("organization")
+
+  @@allow('create,read', true)
+}
+
+model Member {
+  id             String       @id @default(cuid(2))
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("member")
+}
+
+model Invitation {
+  id             String       @id @default(cuid(2))
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  inviterId      String
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@map("invitation")
 }

@@ -3,15 +3,15 @@ import "./src/env.js";
 
 const config: NextConfig = {
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   },
   experimental: {
     reactCompiler: true,
-    inlineCss: true,
-  },
+    inlineCss: true
+  }
 };
 
 export default config;

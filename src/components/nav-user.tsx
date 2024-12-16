@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   BadgeCheck,
@@ -7,13 +7,9 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
-} from "lucide-react"
+} from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "~/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,39 +18,34 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
+} from "~/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "~/components/ui/sidebar"
-import { signOut } from "~/lib/auth-client"
-import { Button } from "~/components/ui/button"
-import { useRouter } from "next/navigation"
+} from "~/components/ui/sidebar";
+import { authClient } from "~/lib/auth-client";
+import { Button } from "~/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
 }: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
+  user: { name: string; email: string; avatar: string };
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
   const router = useRouter();
-  
+
   const onSignOut = () => {
-    signOut({
+    authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
           router.push("/login"); // redirect to login page
         },
       },
     });
-  }
-
+  };
 
   return (
     <SidebarMenu>
@@ -67,6 +58,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
+
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -86,6 +78,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
+
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -117,9 +110,13 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild >
-              <Button variant="ghost" className="w-full flex justify-start" onClick={onSignOut}>
-                <LogOut />  
+            <DropdownMenuItem asChild>
+              <Button
+                variant="ghost"
+                className="w-full flex justify-start"
+                onClick={onSignOut}
+              >
+                <LogOut />
                 Log out
               </Button>
             </DropdownMenuItem>
@@ -127,5 +124,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

@@ -1,5 +1,10 @@
-import { createAuthClient } from "better-auth/react"
+import { createAuthClient } from "better-auth/react";
+import { adminClient, organizationClient } from "better-auth/client/plugins";
 
-export const { signIn, signUp, useSession, signOut } = createAuthClient({
-  baseURL: "http://localhost:3000"
-})
+export const authClient = createAuthClient({
+  baseURL: "http://localhost:3000",
+  plugins: [
+    adminClient(),
+    organizationClient(),
+  ],
+});

@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
-import { AppSidebar } from "~/components/app-sidebar"
+import { Suspense } from "react";
+import { AppSidebar } from "~/components/app-sidebar";
+import { PostList } from "~/components/post-list";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,15 +9,14 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
-import { Separator } from "~/components/ui/separator"
+} from "~/components/ui/breadcrumb";
+import { Separator } from "~/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "~/components/ui/sidebar"
+} from "~/components/ui/sidebar";
 import { useSession } from "~/server/auth";
-import { api } from "~/trpc/server";
 
 export default async function Page() {
   const session = await useSession();
@@ -23,9 +24,6 @@ export default async function Page() {
   if (!session?.user) {
     redirect("/login");
   }
-
-  const data = await api.post.findMany({});
-  console.log(`data:`, data)
 
   return (
     <SidebarProvider>
@@ -35,6 +33,7 @@ export default async function Page() {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
+
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
@@ -43,6 +42,7 @@ export default async function Page() {
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
+
                 <BreadcrumbItem>
                   <BreadcrumbPage>Data Fetching</BreadcrumbPage>
                 </BreadcrumbItem>
@@ -50,15 +50,10 @@ export default async function Page() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-          </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-        </div>
+        
+        <PostList />
+
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

@@ -1,49 +1,72 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { Button } from "~/components/ui/button"
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { signIn } from "~/lib/auth-client"
+} from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { authClient } from "~/lib/auth-client";
 
 export function LoginForm() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
- 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
   const onSignIn = async () => {
-    const { data, error } = await signIn.email({ 
-        email, 
-        password, 
-     }, { 
-        onRequest: (ctx) => { 
-         //show loading
-        }, 
-        onSuccess: (ctx) => { 
+    const { data, error } = await authClient.signIn.email(
+      {
+        email,
+        password,
+      },
+      {
+        onRequest: (ctx) => {
+          setLoading(true);
+        },
+        onSuccess: (ctx) => {
           //redirect to the dashboard
+          setLoading(false);
+
           router.push("/dashboard");
-        }, 
-        onError: (ctx) => { 
-          alert(ctx.error.message); 
-        }, 
-      }); 
+        },
+        onError: (ctx) => {
+          setLoading(false);
+          alert(ctx.error.message);
+        },
+      },
+    );
   };
 
   const onSignInWithGoogle = async () => {
-    const { data, error } = await signIn.social({
-      provider: "google",
-    });
+    const { data, error } = await authClient.signIn.social(
+      {
+        provider: "google",
+      },
+      {
+        onRequest: (ctx) => {
+          setLoading(true);
+        },
+        onSuccess: (ctx) => {
+          setLoading(false);
+          router.push("/dashboard");
+        },
+        onError: (ctx) => {
+          setLoading(false);
+          alert(ctx.error.message);
+        },
+      },
+    );
   };
 
   return (
@@ -74,12 +97,22 @@ export function LoginForm() {
                 Forgot your password?
               </Link>
             </div>
-            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           <Button type="submit" className="w-full" onClick={onSignIn}>
             Login
           </Button>
-          <Button variant="outline" className="w-full" onClick={onSignInWithGoogle}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={onSignInWithGoogle}
+          >
             Login with Google
           </Button>
         </div>
@@ -91,5 +124,5 @@ export function LoginForm() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
