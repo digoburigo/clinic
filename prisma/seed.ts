@@ -17,7 +17,7 @@ async function main() {
       password: "12345678",
       name: "admin-user",
     },
-  });
+  }); 
 
   const memberUser = await auth.api.signUpEmail({
     body: {

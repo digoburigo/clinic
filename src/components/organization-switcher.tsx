@@ -18,6 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~/components/ui/sidebar";
+import { Skeleton } from "~/components/ui/skeleton";
 import { authClient } from "~/lib/auth-client";
 import { Organization } from "@prisma/client";
 
@@ -27,12 +28,15 @@ export function OrganizationSwitcher({
   organizations: Organization[];
 }) {
   const { isMobile } = useSidebar();
-  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const { data: activeOrganization, isPending } = authClient.useActiveOrganization();
 
-  function setActiveOrganization(organization: Organization) {
+  async function setActiveOrganization(organization: Organization) {
     authClient.organization.setActive({
       organizationId: organization.id,
     });
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
   }
 
   return (
@@ -49,7 +53,7 @@ export function OrganizationSwitcher({
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeOrganization?.name}
+                  {isPending ? <Skeleton className="h-4 w-32" /> : activeOrganization?.name}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -82,7 +86,9 @@ export function OrganizationSwitcher({
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
-              <div className="font-medium text-muted-foreground">Add organization</div>
+              <div className="font-medium text-muted-foreground">
+                Add organization
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

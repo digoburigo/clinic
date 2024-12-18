@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   BookOpen,
   Bot,
-  Command,
   Frame,
   LifeBuoy,
   Map,
@@ -27,9 +25,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import { Skeleton } from "~/components/ui/skeleton";
 import { authClient } from "~/lib/auth-client";
 import { Organization } from "@prisma/client";
-import { Prettify } from "better-auth";
 import { OrganizationSwitcher } from "./organization-switcher";
 
 const data = {
@@ -46,8 +44,8 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Posts",
+          url: "/posts",
         },
         {
           title: "Starred",
@@ -159,17 +157,27 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: organizations } = authClient.useListOrganizations();
+  const { data: organizations, isPending } = authClient.useListOrganizations();
 
   return (
     <Sidebar variant="inset" {...props}>
-     <SidebarHeader>
-        {organizations && <OrganizationSwitcher organizations={organizations as Organization[]} />}
+      <SidebarHeader>
+        {isPending ? (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Skeleton className="h-[48px] w-[224px]" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        ) : (
+          <OrganizationSwitcher
+            organizations={organizations as Organization[]}
+          />
+        )}
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

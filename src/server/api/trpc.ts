@@ -10,10 +10,49 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { useSession } from "~/server/auth";
+import { auth, useSession } from "~/server/auth";
 import { enhance } from '@zenstackhq/runtime';
 
 import { db } from "~/server/db";
+import { headers } from "next/headers";
+
+
+async function getPrisma() {
+  const reqHeaders = await headers();
+  const sessionResult = await auth.api.getSession({
+      headers: reqHeaders,
+  });
+
+  if (!sessionResult) {
+      // anonymous user, create enhanced client without user context
+      return enhance(db);
+  }
+
+  let organizationId: string | undefined = undefined;
+  let organizationRole: string | undefined = undefined;
+  const { session } = sessionResult;
+
+  if (session.activeOrganizationId) {
+      // if there's an active orgId, get the role of the user in the org
+      organizationId = session.activeOrganizationId;
+      const org = await auth.api.getFullOrganization({ headers: reqHeaders });
+      if (org?.members) {
+          const myMember = org.members.find(
+              (m) => m.userId === session.userId
+          );
+          organizationRole = myMember?.role;
+      }
+  }
+
+  // create enhanced client with user context
+  const userContext = {
+      userId: session.userId,
+      organizationId,
+      organizationRole,
+  };
+  return enhance(db, { user: userContext });
+}
+
 
 /**
  * 1. CONTEXT
@@ -29,7 +68,7 @@ import { db } from "~/server/db";
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await useSession();
-  const prisma = await enhance(db, { user: session?.user });
+  const prisma = await getPrisma();
 
   return {
     db,

@@ -10,8 +10,8 @@ const config: NextConfig = {
   },
   experimental: {
     reactCompiler: true,
-    inlineCss: true
-  }
+    inlineCss: true,
+  },
 };
 
 export default config;

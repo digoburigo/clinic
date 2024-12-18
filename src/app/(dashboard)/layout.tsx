@@ -1,7 +1,4 @@
-import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import { AppSidebar } from "~/components/app-sidebar";
-import { PostList } from "~/components/post-list";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,15 +13,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "~/components/ui/sidebar";
-import { useSession } from "~/server/auth";
 
-export default async function Page() {
-  const session = await useSession();
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -33,7 +23,6 @@ export default async function Page() {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
@@ -50,9 +39,8 @@ export default async function Page() {
             </Breadcrumb>
           </div>
         </header>
-        
-        <PostList />
 
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
