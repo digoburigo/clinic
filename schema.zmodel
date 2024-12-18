@@ -59,6 +59,16 @@ model Post {
   @@allow('read', organizationId != null)
 }
 
+model Cid {
+  id        String      @id @default(cuid(2))
+  code       String
+  description       String
+
+  @@unique([code])
+
+  @@allow('read', true)
+}
+
 model User {
   id            String       @id @default(cuid(2))
   name          String

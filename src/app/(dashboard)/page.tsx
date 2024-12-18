@@ -13,6 +13,8 @@ import { useSession } from "~/server/auth";
 import { BarChartExample } from "~/components/bar-chart";
 import { TrendingUp } from "lucide-react";
 
+import { CidMultiSelect } from "~/components/cid-multi-select";
+
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "Example dashboard app built using the components.",
@@ -165,7 +167,7 @@ export default async function Page() {
               <CardDescription>You made 265 sales this month.</CardDescription>
             </CardHeader>
             <CardContent>
-              <p>Graph</p>
+              <CidMultiSelect />
             </CardContent>
           </Card>
         </div>

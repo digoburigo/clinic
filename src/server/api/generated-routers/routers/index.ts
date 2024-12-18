@@ -9,6 +9,7 @@ import type { AnyTRPCRouter as AnyRouter } from "@trpc/server";
 import type { PrismaClient } from "@zenstackhq/runtime/models";
 import { createTRPCRouter } from "../../trpc";
 import createPostRouter from "./Post.router";
+import createCidRouter from "./Cid.router";
 import createUserRouter from "./User.router";
 import createSessionRouter from "./Session.router";
 import createAccountRouter from "./Account.router";
@@ -27,6 +28,7 @@ export function db(ctx: any) {
 export function createRouter() {
     return createTRPCRouter({
         post: createPostRouter(),
+        cid: createCidRouter(),
         user: createUserRouter(),
         session: createSessionRouter(),
         account: createAccountRouter(),
