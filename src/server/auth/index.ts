@@ -6,14 +6,40 @@ import { db } from "~/server/db";
 import { headers } from "next/headers";
 import { admin, organization } from "better-auth/plugins";
 import { sendEmail } from "../email";
-import OrganizationInvitationEmail from "emails/OrganizationInvitationEmail";
+import OrganizationInvitationEmail from "../email/templates/OrganizationInvitationEmail";
+import EmailVerificationEmail from "../email/templates/EmailVerificationEmail";
+import ResetPasswordEmail from "../email/templates/ResetPasswordEmail";
 
 export const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "sqlite",
   }),
+  emailVerification: {
+    async sendVerificationEmail({ user, url }) {
+      console.log("Sending verification email to", user.email);
+      const res = await sendEmail({
+        emailTemplate: EmailVerificationEmail({
+          email: user.email,
+          url,
+        }),
+        to: user.email,
+        subject: "Verifique seu email",
+      });
+      console.log(res, user.email);
+    },
+    sendOnSignUp: true,
+  },
   emailAndPassword: {
     enabled: true,
+    async sendResetPassword({ user, url }) {
+      await sendEmail({
+        emailTemplate: ResetPasswordEmail({
+          resetLink: url,
+        }),
+        to: user.email,
+        subject: "Troca de senha",
+      });
+    },
   },
   socialProviders: {
     google: {
@@ -28,7 +54,13 @@ export const auth = betterAuth({
       organizationLimit: 20,
       membershipLimit: 200,
       async sendInvitationEmail(data) {
-        const inviteLink = `https://example.com/accept-invitation/${data.id}`;
+        const inviteLink =
+          process.env.NODE_ENV === "development"
+            ? `http://localhost:3000/accept-invitation/${data.id}`
+            : `${
+                process.env.BETTER_AUTH_URL || "https://demo.better-auth.com"
+              }/accept-invitation/${data.id}`;
+
         await sendEmail({
           emailTemplate: OrganizationInvitationEmail({
             email: data.email,
@@ -38,7 +70,7 @@ export const auth = betterAuth({
             inviteLink,
           }),
           to: data.email,
-          subject: "You've been invited to join an organization",
+          subject: "Você foi convidado para entrar em uma organização",
         });
       },
     }),

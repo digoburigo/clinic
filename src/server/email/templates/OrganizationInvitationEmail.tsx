@@ -1,6 +1,7 @@
-import { Button, Html } from "@react-email/components";
+import { Html } from "@react-email/components";
 import * as React from "react";
-import TailwindProvider from "../email-utils/tailwind";
+import TailwindProvider from "./utils/tailwind";
+import { EmailButton } from "./ui/email-button";
 
 export default function OrganizationInvitationEmail({
   email,
@@ -21,12 +22,11 @@ export default function OrganizationInvitationEmail({
         <p>
           You've been invited to join {teamName} by {invitedByUsername} ({invitedByEmail}).
         </p>
-        <Button
+        <EmailButton
           href={inviteLink}
-          className="bg-primary py-2 px-3 rounded-md"
         >
-          Accept Invitation
-        </Button>
+          Aceitar convite
+        </EmailButton>
       </Html>
     </TailwindProvider>
   );
