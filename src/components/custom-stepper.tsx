@@ -19,8 +19,9 @@ import { Step, Stepper, useStepper } from "~/components/ui/stepper";
 import { toast } from "sonner";
 
 const steps = [
-  { label: "Step 1", description: "Description 1" },
-  { label: "Step 2", description: "Description 2" },
+  { label: "Informações Pessoais", description: "Descrição 1" },
+  { label: "informações Sociodemográficas", description: "Descrição 2" },
+  { label: "Informações Médicas", description: "Descrição 3" },
 ];
 
 export default function StepperDemo() {
@@ -66,7 +67,7 @@ function FirstStepForm() {
 
   function onSubmit(data: z.infer<typeof FirstFormSchema>) {
     nextStep();
-    toast.success("First step submitted!")
+    toast.success("Parabéns você completou o primeiro passo!");
   }
 
   return (
@@ -77,12 +78,49 @@ function FirstStepForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Nome Completo</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Digite seu nome completo" {...field} />
               </FormControl>
+
+              <FormLabel>CPF</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite seu CPF" {...field} />
+              </FormControl>
+
+              <FormLabel>Celular</FormLabel>
+              <FormControl>
+                <Input placeholder="" {...field} />
+              </FormControl>
+
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite seu melhor Email" {...field} />
+              </FormControl>
+
+              <FormLabel>Sexo</FormLabel>
+              <FormControl>
+                <Input placeholder="" {...field} />
+              </FormControl>
+
+              <FormLabel>Responsável</FormLabel>
+              <FormControl>
+                <Input placeholder="" {...field} />
+              </FormControl>
+
+              <FormLabel>Nacionalidade</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite sua nacionalidade" {...field} />
+              </FormControl>
+
+              <FormLabel>Raça / Cor</FormLabel>
+              <FormControl>
+                <Input placeholder="" {...field} />
+              </FormControl>
+
+
               <FormDescription>
-                This is your public display name.
+                
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -94,51 +132,6 @@ function FirstStepForm() {
   );
 }
 
-const SecondFormSchema = z.object({
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-});
-
-function SecondStepForm() {
-  const { nextStep } = useStepper();
-
-  const form = useForm<z.infer<typeof SecondFormSchema>>({
-    resolver: zodResolver(SecondFormSchema),
-    defaultValues: {
-      password: "",
-    },
-  });
-
-  function onSubmit(data: z.infer<typeof SecondFormSchema>) {
-    nextStep();
-    toast({
-      title: "Second step submitted!",
-    });
-  }
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" {...field} />
-              </FormControl>
-              <FormDescription>This is your private password.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <StepperFormActions />
-      </form>
-    </Form>
-  );
-}
 
 function StepperFormActions() {
   const {

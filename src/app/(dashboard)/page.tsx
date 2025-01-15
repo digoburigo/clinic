@@ -30,15 +30,15 @@ export default async function Page() {
   return (
     <Tabs defaultValue="overview" className="space-y-4">
       <TabsList>
-        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="overview">Inicio</TabsTrigger>
         <TabsTrigger value="analytics" disabled>
-          Analytics
+          Relatórios
         </TabsTrigger>
         <TabsTrigger value="reports" disabled>
-          Reports
+          Consultas
         </TabsTrigger>
         <TabsTrigger value="notifications" disabled>
-          Notifications
+          Notificações
         </TabsTrigger>
       </TabsList>
       <TabsContent value="overview" className="space-y-4">
@@ -46,7 +46,7 @@ export default async function Page() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Revenue
+                Valor Total
               </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -62,16 +62,16 @@ export default async function Page() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$45,231.89</div>
+              <div className="text-2xl font-bold">R$45,231.89</div>
               <p className="text-xs text-muted-foreground">
-                +20.1% from last month
+                +20.1% no último mês
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Subscriptions
+                Novos Pacientes
               </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,15 +89,15 @@ export default async function Page() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+2350</div>
+              <div className="text-2xl font-bold">+23</div>
               <p className="text-xs text-muted-foreground">
-                +180.1% from last month
+                +18.1% no último mês
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Sales</CardTitle>
+              <CardTitle className="text-sm font-medium">Consultas Feitas</CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -113,15 +113,15 @@ export default async function Page() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+12,234</div>
+              <div className="text-2xl font-bold">12</div>
               <p className="text-xs text-muted-foreground">
-                +19% from last month
+                +19% no último mês
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Now</CardTitle>
+              <CardTitle className="text-sm font-medium">Agenda Hoje</CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -136,9 +136,9 @@ export default async function Page() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+573</div>
+              <div className="text-2xl font-bold">13</div>
               <p className="text-xs text-muted-foreground">
-                +201 since last hour
+                +20 no último mês
               </p>
             </CardContent>
           </Card>
@@ -146,25 +146,25 @@ export default async function Page() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-4">
             <CardHeader>
-              <CardTitle>Overview</CardTitle>
+              <CardTitle>Informações Gerais</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
               <BarChartExample />
             </CardContent>
             <CardFooter className="flex-col items-start gap-2 text-sm">
               <div className="flex gap-2 font-medium leading-none">
-                Trending up by 5.2% this month{" "}
+                Comparativo Mensal{" "}
                 <TrendingUp className="h-4 w-4" />
               </div>
               <div className="leading-none text-muted-foreground">
-                Showing total visitors for the last 6 months
+                Mostrando o total de pacientes
               </div>
             </CardFooter>
           </Card>
           <Card className="col-span-3">
             <CardHeader>
-              <CardTitle>Recent Sales</CardTitle>
-              <CardDescription>You made 265 sales this month.</CardDescription>
+              <CardTitle>Prospecção de Pacientes</CardTitle>
+              <CardDescription>Você realizou 22 consultas novas esse mês.</CardDescription>
             </CardHeader>
             <CardContent>
               <CidMultiSelect />
