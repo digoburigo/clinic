@@ -41,6 +41,11 @@ export function LoginForm() {
         },
         onError: (ctx) => {
           setLoading(false);
+          if (ctx.error.status === 403) {
+            toast.error("Sua conta não está verificada. Verifique seu email.");
+            return;
+          }
+          
           toast.error("Não foi possível entrar em sua conta. Tente novamente.");
         },
       },

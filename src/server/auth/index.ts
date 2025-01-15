@@ -15,12 +15,19 @@ export const auth = betterAuth({
     provider: "sqlite",
   }),
   emailVerification: {
+    autoSignInAfterVerification: true,
     async sendVerificationEmail({ user, url }) {
       console.log("Sending verification email to", user.email);
+
+      // change callback url to /
+      const parsedUrl = new URL(url);
+      const params = new URLSearchParams(parsedUrl.search);
+      params.set("callbackUrl", "/login");
+
       const res = await sendEmail({
         emailTemplate: EmailVerificationEmail({
           email: user.email,
-          url,
+          url: parsedUrl.toString(),
         }),
         to: user.email,
         subject: "Verifique seu email",
@@ -31,6 +38,7 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
     async sendResetPassword({ user, url }) {
       await sendEmail({
         emailTemplate: ResetPasswordEmail({

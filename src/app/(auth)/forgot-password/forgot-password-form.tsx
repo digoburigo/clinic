@@ -35,7 +35,7 @@ export function ForgotPasswordForm(props: { email?: string }) {
             });
             setIsSubmitted(true);
         } catch (err) {
-            setError('An error occurred. Please try again.');
+            setError('Ocorreu um erro. Por favor, tente novamente.');
         } finally {
             setIsSubmitting(false);
         }
@@ -46,17 +46,18 @@ export function ForgotPasswordForm(props: { email?: string }) {
             <main className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)]">
                 <Card className="w-[350px]">
                     <CardHeader>
-                        <CardTitle>Check your email</CardTitle>
+                        <CardTitle>Verifique seu email</CardTitle>
                         <CardDescription>
-                            We've sent a password reset link to your email.
+                            Enviamos um link para redefinir sua senha para o seu
+                            email.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Alert>
                             <CheckCircle2 className="h-4 w-4" />
                             <AlertDescription>
-                                If you don't see the email, check your spam
-                                folder.
+                                Se você não receber o email, verifique sua caixa
+                                de spam.
                             </AlertDescription>
                         </Alert>
                     </CardContent>
@@ -66,8 +67,8 @@ export function ForgotPasswordForm(props: { email?: string }) {
                             className="w-full"
                             onClick={() => setIsSubmitted(false)}
                         >
-                            <ArrowLeft className="mr-2 h-4 w-4" /> Back to reset
-                            password
+                            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para o
+                            login
                         </Button>
                     </CardFooter>
                 </Card>
@@ -77,13 +78,13 @@ export function ForgotPasswordForm(props: { email?: string }) {
 
     return (
         <main className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)]">
-            {/* Radial gradient for the container to give a faded look */}
             <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
             <Card className="w-[350px]">
                 <CardHeader>
-                    <CardTitle>Forgot password</CardTitle>
+                    <CardTitle>Esqueci minha senha</CardTitle>
                     <CardDescription>
-                        Enter your email to reset your password
+                        Você receberá um email com instruções para redefinir sua
+                        senha
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -94,7 +95,7 @@ export function ForgotPasswordForm(props: { email?: string }) {
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="Enter your email"
+                                    placeholder="Digite seu email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
@@ -112,14 +113,14 @@ export function ForgotPasswordForm(props: { email?: string }) {
                             type="submit"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Sending...' : 'Send reset link'}
+                            {isSubmitting ? 'Enviando...' : 'Enviar'}
                         </Button>
                     </form>
                 </CardContent>
                 <CardFooter className="flex justify-center">
-                    <Link href="/sign-in">
+                    <Link href="/login">
                         <Button variant="link" className="px-0">
-                            Back to sign in
+                            Voltar para o login
                         </Button>
                     </Link>
                 </CardFooter>
