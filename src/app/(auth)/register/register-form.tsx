@@ -8,18 +8,23 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from "./ui/card";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Button } from "./ui/button";
-import Link from "next/link";
+} from "../../../components/ui/card";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import { Button } from "../../../components/ui/button";
 import { authClient } from "~/lib/auth-client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { InputPassword } from "~/components/ui/input-password";
 
 export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [toastId, setToastId] = useState<string | number | undefined>(undefined);
 
   const onSignUp = async () => {
     const { data, error } = await authClient.signUp.email(
@@ -30,13 +35,23 @@ export function RegisterForm() {
       },
       {
         onRequest: (ctx) => {
-          //show loading
+          setIsLoading(true);
+          const toastId = toast.loading('Criando conta...', {
+            dismissible: false,
+            duration: Infinity,
+            position: 'top-center',
+          });
+          setToastId(toastId);
         },
         onSuccess: (ctx) => {
-          //redirect to the dashboard
+          toast.dismiss(toastId);
+          toast.success('Conta criada com sucesso!');
+          router.push('/');
         },
         onError: (ctx) => {
-          alert(ctx.error.message);
+          toast.dismiss(toastId);
+          setIsLoading(false);
+          toast.error('Erro ao criar conta. Tente novamente.');
         },
       },
     );
@@ -45,21 +60,22 @@ export function RegisterForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Register</CardTitle>
+        <CardTitle className="text-2xl">Cadastro</CardTitle>
         <CardDescription>
-          Enter your email below to register to your account
+          Insira suas informações abaixo para criar sua conta
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">Nome</Label>
             <Input
               id="name"
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
@@ -68,24 +84,24 @@ export function RegisterForm() {
             <Input
               id="email"
               type="email"
-              placeholder="m@example.com"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
+            <InputPassword
               id="password"
-              type="password"
+              label="Senha"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full" onClick={onSignUp}>
-            Sign Up
+          <Button type="submit" className="w-full" onClick={onSignUp} disabled={isLoading}>
+            Criar conta
           </Button>
         </div>
       </CardContent>

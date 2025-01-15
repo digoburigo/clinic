@@ -68,7 +68,7 @@ export function OrganizationSwitcher({
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               Teams
             </DropdownMenuLabel>
-            {organizations.map((organization, index) => (
+            {organizations?.map((organization, index) => (
               <DropdownMenuItem
                 key={organization.id}
                 onClick={() => setActiveOrganization(organization)}

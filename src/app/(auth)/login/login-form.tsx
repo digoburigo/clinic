@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import { InputPassword } from "~/components/ui/input-password";
 import { Label } from "~/components/ui/label";
 import { authClient } from "~/lib/auth-client";
 
@@ -35,14 +37,16 @@ export function LoginForm() {
           setLoading(true);
         },
         onSuccess: (ctx) => {
-          //redirect to the dashboard
-          setLoading(false);
-
-          router.push("/dashboard");
+          router.push("/");
         },
         onError: (ctx) => {
           setLoading(false);
-          alert(ctx.error.message);
+          if (ctx.error.status === 403) {
+            toast.error("Sua conta não está verificada. Verifique seu email.");
+            return;
+          }
+          
+          toast.error("Não foi possível entrar em sua conta. Tente novamente.");
         },
       },
     );
@@ -58,12 +62,11 @@ export function LoginForm() {
           setLoading(true);
         },
         onSuccess: (ctx) => {
-          setLoading(false);
-          router.push("/dashboard");
+          router.push("/");
         },
         onError: (ctx) => {
           setLoading(false);
-          alert(ctx.error.message);
+          toast.error("Não foi possível entrar em sua conta. Tente novamente.");
         },
       },
     );
@@ -72,9 +75,9 @@ export function LoginForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
+        <CardTitle className="text-2xl">Entrar</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Insira suas informações abaixo para entrar na sua conta
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -84,42 +87,49 @@ export function LoginForm() {
             <Input
               id="email"
               type="email"
-              placeholder="m@example.com"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
           </div>
           <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <Link href="#" className="ml-auto inline-block text-sm underline">
-                Forgot your password?
-              </Link>
-            </div>
-            <Input
+            <InputPassword
               id="password"
-              type="password"
-              required
+              label="Senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
-          <Button type="submit" className="w-full" onClick={onSignIn}>
-            Login
+          <Link
+            href={`/forgot-password${email ? `?email=${email}` : ""}`}
+            className="ml-auto inline-block text-sm underline"
+            aria-disabled={loading}
+          >
+            Esqueceu sua senha?
+          </Link>
+          <Button
+            type="submit"
+            className="w-full"
+            onClick={onSignIn}
+            disabled={loading}
+          >
+            Entrar
           </Button>
           <Button
             variant="outline"
             className="w-full"
             onClick={onSignInWithGoogle}
+            disabled={loading}
           >
-            Login with Google
+            Entrar com Google
           </Button>
         </div>
         <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href="#" className="underline">
-            Sign up
+          Não tem uma conta?{" "}
+          <Link href="/register" className="underline" aria-disabled={loading}>
+            Cadastre-se
           </Link>
         </div>
       </CardContent>
