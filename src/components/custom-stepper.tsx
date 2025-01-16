@@ -17,6 +17,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { Step, Stepper, useStepper } from "~/components/ui/stepper";
 import { toast } from "sonner";
+import { FirstStepForm } from "./first-form";
 
 const steps = [
   { label: "Informações Pessoais", description: "Descrição 1" },
@@ -39,7 +40,7 @@ export default function StepperDemo() {
 
           return (
             <Step key={stepProps.label} {...stepProps}>
-              <SecondStepForm />
+              {/* <SecondStepForm /> */}
             </Step>
           );
         })}
@@ -49,91 +50,9 @@ export default function StepperDemo() {
   );
 }
 
-const FirstFormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
-
-function FirstStepForm() {
-  const { nextStep } = useStepper();
-
-  const form = useForm<z.infer<typeof FirstFormSchema>>({
-    resolver: zodResolver(FirstFormSchema),
-    defaultValues: {
-      username: "",
-    },
-  });
-
-  function onSubmit(data: z.infer<typeof FirstFormSchema>) {
-    nextStep();
-    toast.success("Parabéns você completou o primeiro passo!");
-  }
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome Completo</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite seu nome completo" {...field} />
-              </FormControl>
-
-              <FormLabel>CPF</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite seu CPF" {...field} />
-              </FormControl>
-
-              <FormLabel>Celular</FormLabel>
-              <FormControl>
-                <Input placeholder="" {...field} />
-              </FormControl>
-
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite seu melhor Email" {...field} />
-              </FormControl>
-
-              <FormLabel>Sexo</FormLabel>
-              <FormControl>
-                <Input placeholder="" {...field} />
-              </FormControl>
-
-              <FormLabel>Responsável</FormLabel>
-              <FormControl>
-                <Input placeholder="" {...field} />
-              </FormControl>
-
-              <FormLabel>Nacionalidade</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite sua nacionalidade" {...field} />
-              </FormControl>
-
-              <FormLabel>Raça / Cor</FormLabel>
-              <FormControl>
-                <Input placeholder="" {...field} />
-              </FormControl>
 
 
-              <FormDescription>
-                
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <StepperFormActions />
-      </form>
-    </Form>
-  );
-}
-
-
-function StepperFormActions() {
+export function StepperFormActions() {
   const {
     prevStep,
     resetSteps,

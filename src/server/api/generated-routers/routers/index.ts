@@ -17,6 +17,10 @@ import createVerificationRouter from "./Verification.router";
 import createOrganizationRouter from "./Organization.router";
 import createMemberRouter from "./Member.router";
 import createInvitationRouter from "./Invitation.router";
+import createPatientRouter from "./Patient.router";
+import createAppointmentRouter from "./Appointment.router";
+import createPatientAllergyRouter from "./PatientAllergy.router";
+import createAllergyRouter from "./Allergy.router";
 
 export function db(ctx: any) {
     if (!ctx.prisma) {
@@ -36,6 +40,10 @@ export function createRouter() {
         organization: createOrganizationRouter(),
         member: createMemberRouter(),
         invitation: createInvitationRouter(),
+        patient: createPatientRouter(),
+        appointment: createAppointmentRouter(),
+        patientAllergy: createPatientAllergyRouter(),
+        allergy: createAllergyRouter(),
     }
     );
 }
