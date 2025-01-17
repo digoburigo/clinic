@@ -18,11 +18,15 @@ import { Input } from "~/components/ui/input";
 import { Step, Stepper, useStepper } from "~/components/ui/stepper";
 import { toast } from "sonner";
 import { FirstStepForm } from "./first-form";
+import { SecondStepForm } from "./second-form";
+import { ThirdStepForm } from "./third-form";
+import { FourthStepForm } from "./fourth-form";
 
 const steps = [
   { label: "Informações Pessoais", description: "Descrição 1" },
-  { label: "informações Sociodemográficas", description: "Descrição 2" },
+  { label: "Informações Sociodemográficas", description: "Descrição 2" },
   { label: "Informações Médicas", description: "Descrição 3" },
+  { label: "Histórico Médico", description: "Descrição 4" },
 ];
 
 export default function StepperDemo() {
@@ -37,10 +41,23 @@ export default function StepperDemo() {
               </Step>
             );
           }
-
+          if (index === 1) {
+            return (
+              <Step key={stepProps.label} {...stepProps}>
+                <SecondStepForm />
+              </Step>
+            );
+          }
+          if (index === 2) {
+            return (
+              <Step key={stepProps.label} {...stepProps}>
+                <ThirdStepForm />
+              </Step>
+            );
+          }
           return (
             <Step key={stepProps.label} {...stepProps}>
-              {/* <SecondStepForm /> */}
+              <FourthStepForm />
             </Step>
           );
         })}
