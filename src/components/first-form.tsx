@@ -1,36 +1,71 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "~/components/ui/input";
-import { useForm, Form } from "react-hook-form";
+import { useForm} from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "./ui/form";
+import { useMaskito } from "@maskito/react";
+import type { MaskitoOptions } from "@maskito/core";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+  } from "~/components/ui/form";
 import { useStepper } from "./ui/stepper";
 import { StepperFormActions } from "./custom-stepper";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 const FirstFormSchema = z.object({
-    username: z.string().min(2, {
-      message: "Username must be at least 2 characters.",
-    }),
-    cpf: z.string().min(11, {
-      message: "CPF must be at least 11 characters.",
-    }),
-    celular: z.string().min(10, {
-      message: "Celular must be at least 10 characters.",
-    }),
-    email: z.string().email({
-      message: "Invalid email address.",
-    }),
-    sexo: z.string().nonempty({
-      message: "Sexo is required.",
-    }),
-    responsavel: z.string().optional(),
-    nacionalidade: z.string().nonempty({
-      message: "Nacionalidade is required.",
-    }),
-    raca_cor: z.string().nonempty({
-      message: "Raça / Cor is required.",
-    }),
-  });
+  username: z.string().min(2, {
+    message: "Nome completo deve ter pelo menos 2 caracteres.",
+  }),
+  cpf: z.string().min(11, {
+    message: "CPF deve ter 11 caracteres.",
+  }),
+  celular: z.string().min(10, {
+    message: "Celular deve ter pelo menos 10 caracteres.",
+  }),
+  email: z.string().email({
+    message: "Email inválido.",
+  }),
+  sexo: z.union([z.literal("masculino"), z.literal("feminino")], {
+    required_error: "Selecione o sexo.",
+  }),
+  responsavel: z.string().optional(),
+  nacionalidade: z.string().min(1, {
+    message: "Nacionalidade é obrigatória.",
+  }),
+  raca_cor: z.union(
+    [
+      z.literal("branco"),
+      z.literal("preto"),
+      z.literal("pardo"),
+      z.literal("amarelo"),
+      z.literal("indigena"),
+    ],
+    {
+      required_error: "Selecione a raça/cor.",
+    }
+  ),
+});
+  
+  const phoneMaskOptions: MaskitoOptions = {
+    mask: [
+      '+', '5', '5', ' ', 
+      '(', /\d/, /\d/, ')', ' ',
+      /\d/, /\d/, /\d/, /\d/, /\d/, '-',
+      /\d/, /\d/, /\d/, /\d/
+    ],
+  };
   
   export function FirstStepForm() {
     const { nextStep } = useStepper();
@@ -103,18 +138,26 @@ const FirstFormSchema = z.object({
             )}
           />
           <FormField
-            control={form.control}
-            name="sexo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Sexo</FormLabel>
-                <FormControl>
-                  <Input placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+  control={form.control}
+  name="sexo"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Sexo</FormLabel>
+      <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <FormControl>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione o sexo" />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent>
+          <SelectItem value="masculino">Masculino</SelectItem>
+          <SelectItem value="feminino">Feminino</SelectItem>
+        </SelectContent>
+      </Select>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
           <FormField
             control={form.control}
             name="responsavel"
@@ -142,18 +185,29 @@ const FirstFormSchema = z.object({
             )}
           />
           <FormField
-            control={form.control}
-            name="raca_cor"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Raça / Cor</FormLabel>
-                <FormControl>
-                  <Input placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+  control={form.control}
+  name="raca_cor"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Raça / Cor</FormLabel>
+      <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <FormControl>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione a raça/cor" />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent>
+          <SelectItem value="branco">Branco</SelectItem>
+          <SelectItem value="preto">Preto</SelectItem>
+          <SelectItem value="pardo">Pardo</SelectItem>
+          <SelectItem value="amarelo">Amarelo</SelectItem>
+          <SelectItem value="indigena">Indígena</SelectItem>
+        </SelectContent>
+      </Select>
+      <FormMessage />
+    </FormItem>
+  )}
+  />
           <StepperFormActions />
         </form>
       </Form>
