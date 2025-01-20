@@ -171,7 +171,7 @@ export default async function Page() {
             </CardHeader>
             <CardContent>
               <CidMultiSelect />
-              {/* <InviteButton  /> */}
+              <InviteButton  />
             </CardContent>
           </Card>
         </div>
