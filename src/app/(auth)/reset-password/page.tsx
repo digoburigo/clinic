@@ -1,5 +1,10 @@
 import ResetPasswordForm from "./reset-password-form";
 
-export default function Page() {
-  return <ResetPasswordForm />;
+type Params = Promise<{ token: string }>;
+
+export default async function Page(props: { params: Params }) {
+  const params = await props.params;
+  const token = params.token;
+
+  return <ResetPasswordForm token={token} />;
 }

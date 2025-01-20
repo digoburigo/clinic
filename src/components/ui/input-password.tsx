@@ -6,8 +6,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { type InputHTMLAttributes, useState } from "react";
 
 type InputPasswordProps = InputHTMLAttributes<HTMLInputElement> & {
-  id: string;
-  label: string;
+  id?: string;
+  label?: string;
 };
 
 const InputPassword = ({

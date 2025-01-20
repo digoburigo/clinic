@@ -1,6 +1,5 @@
 "use client";
 
-import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -11,78 +10,144 @@ import {
 } from "~/components/ui/card";
 import { InputPassword } from "~/components/ui/input-password";
 import { authClient } from "~/lib/auth-client";
-import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { LoaderCircle } from "lucide-react";
 
-export default function ResetPasswordForm() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
+const ResetPasswordFormSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
+    confirmPassword: z.string().min(8, {
+      message: "A senha deve ter pelo menos 8 caracteres",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não correspondem",
+    path: ["confirmPassword"],
+  });
+
+const RESET_PASSWORD_ERRORS = {
+  INVALID_TOKEN: "Token inválido",
+};
+
+export default function ResetPasswordForm(props: { token: string }) {
   const router = useRouter();
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError("");
-    const res = await authClient.resetPassword({
-      newPassword: password,
-    });
-    if (res.error) {
-      toast.error(res.error.message);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<z.infer<typeof ResetPasswordFormSchema>>({
+    resolver: zodResolver(ResetPasswordFormSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  async function onSubmit(formValues: z.infer<typeof ResetPasswordFormSchema>) {
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await authClient.resetPassword({
+        newPassword: formValues.password,
+        token: props.token,
+      });
+
+      if (error?.code) {  
+        toast.error(RESET_PASSWORD_ERRORS[error.code as keyof typeof RESET_PASSWORD_ERRORS], {
+          position: "top-center",
+        });
+      }
+
+      if (data?.status) {
+        toast.success("Senha redefinida com sucesso", {
+          position: "top-center",
+        });
+      }
+
+      router.push("/login");
+    } catch (error) {
+      toast.error("Erro ao redefinir senha", {
+        position: "top-center",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setIsSubmitting(false);
-    router.push("/login");
   }
 
   return (
     <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Reset password</CardTitle>
-          <CardDescription>
-            Enter new password and confirm it to reset your password
-          </CardDescription>
+          <CardTitle>Redefinir senha</CardTitle>
+          <CardDescription>Digite a nova senha para sua conta</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
-            <div className="grid w-full items-center gap-2">
-              <div className="flex flex-col space-y-1.5">
-                <InputPassword
-                  id="password"
-                  label="Nova senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="password"
-                  placeholder="Password"
-                />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <InputPassword
-                  id="password"
-                  label="Confirme a senha"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  autoComplete="password"
-                  placeholder="Password"
-                />
-              </div>
-            </div>
-            {error && (
-              <Alert variant="destructive" className="mt-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <Button
-              className="mt-4 w-full"
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Resetting..." : "Reset password"}
-            </Button>
-          </form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="password">Senha</FormLabel>
+                    <FormControl>
+                      <InputPassword {...field} id="password" />
+                    </FormControl>
+
+                    {!form.getFieldState("password").invalid ? (
+                      <FormDescription>
+                        A senha deve ter pelo menos 8 caracteres
+                      </FormDescription>
+                    ) : null}
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="confirmPassword">
+                      Confirmar senha
+                    </FormLabel>
+                    <FormControl>
+                      <InputPassword {...field} id="confirmPassword" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <LoaderCircle
+                    className="-ms-1 me-2 animate-spin"
+                    size={16}
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  />
+                ) : null}
+                Redefinir
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

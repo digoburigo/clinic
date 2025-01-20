@@ -20,7 +20,7 @@ export default function OrganizationInvitationEmail({
     <TailwindProvider>
       <Html>
         <p>
-          You've been invited to join {teamName} by {invitedByUsername} ({invitedByEmail}).
+          Você foi convidado para se juntar à {teamName} por {invitedByUsername} ({invitedByEmail}).
         </p>
         <EmailButton
           href={inviteLink}

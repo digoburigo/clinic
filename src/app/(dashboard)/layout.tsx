@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { AppSidebar } from "~/components/app-sidebar";
 import {
   Breadcrumb,
@@ -13,8 +14,19 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "~/components/ui/sidebar";
+import { useSession } from "~/server/auth";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const session = await useSession();
+
+  if (!session?.user) {
+    return redirect("/login");
+  }
+
+  if (!session?.user?.emailVerified) {
+    return redirect("/verify-email");
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

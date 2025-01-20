@@ -21,6 +21,7 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 import { authClient } from "~/lib/auth-client";
 import { Organization } from "@prisma/client";
+import { api } from "~/trpc/react";
 
 export function OrganizationSwitcher({
   organizations,
@@ -28,15 +29,18 @@ export function OrganizationSwitcher({
   organizations: Organization[];
 }) {
   const { isMobile } = useSidebar();
-  const { data: activeOrganization, isPending } = authClient.useActiveOrganization();
+  const { data: activeOrganization, isPending } =
+    authClient.useActiveOrganization();
+  const utils = api.useUtils();
 
   async function setActiveOrganization(organization: Organization) {
-    authClient.organization.setActive({
+    await authClient.organization.setActive({
       organizationId: organization.id,
     });
-    if (typeof window !== "undefined") {
-      window.location.reload();
-    }
+    await utils.invalidate();
+    // if (typeof window !== "undefined") {
+    //   window.location.reload();
+    // }
   }
 
   return (
@@ -53,7 +57,11 @@ export function OrganizationSwitcher({
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {isPending ? <Skeleton className="h-4 w-32" /> : activeOrganization?.name}
+                  {isPending ? (
+                    <Skeleton className="h-4 w-32" />
+                  ) : (
+                    activeOrganization?.name
+                  )}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />

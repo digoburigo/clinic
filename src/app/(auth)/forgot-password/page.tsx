@@ -1,5 +1,11 @@
 import { ForgotPasswordForm } from "./forgot-password-form";
+import type { NextPage } from "next";
 
-export default function Page({ searchParams }: { searchParams: { email?: string } }) {
-  return <ForgotPasswordForm email={searchParams.email} />;
+type SearchParams = Promise<{ email?: string }>;
+
+export default async function Page(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams;
+  const email = searchParams.email;
+
+  return <ForgotPasswordForm email={email} />;
 }
