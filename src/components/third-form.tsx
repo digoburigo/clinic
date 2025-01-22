@@ -13,15 +13,28 @@ import {
 } from "~/components/ui/form";
 import { useStepper } from "./ui/stepper";
 import { StepperFormActions } from "./custom-stepper";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 const ThirdFormSchema = z.object({
   ocupacao: z.string().nonempty({
     message: "Ocupação is required.",
   }),
   orientacao_sexual: z.string().optional(),
-  estado_civil: z.string().optional(),
-  tipo_sanguineo: z.string().optional(),
-  identidade_genero: z.string().optional(),
+  estado_civil: z.string().nonempty({
+    message: "Estado civil is required.",
+  }),
+  tipo_sanguineo: z.string().nonempty({
+    message: "Tipo sanguíneo is required.",
+  }),
+  identidade_genero: z.string().nonempty({
+    message: "Identidade de gênero is required.",
+  }),
 });
 
 export function ThirdStepForm() {
@@ -80,9 +93,20 @@ export function ThirdStepForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Estado Civil</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite seu estado civil" {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o estado civil" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="solteiro">Solteiro(a)</SelectItem>
+                  <SelectItem value="casado">Casado(a)</SelectItem>
+                  <SelectItem value="separado">Separado(a)</SelectItem>
+                  <SelectItem value="divorciado">Divorciado(a)</SelectItem>
+                  <SelectItem value="viuvo">Viúvo(a)</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -94,9 +118,23 @@ export function ThirdStepForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Tipo Sanguíneo</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite seu tipo sanguíneo" {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo sanguíneo" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="apositivo">A+</SelectItem>
+                  <SelectItem value="anegativo">A-</SelectItem>
+                  <SelectItem value="bpositivo">B+</SelectItem>
+                  <SelectItem value="bnegativo">B-</SelectItem>
+                  <SelectItem value="abpositivo">AB+</SelectItem>
+                  <SelectItem value="abnegativo">AB-</SelectItem>
+                  <SelectItem value="opositivo">O+</SelectItem>
+                  <SelectItem value="onegativo">O-</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -108,12 +146,18 @@ export function ThirdStepForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Identidade de Gênero</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Digite sua identidade de gênero"
-                  {...field}
-                />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a identidade de gênero" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="cisgenero">Cisgênero</SelectItem>
+                  <SelectItem value="transgenero">Transgênero</SelectItem>
+                  <SelectItem value="naobinario">Não-Binário</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

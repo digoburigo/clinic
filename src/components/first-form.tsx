@@ -85,8 +85,30 @@ const phoneMaskOptions: MaskitoOptions = {
   ],
 };
 
+const cpfMaskOptions: MaskitoOptions = {
+  mask: [
+    /\d/,
+    /\d/,
+    /\d/,
+    ".",
+    /\d/,
+    /\d/,
+    /\d/,
+    ".",
+    /\d/,
+    /\d/,
+    /\d/,
+    "-",
+    /\d/,
+    /\d/,
+  ],
+};
+
 export function FirstStepForm() {
   const { nextStep } = useStepper();
+
+  const phoneInputRef = useMaskito({ options: phoneMaskOptions });
+  const cpfInputRef = useMaskito({ options: cpfMaskOptions });
 
   const form = useForm<z.infer<typeof FirstFormSchema>>({
     resolver: zodResolver(FirstFormSchema),
@@ -126,7 +148,9 @@ export function FirstStepForm() {
             <FormItem>
               <FormLabel>CPF</FormLabel>
               <FormControl>
-                <Input placeholder="Digite seu CPF" {...field} />
+                <Input placeholder="Digite seu CPF" {...field} ref={cpfInputRef} onInput={(evt) => {
+                        form.setValue("cpf", evt.currentTarget.value);
+                      }} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -140,7 +164,9 @@ export function FirstStepForm() {
             <FormItem>
               <FormLabel>Celular</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} ref={inputRef} />
+                <Input placeholder="" {...field} ref={phoneInputRef} onInput={(evt) => {
+                        form.setValue("celular", evt.currentTarget.value);
+                      }}/>
               </FormControl>
               <FormMessage />
             </FormItem>
