@@ -35,6 +35,21 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "~/components/ui/tabs";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
 
 const sampleData: Payment[] = [
   {
@@ -199,15 +214,84 @@ export function ClientsList() {
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <div className="flex items-center justify-between py-4">
+        <div className="flex items-center gap-4">
+          <Input
+            placeholder="Filter emails..."
+            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("email")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Nova Consulta</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>Nova Consulta</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="paciente">Nome do Paciente</Label>
+                  <Input id="paciente" placeholder="Digite o nome do paciente" />
+                </div>
+                <Tabs defaultValue="subjetivo" className="w-full">
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="subjetivo">Subjetivo</TabsTrigger>
+                    <TabsTrigger value="objetivo">Objetivo</TabsTrigger>
+                    <TabsTrigger value="avaliacao">Avaliação</TabsTrigger>
+                    <TabsTrigger value="plano">Plano</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="subjetivo">
+                    <div className="grid gap-2">
+                      <Label htmlFor="subjetivo">Informações Subjetivas</Label>
+                      <Textarea
+                        id="subjetivo"
+                        placeholder="Digite as informações subjetivas do paciente"
+                        className="min-h-[150px]"
+                      />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="objetivo">
+                    <div className="grid gap-2">
+                      <Label htmlFor="objetivo">Informações Objetivas</Label>
+                      <Textarea
+                        id="objetivo"
+                        placeholder="Digite as informações objetivas do paciente"
+                        className="min-h-[150px]"
+                      />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="avaliacao">
+                    <div className="grid gap-2">
+                      <Label htmlFor="avaliacao">Avaliação</Label>
+                      <Textarea
+                        id="avaliacao"
+                        placeholder="Digite a avaliação do paciente"
+                        className="min-h-[150px]"
+                      />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="plano">
+                    <div className="grid gap-2">
+                      <Label htmlFor="plano">Plano</Label>
+                      <Textarea
+                        id="plano"
+                        placeholder="Digite o plano de tratamento"
+                        className="min-h-[150px]"
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
+                <div className="flex justify-end">
+                  <Button type="submit">Salvar Consulta</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
