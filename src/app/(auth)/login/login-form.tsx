@@ -161,7 +161,9 @@ export function LoginForm() {
                           size="sm"
                           aria-disabled={isLoading}
                           onClick={() => {
-                            router.push(`/forgot-password${form.getValues().email ? `?email=${form.getValues().email}` : ""}`);
+                            router.push(
+                              `/forgot-password${form.getValues().email ? `?email=${form.getValues().email}` : ""}`,
+                            );
                           }}
                         >
                           Esqueceu sua senha?

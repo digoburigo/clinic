@@ -13,8 +13,8 @@ export default async function Page() {
     redirect("/login");
   }
 
-  void api.post.findMany.prefetch()
-  
+  void api.post.findMany.prefetch();
+
   return (
     <HydrateClient>
       <Suspense fallback={<div>Loading...</div>}>
@@ -32,5 +32,3 @@ export default async function Page() {
     </HydrateClient>
   );
 }
-
-

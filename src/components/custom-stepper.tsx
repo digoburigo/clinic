@@ -102,7 +102,6 @@ export function StepperFormActions() {
   );
 }
 
-
 function MyStepperFooter() {
   const { activeStep, resetSteps, steps } = useStepper();
 

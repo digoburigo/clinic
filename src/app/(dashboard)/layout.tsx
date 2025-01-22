@@ -16,7 +16,11 @@ import {
 } from "~/components/ui/sidebar";
 import { useSession } from "~/server/auth";
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const session = await useSession();
 
   if (!session?.user) {
@@ -38,9 +42,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Melomar Clínica
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href="#">Melomar Clínica</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
 

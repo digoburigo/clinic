@@ -13,15 +13,9 @@ export default function EmailVerificationEmail({
   return (
     <TailwindProvider>
       <Html>
-        <p>
-          Clique no botão abaixo para verificar seu email ({email}).
-        </p>
-        <EmailButton
-          href={url}
-        >
-          Verificar email
-        </EmailButton>
+        <p>Clique no botão abaixo para verificar seu email ({email}).</p>
+        <EmailButton href={url}>Verificar email</EmailButton>
       </Html>
     </TailwindProvider>
   );
-};
+}

@@ -59,12 +59,16 @@ export function FourthStepForm() {
             <FormItem>
               <FormLabel>Vacinação</FormLabel>
               <FormControl>
-                <Input placeholder="Informe seu histórico de vacinação" {...field} />
+                <Input
+                  placeholder="Informe seu histórico de vacinação"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="alergias"
@@ -72,12 +76,16 @@ export function FourthStepForm() {
             <FormItem>
               <FormLabel>Alergias</FormLabel>
               <FormControl>
-                <Input placeholder="Liste suas alergias, se houver" {...field} />
+                <Input
+                  placeholder="Liste suas alergias, se houver"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="medicacoes"
@@ -91,6 +99,7 @@ export function FourthStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="resultados_exames"
@@ -98,12 +107,16 @@ export function FourthStepForm() {
             <FormItem>
               <FormLabel>Resultados de Exames</FormLabel>
               <FormControl>
-                <Input placeholder="Informe resultados de exames relevantes" {...field} />
+                <Input
+                  placeholder="Informe resultados de exames relevantes"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="comorbidades"
@@ -111,12 +124,16 @@ export function FourthStepForm() {
             <FormItem>
               <FormLabel>Comorbidades</FormLabel>
               <FormControl>
-                <Input placeholder="Liste suas comorbidades, se houver" {...field} />
+                <Input
+                  placeholder="Liste suas comorbidades, se houver"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="cirurgias"
@@ -130,6 +147,7 @@ export function FourthStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="plano_saude"
@@ -143,8 +161,9 @@ export function FourthStepForm() {
             </FormItem>
           )}
         />
+
         <StepperFormActions />
       </form>
     </Form>
   );
-} 
+}

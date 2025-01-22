@@ -46,7 +46,7 @@ export function ForgotPasswordForm(props: { email?: string }) {
   async function onSubmit(
     formValues: z.infer<typeof ForgotPasswordFormSchema>,
   ) {
-    setIsLoading(true); 
+    setIsLoading(true);
 
     try {
       const { data, error } = await authClient.forgetPassword({
@@ -56,14 +56,13 @@ export function ForgotPasswordForm(props: { email?: string }) {
 
       if (error) {
         toast.error("Não foi possível enviar o email. Tente novamente.", {
-            position: "top-center",
+          position: "top-center",
         });
       }
 
       if (data?.status) {
         setIsSubmitted(true);
       }
-
     } catch (err) {
       toast.error("Não foi possível enviar o email. Tente novamente.", {
         position: "top-center",
@@ -125,7 +124,10 @@ export function ForgotPasswordForm(props: { email?: string }) {
         <CardFooter className="flex justify-center">
           <div className="text-center text-sm">
             Relembrou a senha?{" "}
-            <Link href="/login" className="underline-offset-4 hover:underline hover:text-primary">
+            <Link
+              href="/login"
+              className="underline-offset-4 hover:underline hover:text-primary"
+            >
               Entrar
             </Link>
           </div>
@@ -160,7 +162,7 @@ function ForgotPasswordIsSubmitted({
         <CardFooter>
           <Link href="/login" className="w-full">
             <Button variant="outline" className="w-full">
-              <ArrowLeft className="mr-2 h-4 w-4" /> 
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar ao login
             </Button>
           </Link>

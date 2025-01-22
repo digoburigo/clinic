@@ -21,13 +21,8 @@ export default async function VerifyEmailPage() {
           <CardTitle className="text-xl">Verifique seu email</CardTitle>
         </CardHeader>
         <CardContent className="text-center">
-          <P>
-            Enviamos um email para você.
-          </P>
-          <Small>
-             Clique no link para verificar seu
-            email.
-          </Small>
+          <P>Enviamos um email para você.</P>
+          <Small>Clique no link para verificar seu email.</Small>
         </CardContent>
       </Card>
     </div>

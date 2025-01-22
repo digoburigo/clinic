@@ -89,6 +89,7 @@ export const columns: ColumnDef<Payment>[] = [
         aria-label="Select all"
       />
     ),
+
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
@@ -96,6 +97,7 @@ export const columns: ColumnDef<Payment>[] = [
         aria-label="Select row"
       />
     ),
+
     enableSorting: false,
     enableHiding: false,
   },
@@ -208,6 +210,7 @@ export function ClientsList() {
           }
           className="max-w-sm"
         />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

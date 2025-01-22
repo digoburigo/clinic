@@ -66,10 +66,15 @@ export default function ResetPasswordForm(props: { token: string }) {
         token: props.token,
       });
 
-      if (error?.code) {  
-        toast.error(RESET_PASSWORD_ERRORS[error.code as keyof typeof RESET_PASSWORD_ERRORS], {
-          position: "top-center",
-        });
+      if (error?.code) {
+        toast.error(
+          RESET_PASSWORD_ERRORS[
+            error.code as keyof typeof RESET_PASSWORD_ERRORS
+          ],
+          {
+            position: "top-center",
+          },
+        );
       }
 
       if (data?.status) {

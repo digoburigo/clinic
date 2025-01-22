@@ -59,6 +59,7 @@ export function ThirdStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="orientacao_sexual"
@@ -72,6 +73,7 @@ export function ThirdStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="estado_civil"
@@ -85,6 +87,7 @@ export function ThirdStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="tipo_sanguineo"
@@ -98,6 +101,7 @@ export function ThirdStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="identidade_genero"
@@ -105,12 +109,16 @@ export function ThirdStepForm() {
             <FormItem>
               <FormLabel>Identidade de Gênero</FormLabel>
               <FormControl>
-                <Input placeholder="Digite sua identidade de gênero" {...field} />
+                <Input
+                  placeholder="Digite sua identidade de gênero"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <StepperFormActions />
       </form>
     </Form>

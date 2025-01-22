@@ -73,6 +73,7 @@ export function SecondStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="municipio"
@@ -86,6 +87,7 @@ export function SecondStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="cep"
@@ -99,6 +101,7 @@ export function SecondStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="bairro"
@@ -112,6 +115,7 @@ export function SecondStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="logradouro"
@@ -125,6 +129,7 @@ export function SecondStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="numero"
@@ -138,6 +143,7 @@ export function SecondStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="complemento"
@@ -145,12 +151,16 @@ export function SecondStepForm() {
             <FormItem>
               <FormLabel>Complemento</FormLabel>
               <FormControl>
-                <Input placeholder="Digite o complemento (opcional)" {...field} />
+                <Input
+                  placeholder="Digite o complemento (opcional)"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <StepperFormActions />
       </form>
     </Form>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { api } from "~/trpc/react";
 
@@ -10,10 +10,6 @@ export function PostList() {
   }
 
   return (
-    <div>
-      {posts?.map((post) => (
-        <div key={post.id}>{post.title}</div>
-      ))}
-    </div>
+    <div>{posts?.map((post) => <div key={post.id}>{post.title}</div>)}</div>
   );
 }

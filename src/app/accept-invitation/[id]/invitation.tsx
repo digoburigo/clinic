@@ -22,7 +22,7 @@ export function Invitation(props: { invitationId: string }) {
   const router = useRouter();
 
   if (!props.invitationId) {
-    router.push('/');
+    router.push("/");
     return;
   }
 
@@ -57,7 +57,7 @@ export function Invitation(props: { invitationId: string }) {
           setInvitationStatus("rejected");
           const timeout = setTimeout(() => {
             toast.info("Convite recusado. Redirecionando em 5 segundos...");
-            router.push('/');
+            router.push("/");
             clearTimeout(timeout);
           }, 5000);
         }
@@ -141,7 +141,7 @@ export function Invitation(props: { invitationId: string }) {
                 <H2 className="text-center">Convite recusado</H2>
                 <P className="text-center">
                   Você recusou o convite para se juntar ao time{" "}
-                   <strong>{invitation?.organizationName}</strong>.
+                  <strong>{invitation?.organizationName}</strong>.
                 </P>
               </div>
             )}

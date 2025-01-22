@@ -54,6 +54,7 @@ const FirstFormSchema = z.object({
       z.literal("amarelo"),
       z.literal("indigena"),
     ],
+
     {
       required_error: "Selecione a raça/cor.",
     },
@@ -99,6 +100,8 @@ export function FirstStepForm() {
     toast.success("Parabéns você completou o primeiro passo!");
   }
 
+  const inputRef = useMaskito({ options: phoneMaskOptions });
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -115,6 +118,7 @@ export function FirstStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="cpf"
@@ -128,6 +132,7 @@ export function FirstStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="celular"
@@ -135,12 +140,13 @@ export function FirstStepForm() {
             <FormItem>
               <FormLabel>Celular</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="" {...field} ref={inputRef} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="email"
@@ -154,6 +160,7 @@ export function FirstStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="sexo"
@@ -175,6 +182,7 @@ export function FirstStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="responsavel"
@@ -188,6 +196,7 @@ export function FirstStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="nacionalidade"
@@ -201,6 +210,7 @@ export function FirstStepForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="raca_cor"
@@ -225,6 +235,7 @@ export function FirstStepForm() {
             </FormItem>
           )}
         />
+
         <StepperFormActions />
       </form>
     </Form>

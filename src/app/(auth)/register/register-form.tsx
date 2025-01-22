@@ -86,6 +86,7 @@ export function RegisterForm() {
             REGISTER_ERROR_MESSAGE[
               ctx.error.code as keyof typeof REGISTER_ERROR_MESSAGE
             ],
+
             {
               position: "top-center",
             },

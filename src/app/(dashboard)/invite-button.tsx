@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import { authClient } from "~/lib/auth-client";
 
 export function InviteButton() {
-  const { data: activeOrganization } = authClient.useActiveOrganization()
+  const { data: activeOrganization } = authClient.useActiveOrganization();
 
   return (
     <Button
@@ -20,4 +20,3 @@ export function InviteButton() {
     </Button>
   );
 }
-

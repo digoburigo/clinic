@@ -21,9 +21,7 @@ export function InvitationError() {
             Erro ao aceitar convite
           </CardTitle>
         </div>
-        <CardDescription>
-          Ocorreu um erro ao aceitar o convite.
-        </CardDescription>
+        <CardDescription>Ocorreu um erro ao aceitar o convite.</CardDescription>
       </CardHeader>
       <CardContent>
         <P className="mb-4 text-sm">
