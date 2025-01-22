@@ -24,9 +24,9 @@ import { FourthStepForm } from "./fourth-form";
 
 const steps = [
   { label: "Informações Pessoais", description: "Descrição 1" },
-  { label: "Informações Sociodemográficas", description: "Descrição 2" },
-  { label: "Informações Médicas", description: "Descrição 3" },
-  { label: "Histórico Médico", description: "Descrição 4" },
+  { label: "Endereço", description: "Descrição 2" },
+  { label: "Informações Sociodemográficas", description: "Descrição 3" },
+  { label: "Informações Médicas", description: "Descrição 4" },
 ];
 
 export default function StepperDemo() {

@@ -13,6 +13,15 @@ import {
 } from "~/components/ui/form";
 import { useStepper } from "./ui/stepper";
 import { StepperFormActions } from "./custom-stepper";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { useMaskito } from "@maskito/react";
+import type { MaskitoOptions } from "@maskito/core";
 
 const SecondFormSchema = z.object({
   estado: z.string().nonempty({
@@ -36,8 +45,23 @@ const SecondFormSchema = z.object({
   complemento: z.string().optional(),
 });
 
+const cepMaskOptions: MaskitoOptions = {
+  mask: [
+    /\d/,
+    /\d/,
+    /\d/,
+    /\d/,
+    /\d/,
+    "-",
+    /\d/,
+    /\d/,
+    /\d/,
+  ],
+};
+
 export function SecondStepForm() {
   const { nextStep } = useStepper();
+  const cepInputRef = useMaskito({ options: cepMaskOptions });
 
   const form = useForm<z.infer<typeof SecondFormSchema>>({
     resolver: zodResolver(SecondFormSchema),
@@ -66,9 +90,42 @@ export function SecondStepForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Estado</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite seu estado" {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um estado" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="AC">Acre</SelectItem>
+                  <SelectItem value="AL">Alagoas</SelectItem>
+                  <SelectItem value="AP">Amapá</SelectItem>
+                  <SelectItem value="AM">Amazonas</SelectItem>
+                  <SelectItem value="BA">Bahia</SelectItem>
+                  <SelectItem value="CE">Ceará</SelectItem>
+                  <SelectItem value="DF">Distrito Federal</SelectItem>
+                  <SelectItem value="ES">Espírito Santo</SelectItem>
+                  <SelectItem value="GO">Goiás</SelectItem>
+                  <SelectItem value="MA">Maranhão</SelectItem>
+                  <SelectItem value="MT">Mato Grosso</SelectItem>
+                  <SelectItem value="MS">Mato Grosso do Sul</SelectItem>
+                  <SelectItem value="MG">Minas Gerais</SelectItem>
+                  <SelectItem value="PA">Pará</SelectItem>
+                  <SelectItem value="PB">Paraíba</SelectItem>
+                  <SelectItem value="PR">Paraná</SelectItem>
+                  <SelectItem value="PE">Pernambuco</SelectItem>
+                  <SelectItem value="PI">Piauí</SelectItem>
+                  <SelectItem value="RJ">Rio de Janeiro</SelectItem>
+                  <SelectItem value="RN">Rio Grande do Norte</SelectItem>
+                  <SelectItem value="RS">Rio Grande do Sul</SelectItem>
+                  <SelectItem value="RO">Rondônia</SelectItem>
+                  <SelectItem value="RR">Roraima</SelectItem>
+                  <SelectItem value="SC">Santa Catarina</SelectItem>
+                  <SelectItem value="SP">São Paulo</SelectItem>
+                  <SelectItem value="SE">Sergipe</SelectItem>
+                  <SelectItem value="TO">Tocantins</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -93,7 +150,14 @@ export function SecondStepForm() {
             <FormItem>
               <FormLabel>CEP</FormLabel>
               <FormControl>
-                <Input placeholder="Digite seu CEP" {...field} />
+                <Input 
+                  placeholder="Digite seu CEP" 
+                  {...field} 
+                  ref={cepInputRef}
+                  onInput={(evt) => {
+                    form.setValue("cep", evt.currentTarget.value);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
