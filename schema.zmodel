@@ -88,6 +88,8 @@ model User {
   banReason  String?
   banExpires DateTime?
 
+  patients Patient[]
+
   @@allow('create,read', true)
   
   // only the user can update or delete their own profile
@@ -158,6 +160,7 @@ model Organization {
   invitations Invitation[]
 
   posts Post[]
+  patients Patient[]
 
   @@unique([slug])
   @@map("organization")
@@ -193,16 +196,6 @@ model Invitation {
   @@map("invitation")
 }
 
-model Patient {
-  id String @id @default(nanoid())
-  name String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  appointments Appointment[]
-  patientAllergies PatientAllergy[]
-}
-
 model Appointment {
   id String @id @default(nanoid())
   patientId String
@@ -211,19 +204,62 @@ model Appointment {
   updatedAt DateTime @updatedAt
 }
 
-model PatientAllergy {
+model Patient {
   id String @id @default(nanoid())
-  patientId String
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  allergyId String
-  allergy Allergy @relation(fields: [allergyId], references: [id], onDelete: Cascade)
-}
-
-model Allergy {
-  id String @id @default(nanoid())
+  
+  // First Form Fields
   name String
+  cpf String
+  phone String
+  email String
+  gender String
+  responsible String?
+  nationality String
+  ethnicity String
+  
+  // Second Form Fields
+  state String
+  city String
+  zipCode String
+  neighborhood String
+  street String
+  number String
+  complement String?
+  
+  // Third Form Fields
+  occupation String
+  sexualOrientation String?
+  maritalStatus String
+  bloodType String
+  genderIdentity String
+  
+  // Fourth Form Fields
+  vaccination String
+  allergies String?
+  medications String?
+  examResults String?
+  comorbidities String?
+  surgeries String?
+  healthInsurance String
+  
+  // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Organization relationship fields
+  ownerId String @default(auth().userId) @allow('update', false)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  patientAllergies PatientAllergy[]
+  organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Existing relationships
+  appointments Appointment[]
+
+  // Access rules
+  @@deny('all', auth() == null)
+  @@deny('all', auth().organizationId != organizationId)
+  @@allow('create', auth().userId == ownerId)
+  @@allow('all', auth().userId == ownerId || auth().organizationRole == 'owner' || auth().organizationRole == 'admin')
+  @@allow('read', organizationId != null)
 }

@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { api } from "~/trpc/react";
 
 const FirstFormSchema = z.object({
   username: z.string().min(2, {
@@ -113,11 +114,50 @@ export function FirstStepForm() {
   const form = useForm<z.infer<typeof FirstFormSchema>>({
     resolver: zodResolver(FirstFormSchema),
     defaultValues: {
-      username: "",
+      cpf: "",
+      celular: "",
+      email: "",
+      sexo: undefined,
+      responsavel: "",
+      nacionalidade: "",
+      raca_cor: undefined,
     },
   });
 
-  function onSubmit(data: z.infer<typeof FirstFormSchema>) {
+  const { mutateAsync: createPatient } = api.patient.create.useMutation();
+
+  async function onSubmit(formData: z.infer<typeof FirstFormSchema>) {
+    await createPatient({
+      data: {
+        name: formData.username,
+        cpf: formData.cpf,
+        phone: formData.celular,
+        email: formData.email,
+        gender: formData.sexo,
+        nationality: formData.nacionalidade,
+        ethnicity: formData.raca_cor,
+        responsible: formData.responsavel,
+        state: "",
+        city: "",
+        zipCode: "",
+        neighborhood: "",
+        street: "",
+        number: "",
+        complement: "",
+        occupation: "",
+        sexualOrientation: "",
+        maritalStatus: "",
+        bloodType: "",
+        genderIdentity: "",
+        vaccination: "",
+        allergies: "",
+        medications: "",
+        examResults: "",
+        comorbidities: "",
+        surgeries: "",
+        healthInsurance: "",
+      },
+    });
     nextStep();
     toast.success("Parabéns você completou o primeiro passo!");
   }

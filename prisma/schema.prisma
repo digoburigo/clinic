@@ -52,6 +52,7 @@ model User {
   banned        Boolean?
   banReason     String?
   banExpires    DateTime?
+  patients      Patient[]
 
   @@unique([email])
   @@map("user")
@@ -115,6 +116,7 @@ model Organization {
   members     Member[]
   invitations Invitation[]
   posts       Post[]
+  patients    Patient[]
 
   @@unique([slug])
   @@map("organization")
@@ -148,15 +150,6 @@ model Invitation {
   @@map("invitation")
 }
 
-model Patient {
-  id               String           @id() @default(nanoid())
-  name             String
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt()
-  appointments     Appointment[]
-  patientAllergies PatientAllergy[]
-}
-
 model Appointment {
   id        String   @id() @default(nanoid())
   patientId String
@@ -165,18 +158,40 @@ model Appointment {
   updatedAt DateTime @updatedAt()
 }
 
-model PatientAllergy {
-  id        String  @id() @default(nanoid())
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  allergyId String
-  allergy   Allergy @relation(fields: [allergyId], references: [id], onDelete: Cascade)
-}
-
-model Allergy {
-  id               String           @id() @default(nanoid())
-  name             String
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt()
-  patientAllergies PatientAllergy[]
+model Patient {
+  id                String        @id() @default(nanoid())
+  name              String
+  cpf               String
+  phone             String
+  email             String
+  gender            String
+  responsible       String?
+  nationality       String
+  ethnicity         String
+  state             String
+  city              String
+  zipCode           String
+  neighborhood      String
+  street            String
+  number            String
+  complement        String?
+  occupation        String
+  sexualOrientation String?
+  maritalStatus     String
+  bloodType         String
+  genderIdentity    String
+  vaccination       String
+  allergies         String?
+  medications       String?
+  examResults       String?
+  comorbidities     String?
+  surgeries         String?
+  healthInsurance   String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt()
+  ownerId           String
+  owner             User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organizationId    String?
+  organization      Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  appointments      Appointment[]
 }

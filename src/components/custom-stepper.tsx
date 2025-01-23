@@ -105,6 +105,8 @@ export function StepperFormActions() {
 function MyStepperFooter() {
   const { activeStep, resetSteps, steps } = useStepper();
 
+  
+
   if (activeStep !== steps.length) {
     return null;
   }

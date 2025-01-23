@@ -50,39 +50,9 @@ import {
 } from "~/components/ui/tabs";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-
-const sampleData: Payment[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@yahoo.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@gmail.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@gmail.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@gmail.com",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@hotmail.com",
-  },
-];
+import Link from "next/link";
+import { api } from "~/trpc/react";
+import { Patient } from "@prisma/client";
 
 export type Payment = {
   id: string;
@@ -91,7 +61,7 @@ export type Payment = {
   email: string;
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Patient>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -117,10 +87,10 @@ export const columns: ColumnDef<Payment>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "name",
+    header: "Nome",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <div className="capitalize">{row.getValue("name")}</div>
     ),
   },
   {
@@ -186,17 +156,14 @@ export const columns: ColumnDef<Payment>[] = [
 
 export function ClientsList() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const [data, setData] = React.useState<Payment[]>(sampleData);
+  const { data: patients } = api.patient.findMany.useQuery();
 
   const table = useReactTable({
-    data,
+    data: patients ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -226,10 +193,12 @@ export function ClientsList() {
             }
             className="max-w-sm"
           />
+
+          <Button variant="link">
+            <Link href="/patients/new">Novo paciente</Link>
+          </Button>
+
           <Dialog>
-            <DialogTrigger asChild>
-              <Button>Nova Consulta</Button>
-            </DialogTrigger>
             <DialogContent className="max-w-3xl">
               <DialogHeader>
                 <DialogTitle>Nova Consulta</DialogTitle>
@@ -322,8 +291,9 @@ export function ClientsList() {
         </DropdownMenu>
       </div>
       <div className="rounded-md border">
-        <Table>
-          <TableHeader>
+        {patients && (
+          <Table>
+            <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -350,9 +320,21 @@ export function ClientsList() {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
+                      {cell.column.id === "email" ? (
+                        <Link
+                          href={`/patients/${row.original.id}`}
+                          className="hover:underline text-primary"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </Link>
+                      ) : (
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )
                       )}
                     </TableCell>
                   ))}
@@ -369,7 +351,8 @@ export function ClientsList() {
               </TableRow>
             )}
           </TableBody>
-        </Table>
+          </Table>
+        )}
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
@@ -391,7 +374,7 @@ export function ClientsList() {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next aasasd
+            Next
           </Button>
         </div>
       </div>
