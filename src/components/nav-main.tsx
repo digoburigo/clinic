@@ -2,6 +2,7 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   Collapsible,
@@ -17,7 +18,9 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarSeparator,
 } from "~/components/ui/sidebar";
+import { cn } from "~/lib/utils";
 
 export function NavMain({
   items,
@@ -30,54 +33,89 @@ export function NavMain({
     items?: { title: string; url: string }[];
   }[];
 }) {
+  const pathname = usePathname();
+  const isActive = (itemHref: string) => {
+    if (itemHref === "/") {
+      return pathname === itemHref;
+    }
+    return pathname === itemHref || pathname.startsWith(itemHref);
+  };
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Menu</SidebarGroupLabel>
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton asChild>
-            <Link href="/">Dashboard</Link>
+            <Link
+              href="/"
+              className={cn(
+                isActive("/") ? "text-primary hover:text-primary" : "",
+              )}
+            >
+              Painel de informações
+            </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
         <SidebarMenuItem>
           <SidebarMenuButton asChild>
-            <Link href="/patients">Pacientes</Link>
+            <Link
+              href="/patients"
+              className={isActive("/patients") ? "text-primary hover:text-primary" : ""}
+            >
+              Pacientes
+            </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
         <SidebarMenuItem>
           <SidebarMenuButton asChild>
-            <Link href="/appointments">Consultas</Link>
+            <Link
+              href="/appointments"
+              className={cn(
+                isActive("/appointments") ? "text-primary hover:text-primary" : "",
+              )}
+            >
+              Consultas
+            </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <Link href={subItem.url}>{subItem.title}</Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
+        <SidebarMenuItem>
+          <SidebarMenuButton asChild>
+            <Link
+              href="/members"
+              className={cn(
+                isActive("/members") ? "text-primary hover:text-primary" : "",
+              )}
+            >
+              Membros
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarSeparator />
+        <SidebarGroupLabel>Atalhos</SidebarGroupLabel>
+        <SidebarMenuItem>
+          <SidebarMenuButton asChild>
+            <Link
+              href="/patients/new"
+              className={cn(
+                isActive("/patients/new") ? "text-primary hover:text-primary" : "",
+              )}
+            >
+              Adicionar Paciente
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton asChild>
+            <Link
+              href="/appointments/new"
+              className={cn(
+                isActive("/appointments/new") ? "text-primary hover:text-primary" : "",
+              )}
+            >
+              Adicionar Consulta
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );
