@@ -5,6 +5,7 @@ import {
   mergeTRPCRouters,
 } from "~/server/api/trpc";
 import { createRouter } from "./generated-routers/routers";
+import { userRouter } from "./custom-routers/user";
 
 export const generatedRouter = createRouter();
 /**
@@ -14,6 +15,7 @@ export const generatedRouter = createRouter();
  */
 export const customRouter = createTRPCRouter({
   _post: postRouter,
+  _user: userRouter,
 });
 
 export const appRouter = mergeTRPCRouters(customRouter, generatedRouter);

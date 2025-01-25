@@ -1,8 +1,9 @@
 import "server-only";
 
-import { betterAuth, undefined } from "better-auth";
+import { betterAuth, } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db } from "~/server/db";
+import { nextCookies } from 'better-auth/next-js';
 import { headers } from "next/headers";
 import { admin, organization } from "better-auth/plugins";
 import { sendEmail } from "../email";
@@ -21,41 +22,41 @@ export const auth = betterAuth({
     },
   },
   databaseHooks: {
-    user: {
-      create: {
-        after: async (user) => {
-          const [orgs, invitations] = await Promise.all([
-            db.organization.findMany({
-              where: {
-                members: {
-                  some: {
-                    userId: user.id,
-                  },
-                },
-              },
-            }),
-            db.invitation.findMany({
-              where: { user: { id: user.id } },
-            }),
-          ]);
+    // user: {
+    //   create: {
+    //     after: async (user) => {
+    //       const [orgs, invitations] = await Promise.all([
+    //         db.organization.findMany({
+    //           where: {
+    //             members: {
+    //               some: {
+    //                 userId: user.id,
+    //               },
+    //             },
+    //           },
+    //         }),
+    //         db.invitation.findMany({
+    //           where: { user: { id: user.id } },
+    //         }),
+    //       ]);
 
-          if (orgs.length === 0 && invitations.length === 0) {
-            // create a default organization
-            await db.organization.create({
-              data: {
-                name: `Time de ${user.name}`,
-                members: {
-                  create: {
-                    user: { connect: { id: user.id } },
-                    role: "owner",
-                  },
-                },
-              },
-            });
-          }
-        },
-      },
-    },
+    //       if (orgs.length === 0 && invitations.length === 0) {
+    //         // create a default organization
+    //         await db.organization.create({
+    //           data: {
+    //             name: `Time de ${user.name}`,
+    //             members: {
+    //               create: {
+    //                 user: { connect: { id: user.id } },
+    //                 role: "owner",
+    //               },
+    //             },
+    //           },
+    //         });
+    //       }
+    //     },
+    //   },
+    // },
     session: {
       create: {
         before: async (session) => {
@@ -125,7 +126,6 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    admin(),
     organization({
       allowUserToCreateOrganization: true,
       organizationLimit: 20,
@@ -151,6 +151,8 @@ export const auth = betterAuth({
         });
       },
     }),
+    admin(),
+    nextCookies(),
   ],
 });
 
