@@ -254,6 +254,8 @@ model Patient {
   comorbidities String?
   surgeries String?
   healthInsurance String
+
+  password String?
   
   // Timestamps
   createdAt DateTime @default(now())
