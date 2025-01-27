@@ -30,6 +30,7 @@ import {
 } from "~/components/ui/form";
 import { LoaderCircle } from "lucide-react";
 import { Small } from "~/components/ui/typography";
+import { Separator } from "~/components/ui/separator";
 
 const LoginFormSchema = z.object({
   email: z.string().email(),
@@ -103,7 +104,7 @@ export function PatientLoginForm() {
         <CardHeader>
           <CardTitle className="text-xl">Bem-vindo</CardTitle>
           <CardDescription>
-            Acesse a área do paciente para gerenciar suas consultas.
+            Área do paciente para acessar suas informações.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -196,6 +197,20 @@ export function PatientLoginForm() {
                   <Small className="text-muted-foreground">
                     Não tem acesso? Entre em contato com seu médico.
                   </Small>
+                </div>
+                <Separator />
+                <div className="text-center text-sm">
+                  Não é paciente?{" "}
+                  <Button
+                    variant="link"
+                    type="button"
+                    className="p-0 underline underline-offset-4"
+                    asChild
+                  >
+                    <Link href="/" aria-disabled={isLoading}>
+                      Acessar área administrativa
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </form>

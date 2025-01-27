@@ -49,7 +49,7 @@ const RegisterFormSchema = z
     path: ["confirmPassword"],
   });
 
-export function RegisterForm() {
+export function RegisterForm({ iup }: { iup?: boolean }) {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof RegisterFormSchema>>({
@@ -78,7 +78,8 @@ export function RegisterForm() {
         onSuccess: (ctx) => {
           setIsLoading(false);
           toast.success("Conta criada com sucesso!");
-          router.push("/login");
+          const pathname = iup ? `/patient-login` : "/login";
+          router.push(pathname);
         },
         onError: (ctx) => {
           setIsLoading(false);

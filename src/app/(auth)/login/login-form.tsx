@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { LoaderCircle } from "lucide-react";
+import { Separator } from "~/components/ui/separator";
 
 const LoginFormSchema = z.object({
   email: z.string().email(),
@@ -194,13 +195,29 @@ export function LoginForm() {
                 </Button>
                 <div className="text-center text-sm">
                   Não tem uma conta?{" "}
-                  <Link
-                    href="/register"
-                    className="underline-offset-4 hover:underline hover:text-primary"
-                    aria-disabled={isLoading}
+                  <Button
+                    variant="link"
+                    className="p-0 underline underline-offset-4"
+                    asChild
                   >
-                    Cadastre-se
-                  </Link>
+                    <Link href="/register" aria-disabled={isLoading}>
+                      Cadastre-se
+                    </Link>
+                  </Button>
+                </div>
+                <Separator />
+                <div className="text-center text-sm">
+                  É paciente?{" "}
+                  <Button
+                    variant="link"
+                    type="button"
+                    className="p-0 underline underline-offset-4"
+                    asChild
+                  >
+                    <Link href="/patient-area" aria-disabled={isLoading}>
+                      Acessar área do paciente
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </form>

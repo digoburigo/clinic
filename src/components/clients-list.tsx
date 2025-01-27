@@ -42,24 +42,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "~/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import Link from "next/link";
 import { api } from "~/trpc/react";
 import { Patient } from "@prisma/client";
+import { authClient } from "~/lib/auth-client";
 
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
 
 export const columns: ColumnDef<Patient>[] = [
   {
@@ -89,9 +79,7 @@ export const columns: ColumnDef<Patient>[] = [
   {
     accessorKey: "name",
     header: "Nome",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("name")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "email",
@@ -155,9 +143,15 @@ export const columns: ColumnDef<Patient>[] = [
 ];
 
 export function ClientsList() {
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const { data: user } = authClient.getSession();
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const { data: patients } = api.patient.findMany.useQuery();
@@ -181,6 +175,48 @@ export function ClientsList() {
     },
   });
 
+  const { mutateAsync: createPatient } = api.patient.create.useMutation();
+
+  async function addMockPatient() {
+    if (!activeOrganization) {
+      return;
+    }
+
+    const session = await authClient.getSession();
+    const email = "rodrigobesmeraldino@gmail.com";
+
+    await createPatient({
+      data: {
+        name: "Rodrigo Besmeraldino",
+        email,
+        cpf: "12345678900",
+        phone: "1234567890",
+        gender: "male",
+        nationality: "Brazil",
+        ethnicity: "branco",
+        state: "SP",
+        city: "São Paulo",
+        zipCode: "1234567890",
+        neighborhood: "Teste",
+        street: "Rua Teste",
+        number: "123",
+        owner: { connect: { id: session.data?.user.id } },
+        occupation: "Médico",
+        maritalStatus: "Solteiro",
+        bloodType: "A+",
+        genderIdentity: "Masculino",
+        vaccination: "Não",
+        healthInsurance: "Não",
+      },
+    });
+
+    await authClient.organization.inviteMember({
+      email,
+      role: "patient",
+      organizationId: activeOrganization?.id,
+    });
+  }
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between py-4">
@@ -198,6 +234,8 @@ export function ClientsList() {
             <Link href="/patients/new">Novo paciente</Link>
           </Button>
 
+          <Button onClick={addMockPatient}>Add mock paciente</Button>
+
           <Dialog>
             <DialogContent className="max-w-3xl">
               <DialogHeader>
@@ -206,7 +244,10 @@ export function ClientsList() {
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="paciente">Nome do Paciente</Label>
-                  <Input id="paciente" placeholder="Digite o nome do paciente" />
+                  <Input
+                    id="paciente"
+                    placeholder="Digite o nome do paciente"
+                  />
                 </div>
                 <Tabs defaultValue="subjetivo" className="w-full">
                   <TabsList className="grid w-full grid-cols-4">
@@ -294,63 +335,63 @@ export function ClientsList() {
         {patients && (
           <Table>
             <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {cell.column.id === "email" ? (
-                        <Link
-                          href={`/patients/${row.original.id}`}
-                          className="hover:underline text-primary"
-                        >
-                          {flexRender(
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {cell.column.id === "email" ? (
+                          <Link
+                            href={`/patients/${row.original.id}`}
+                            className="text-primary hover:underline"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </Link>
+                        ) : (
+                          flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),
-                          )}
-                        </Link>
-                      ) : (
-                        flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )
-                      )}
-                    </TableCell>
-                  ))}
+                          )
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+              )}
+            </TableBody>
           </Table>
         )}
       </div>

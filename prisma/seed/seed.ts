@@ -1,64 +1,70 @@
 import { PrismaClient } from "@prisma/client";
 import { auth } from "~/server/auth";
+import { faker } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("Seeding database...");
 
-  await prisma.organization.deleteMany();
-  await prisma.account.deleteMany();
-  await prisma.user.deleteMany();
-
-  const [superAdminUser, adminUser, memberUser, ownerUser, patientUser] = await Promise.all([
-    auth.api.signUpEmail({
-      body: {
-        email: "superadmin@test.com",
-        password: "12345678",
-        name: "super-admin-user",
-      },
-    }),
-    auth.api.signUpEmail({
-      body: {
-        email: "admin@test.com",
-        password: "12345678",
-        name: "admin-user",
-      },
-    }),
-    auth.api.signUpEmail({
-      body: {
-        email: "member@test.com",
-        password: "12345678",
-        name: "member-user",
-      },
-    }),
-    auth.api.signUpEmail({
-      body: {
-        email: "owner@test.com",
-        password: "12345678",
-        name: "owner-user",
-      },
-    }),
-    auth.api.signUpEmail({
-      body: {
-        email: "patient@test.com",
-        password: "12345678",
-        name: "patient-user",
-      },
-    }),
+  await Promise.all([
+    prisma.organization.deleteMany(),
+    prisma.account.deleteMany(),
+    prisma.user.deleteMany(),
+    prisma.session.deleteMany(),
+    prisma.verification.deleteMany(),
+    prisma.invitation.deleteMany(),
   ]);
-  
+
+  const [superAdminUser, adminUser, memberUser, ownerUser, patientUser] =
+    await Promise.all([
+      auth.api.signUpEmail({
+        body: {
+          email: "superadmin@test.com",
+          password: "12345678",
+          name: "super-admin-user",
+        },
+      }),
+      auth.api.signUpEmail({
+        body: {
+          email: "admin@test.com",
+          password: "12345678",
+          name: "admin-user",
+        },
+      }),
+      auth.api.signUpEmail({
+        body: {
+          email: "member@test.com",
+          password: "12345678",
+          name: "member-user",
+        },
+      }),
+      auth.api.signUpEmail({
+        body: {
+          email: "owner@test.com",
+          password: "12345678",
+          name: "owner-user",
+        },
+      }),
+      auth.api.signUpEmail({
+        body: {
+          email: "patient@test.com",
+          password: "12345678",
+          name: "patient-user",
+        },
+      }),
+    ]);
 
   const [organization1, organization2] =
     await prisma.organization.createManyAndReturn({
       data: [
         {
-          name: "Test Organization",
-          slug: "test-organization",
+          name: "Clínica 1",
+          slug: "clinica-1",
         },
         {
-          name: "Test Organization 2",
-          slug: "test-organization-2",
+          name: "Clínica 2",
+          slug: "clinica-2",
         },
       ],
     });
@@ -141,6 +147,34 @@ async function main() {
       },
     }),
   ]);
+
+  const mockPatients = Array.from({ length: 100 }, () => ({
+    name: faker.person.fullName(),
+    email: faker.internet.email(),
+    cpf: faker.string.numeric(11),
+    phone: faker.phone.number(),
+    gender: faker.person.gender(),
+    nationality: faker.location.country(),
+    ethnicity: faker.person.zodiacSign(),
+    state: faker.location.state(),
+    city: faker.location.city(),
+    zipCode: faker.location.zipCode(),
+    neighborhood: faker.location.streetAddress(),
+    street: faker.location.streetAddress(),
+    number: faker.location.buildingNumber(),
+    ownerId: ownerUser.user.id as string,
+    organizationId: organization1?.id as string,
+    occupation: faker.person.jobTitle(),
+    maritalStatus: faker.color.human(),
+    bloodType: faker.word.verb(),
+    genderIdentity: faker.person.sex(),
+    vaccination: faker.word.verb(),
+    healthInsurance: faker.word.verb(),
+  }));
+
+  await prisma.patient.createMany({
+    data: mockPatients,
+  });
 }
 
 main()

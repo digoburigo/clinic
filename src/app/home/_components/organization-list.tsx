@@ -39,7 +39,7 @@ export function OrganizationList({ organizations }: { organizations: Organizatio
               <P className="text-muted-foreground">Possíveis causas</P>
               <UL>
                 <LI>
-                  Verifique se você está autenticado com a conta correta.
+                  Verifique se você está autenticado na conta com o email correto.
                 </LI>
                 <LI>
                   Verifique o email vinculado a essa conta se contém convites

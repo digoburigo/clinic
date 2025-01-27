@@ -17,6 +17,7 @@ import {
 import OrganizationInvitationEmail from "../email/templates/OrganizationInvitationEmail";
 import EmailVerificationEmail from "../email/templates/EmailVerificationEmail";
 import ResetPasswordEmail from "../email/templates/ResetPasswordEmail";
+import PatientRegistrationEmail from "../email/templates/PatientRegistrationEmail";
 
 export const auth = betterAuth({
   database: prismaAdapter(db, {
@@ -114,23 +115,35 @@ export const auth = betterAuth({
             },
           });
 
-          const inviteLink =
-            process.env.NODE_ENV === "development"
-              ? `http://localhost:3000/accept-invitation/${data.id}?has=${Boolean(user) ? "true" : "false"}`
-              : `${
-                  process.env.BETTER_AUTH_URL || "https://demo.better-auth.com"
-                }/accept-invitation/${data.id}?has=${Boolean(user) ? "true" : "false"}`;
+          const isDev = process.env.NODE_ENV === "development";
+          const domain = isDev ? "http://localhost:3000" : "https://clinic.com";
+          const inviteLinkUrl = new URL(domain);
+
+          const isPatient = data.role === "patient";
+          const pathname = isPatient ? "/patient-registration" : "/accept-invitation";
+          inviteLinkUrl.pathname = `${pathname}/${data.id}`;
+          
+          const hasUser = Boolean(user);
+          inviteLinkUrl.searchParams.set("has", hasUser ? "true" : "false");
+
+          const emailTemplate = isPatient
+            ? PatientRegistrationEmail
+            : OrganizationInvitationEmail;
+          
+          const subject = isPatient
+            ? "Você foi cadastrado como paciente"
+            : "Você foi convidado para entrar em uma organização";
 
           await sendEmail({
-            emailTemplate: OrganizationInvitationEmail({
+            emailTemplate: emailTemplate({
               email: data.email,
               invitedByUsername: data.inviter.user.name,
               invitedByEmail: data.inviter.user.email,
               teamName: data.organization.name,
-              inviteLink,
+              inviteLink: inviteLinkUrl.toString(),
             }),
             to: data.email,
-            subject: "Você foi convidado para entrar em uma organização",
+            subject,
           });
         } catch (error) {
           console.error(error);

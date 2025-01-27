@@ -8,15 +8,57 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { PatientAreaNav } from "~/app/patient-area/_components/patient-area-nav";
 import { UserMenu } from "~/components/user/user-menu";
+import { PatientAreaNav } from "./_components/patient-area-nav";
+import { useSession } from "~/server/auth";
+import { redirect } from "next/navigation";
+import { api } from "~/trpc/server";
 
 export const metadata: Metadata = {
   title: "Área do paciente",
   description: "Verifique seus dados, agendamentos e muito mais.",
 };
 
-export default function Page() {
+export default async function Page() {
+  const authSession = await useSession();
+
+  if (!authSession?.session) {
+    return redirect("/patient-login");
+  }
+
+  const member = await api.member.findFirst({
+    where: {
+      organizationId: authSession.session.activeOrganizationId as string,
+      userId: authSession.user.id,
+    },
+  });
+
+  if (member?.role !== "patient") {
+    return redirect("/");
+  }
+
+  const user = await api.user.findFirst({
+    where: {
+      id: authSession.user.id,
+    },
+  });
+
+  const patient = await api.patient.findFirst({
+    where: {
+      email: user?.email,
+      organizationId: authSession.session.activeOrganizationId as string,
+    },
+  });
+
+  if (!patient?.userId) {
+  console.log(`patient:`, patient)
+
+    await api._patient.relateToUser({
+      userId: authSession.user.id,
+      organizationId: authSession.session.activeOrganizationId as string,
+    });
+  }
+
   return (
     <div className="mx-auto max-w-screen-2xl">
       <div className="border-b">
