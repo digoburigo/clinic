@@ -1,4 +1,5 @@
 "use client";
+"use no memo";
 
 import * as React from "react";
 import {
@@ -108,14 +109,20 @@ export const columns: ColumnDef<Appointment>[] = [
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
       return (
-        <div className={`capitalize ${
-          status === "scheduled" ? "text-blue-600" :
-          status === "completed" ? "text-green-600" :
-          "text-red-600"
-        }`}>
-          {status === "scheduled" ? "Agendada" :
-           status === "completed" ? "Realizada" :
-           "Cancelada"}
+        <div
+          className={`capitalize ${
+            status === "scheduled"
+              ? "text-blue-600"
+              : status === "completed"
+                ? "text-green-600"
+                : "text-red-600"
+          }`}
+        >
+          {status === "scheduled"
+            ? "Agendada"
+            : status === "completed"
+              ? "Realizada"
+              : "Cancelada"}
         </div>
       );
     },
@@ -159,8 +166,11 @@ export const columns: ColumnDef<Appointment>[] = [
 
 export function AppointmentsList({ patientId }: { patientId: string }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [data, setData] = React.useState<Appointment[]>(sampleData);
 
   const table = useReactTable({
@@ -185,14 +195,19 @@ export function AppointmentsList({ patientId }: { patientId: string }) {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filtrar por paciente..."
-          value={(table.getColumn("patientName")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("patientName")?.setFilterValue(event.target.value)
+          value={
+            (table.getColumn("patientName")?.getFilterValue() as string) ?? ""
           }
+          onChange={(event) => {
+            console.log(event.target.value);
+            table.getColumn("patientName")?.setFilterValue(event.target.value);
+          }}
           className="max-w-sm"
         />
         <Button variant="outline" className="ml-4">
-          <Link href={`/patients/${patientId}/appointments/new`}>Nova Consulta</Link>
+          <Link href={`/patients/${patientId}/appointments/new`}>
+            Nova Consulta
+          </Link>
         </Button>
       </div>
       <div className="rounded-md border">
@@ -260,4 +275,4 @@ export function AppointmentsList({ patientId }: { patientId: string }) {
       </div>
     </div>
   );
-} 
+}

@@ -37,6 +37,8 @@ export default function MembersList({ organizationId }: { organizationId: string
     },
   );
 
+  const { data: invitations } = api.invitation.findMany.useQuery();
+
   if (isPending) return <div>Loading...</div>;
 
   if (!members) return <div>Nenhum membro encontrado</div>;

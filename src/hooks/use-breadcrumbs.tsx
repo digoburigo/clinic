@@ -28,7 +28,9 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
     { title: "Consultas", link: "/appointments" },
     { title: "Adicionar Consulta", link: "/appointments/new" },
   ],
-  // Add more custom mappings as needed
+  "/admin": [
+    { title: "Administração", link: "/admin" },
+  ],
 };
 
 export function useBreadcrumbs() {

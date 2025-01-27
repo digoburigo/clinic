@@ -4,9 +4,7 @@ import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -29,18 +27,14 @@ import { authClient } from "~/lib/auth-client";
 import { Button } from "~/components/ui/button";
 import { useRouter } from "next/navigation";
 
-export function NavUser({
-  user,
-}: {
-  user: { name: string; email: string; avatar: string };
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
   const { data: session } = authClient.useSession();
 
-  const onSignOut = () => {
-    authClient.signOut({
+  async function onSignOut() {
+   await authClient.signOut({
       fetchOptions: {
         onSuccess: async () => {
           router.push("/login"); // redirect to login page

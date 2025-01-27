@@ -18,7 +18,7 @@ import { InvitationError } from "./invitation-error";
 import { P, H2 } from "~/components/ui/typography";
 import { toast } from "sonner";
 
-export function Invitation(props: { invitationId: string }) {
+export function Invitation(props: { invitationId: string; hasUser: boolean }) {
   const router = useRouter();
 
   if (!props.invitationId) {
@@ -31,18 +31,20 @@ export function Invitation(props: { invitationId: string }) {
   >("pending");
 
   async function handleAccept() {
-    await authClient.organization
-      .acceptInvitation({
-        invitationId: props.invitationId,
-      })
-      .then((res) => {
-        if (res.error) {
-          setError(res.error.message || "Um erro ocorreu");
-        } else {
-          setInvitationStatus("accepted");
-          router.push(`/`);
-        }
-      });
+    const res = await authClient.organization.acceptInvitation({
+      invitationId: props.invitationId,
+    });
+
+    if (res.error) {
+      setError(res.error.message || "Um erro ocorreu");
+      return;
+    }
+
+    setInvitationStatus("accepted");
+    await authClient.organization.setActive({
+      organizationId: invitation?.organizationId,
+    });
+    router.push(`/`);
   }
 
   async function handleReject() {
@@ -156,7 +158,7 @@ export function Invitation(props: { invitationId: string }) {
           )}
         </Card>
       ) : error ? (
-        <InvitationError />
+        <InvitationError hasUser={props.hasUser} />
       ) : (
         <InvitationSkeleton />
       )}

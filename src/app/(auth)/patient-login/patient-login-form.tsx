@@ -1,75 +1,59 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
+import { Button } from "~/components/ui/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-} from "../../../components/ui/card";
+} from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Button } from "~/components/ui/button";
-import { authClient } from "~/lib/auth-client";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { InputPassword } from "~/components/ui/input-password";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { authClient } from "~/lib/auth-client";
+
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
 import { LoaderCircle } from "lucide-react";
-import Link from "next/link";
+import { Small } from "~/components/ui/typography";
 
-const REGISTER_ERROR_MESSAGE = {
-  EMAIL_ALREADY_IN_USE: "Algum erro aconteceu. Tente novamente mais tarde.",
-  INVALID_EMAIL: "O email é inválido",
-  PASSWORD_TOO_SHORT: "A senha deve ter pelo menos 8 caracteres",
-};
+const LoginFormSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
 
-const RegisterFormSchema = z
-  .object({
-    email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string(),
-    name: z.string().min(3),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "As senhas não coincidem",
-    path: ["confirmPassword"],
-  });
-
-export function RegisterForm() {
+export function PatientLoginForm() {
   const router = useRouter();
-
-  const form = useForm<z.infer<typeof RegisterFormSchema>>({
-    resolver: zodResolver(RegisterFormSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      name: "",
-    },
-  });
 
   const [isLoading, setIsLoading] = useState(false);
 
-  async function onSubmit(formData: z.infer<typeof RegisterFormSchema>) {
-    const { data, error } = await authClient.signUp.email(
+  const form = useForm<z.infer<typeof LoginFormSchema>>({
+    resolver: zodResolver(LoginFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  async function onSubmit(formValues: z.infer<typeof LoginFormSchema>) {
+    const { data, error } = await authClient.signIn.email(
       {
-        email: formData.email as string,
-        password: formData.password,
-        name: formData.name,
+        email: formValues.email,
+        password: formValues.password,
       },
       {
         onRequest: (ctx) => {
@@ -77,20 +61,16 @@ export function RegisterForm() {
         },
         onSuccess: (ctx) => {
           setIsLoading(false);
-          toast.success("Conta criada com sucesso!");
-          router.push("/login");
+          router.push("/");
         },
         onError: (ctx) => {
           setIsLoading(false);
-          toast.error(
-            REGISTER_ERROR_MESSAGE[
-              ctx.error.code as keyof typeof REGISTER_ERROR_MESSAGE
-            ],
+          if (ctx.error.status === 403) {
+            toast.error("Sua conta não está verificada. Verifique seu email.");
+            return;
+          }
 
-            {
-              position: "top-center",
-            },
-          );
+          toast.error("Não foi possível entrar em sua conta. Tente novamente.");
         },
       },
     );
@@ -121,9 +101,9 @@ export function RegisterForm() {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Cadastro</CardTitle>
+          <CardTitle className="text-xl">Bem-vindo</CardTitle>
           <CardDescription>
-            Cadastre-se para gerenciar suas consultas e pacientes
+            Acesse a área do paciente para gerenciar suas consultas.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -136,6 +116,7 @@ export function RegisterForm() {
                     className="w-full"
                     onClick={onSignInWithGoogle}
                     disabled={isLoading}
+                    type="button"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                       <path
@@ -143,7 +124,7 @@ export function RegisterForm() {
                         fill="currentColor"
                       />
                     </svg>
-                    Cadastre-se com Google
+                    Entrar com Google
                   </Button>
                 </div>
 
@@ -155,26 +136,12 @@ export function RegisterForm() {
 
                 <FormField
                   control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel htmlFor="email">Email</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} id="email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -186,26 +153,24 @@ export function RegisterForm() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Senha</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel htmlFor="password">Senha</FormLabel>
+                        <Button
+                          variant="link"
+                          type="button"
+                          size="sm"
+                          aria-disabled={isLoading}
+                          onClick={() => {
+                            router.push(
+                              `/forgot-password${form.getValues().email ? `?email=${form.getValues().email}` : ""}`,
+                            );
+                          }}
+                        >
+                          Esqueceu sua senha?
+                        </Button>
+                      </div>
                       <FormControl>
-                        <InputPassword {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        A senha deve ter pelo menos 8 caracteres
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirmar senha</FormLabel>
-                      <FormControl>
-                        <InputPassword {...field} />
+                        <InputPassword {...field} id="password" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -225,17 +190,12 @@ export function RegisterForm() {
                       aria-hidden="true"
                     />
                   ) : null}
-                  Criar conta
+                  Entrar
                 </Button>
                 <div className="text-center text-sm">
-                  Já tem uma conta?{" "}
-                  <Link
-                    href="/login"
-                    className="underline"
-                    aria-disabled={isLoading}
-                  >
-                    Entrar
-                  </Link>
+                  <Small className="text-muted-foreground">
+                    Não tem acesso? Entre em contato com seu médico.
+                  </Small>
                 </div>
               </div>
             </form>

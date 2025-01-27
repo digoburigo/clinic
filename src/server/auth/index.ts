@@ -1,12 +1,19 @@
-import "server-only";
+// import "server-only";
 
-import { betterAuth, } from "better-auth";
+import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db } from "~/server/db";
-import { nextCookies } from 'better-auth/next-js';
+import { nextCookies } from "better-auth/next-js";
 import { headers } from "next/headers";
 import { admin, organization } from "better-auth/plugins";
 import { sendEmail } from "../email";
+import {
+  ac,
+  customOwnerAc,
+  customAdminAc,
+  cutomMemberAc,
+  patientAc,
+} from "./permissions";
 import OrganizationInvitationEmail from "../email/templates/OrganizationInvitationEmail";
 import EmailVerificationEmail from "../email/templates/EmailVerificationEmail";
 import ResetPasswordEmail from "../email/templates/ResetPasswordEmail";
@@ -22,41 +29,6 @@ export const auth = betterAuth({
     },
   },
   databaseHooks: {
-    // user: {
-    //   create: {
-    //     after: async (user) => {
-    //       const [orgs, invitations] = await Promise.all([
-    //         db.organization.findMany({
-    //           where: {
-    //             members: {
-    //               some: {
-    //                 userId: user.id,
-    //               },
-    //             },
-    //           },
-    //         }),
-    //         db.invitation.findMany({
-    //           where: { user: { id: user.id } },
-    //         }),
-    //       ]);
-
-    //       if (orgs.length === 0 && invitations.length === 0) {
-    //         // create a default organization
-    //         await db.organization.create({
-    //           data: {
-    //             name: `Time de ${user.name}`,
-    //             members: {
-    //               create: {
-    //                 user: { connect: { id: user.id } },
-    //                 role: "owner",
-    //               },
-    //             },
-    //           },
-    //         });
-    //       }
-    //     },
-    //   },
-    // },
     session: {
       create: {
         before: async (session) => {
@@ -69,7 +41,6 @@ export const auth = betterAuth({
               },
             },
           });
-
 
           const activeOrganizationId = orgs.length > 0 ? orgs.at(0)?.id : null;
 
@@ -84,7 +55,7 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    autoSignInAfterVerification: true,
+    autoSignInAfterVerification: false,
     async sendVerificationEmail({ user, url }) {
       console.log("Sending verification email to", user.email);
 
@@ -103,12 +74,11 @@ export const auth = betterAuth({
       });
       console.log(res, user.email);
     },
-    sendOnSignUp: true,
   },
   emailAndPassword: {
     enabled: true,
-    autoSignIn: true,
-    requireEmailVerification: true,
+    autoSignIn: false,
+    requireEmailVerification: process.env.SEED === "true" ? false : true,
     async sendResetPassword({ user, url }) {
       await sendEmail({
         emailTemplate: ResetPasswordEmail({
@@ -127,28 +97,44 @@ export const auth = betterAuth({
   },
   plugins: [
     organization({
-      allowUserToCreateOrganization: true,
-      organizationLimit: 20,
+      ac: ac,
+      roles: {
+        owner: customOwnerAc,
+        admin: customAdminAc,
+        member: cutomMemberAc,
+        patient: patientAc,
+      },
+      organizationLimit: 2,
       membershipLimit: 200,
       async sendInvitationEmail(data) {
-        const inviteLink =
-          process.env.NODE_ENV === "development"
-            ? `http://localhost:3000/accept-invitation/${data.id}`
-            : `${
-                process.env.BETTER_AUTH_URL || "https://demo.better-auth.com"
-              }/accept-invitation/${data.id}`;
+        try {
+          const user = await db.user.findFirst({
+            where: {
+              email: data.email,
+            },
+          });
 
-        await sendEmail({
-          emailTemplate: OrganizationInvitationEmail({
-            email: data.email,
-            invitedByUsername: data.inviter.user.name,
-            invitedByEmail: data.inviter.user.email,
-            teamName: data.organization.name,
-            inviteLink,
-          }),
-          to: data.email,
-          subject: "Você foi convidado para entrar em uma organização",
-        });
+          const inviteLink =
+            process.env.NODE_ENV === "development"
+              ? `http://localhost:3000/accept-invitation/${data.id}?has=${Boolean(user) ? "true" : "false"}`
+              : `${
+                  process.env.BETTER_AUTH_URL || "https://demo.better-auth.com"
+                }/accept-invitation/${data.id}?has=${Boolean(user) ? "true" : "false"}`;
+
+          await sendEmail({
+            emailTemplate: OrganizationInvitationEmail({
+              email: data.email,
+              invitedByUsername: data.inviter.user.name,
+              invitedByEmail: data.inviter.user.email,
+              teamName: data.organization.name,
+              inviteLink,
+            }),
+            to: data.email,
+            subject: "Você foi convidado para entrar em uma organização",
+          });
+        } catch (error) {
+          console.error(error);
+        }
       },
     }),
     admin(),

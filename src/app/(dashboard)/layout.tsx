@@ -16,25 +16,44 @@ import {
   SidebarTrigger,
 } from "~/components/ui/sidebar";
 import { useSession } from "~/server/auth";
+import { api } from "~/trpc/server";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await useSession();
+  const authSession = await useSession();
 
-  if (!session?.user) {
+  if (!authSession?.user) {
     return redirect("/login");
   }
 
-  if (!session?.user?.emailVerified) {
+  if (!authSession?.user?.emailVerified) {
     return redirect("/verify-email");
+  }
+
+  if (authSession?.user?.role === "admin") {
+    return redirect("/admin");
+  }
+
+  const member = await api.member.findFirst({
+    where: {
+      userId: authSession.user.id,
+    },
+  });
+
+  if (member?.role === "patient") {
+    return redirect("/patient-area");
+  }
+
+  if (!authSession?.session.activeOrganizationId) {
+    return redirect("/home");
   }
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar memberRole={member?.role} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">

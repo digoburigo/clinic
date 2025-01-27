@@ -83,8 +83,6 @@ model User {
   invitations   Invitation[]
   posts         Post[]
 
-  createdFromInvitation     Boolean?
-
   role       String?
   banned     Boolean?
   banReason  String?
@@ -205,6 +203,9 @@ model Invitation {
   user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
 
   @@map("invitation")
+
+  // allow read access to invitations that belong to the user's active organization and the user is the inviter
+  @@allow('read', auth().userId == inviterId && auth().organizationId == organizationId)
 }
 
 model Appointment {

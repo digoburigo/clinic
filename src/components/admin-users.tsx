@@ -47,17 +47,10 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import { authClient } from '~/lib/auth-client';
 
-type User = {
-    id: string;
-    email: string;
-    name: string;
-    role: 'admin' | 'user';
-};
-
-export  function MembersList() {
+export function AdminUsers() {
     const queryClient = useQueryClient();
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -104,14 +97,14 @@ export  function MembersList() {
                 name: newUser.name,
                 role: newUser.role,
             });
-            toast.success('User created successfully');
+            toast.success('Usuário criado com sucesso');
             setNewUser({ email: '', password: '', name: '', role: 'user' });
             setIsDialogOpen(false);
             queryClient.invalidateQueries({
                 queryKey: ['users'],
             });
         } catch (error: any) {
-            toast.error(error.message || 'Failed to create user');
+            toast.error(error.message || 'Falha ao criar usuário');
         } finally {
             setIsLoading(undefined);
         }
@@ -121,12 +114,12 @@ export  function MembersList() {
         setIsLoading(`delete-${id}`);
         try {
             await authClient.admin.removeUser({ userId: id });
-            toast.success('User deleted successfully');
+            toast.success('Usuário deletado com sucesso');
             queryClient.invalidateQueries({
                 queryKey: ['users'],
             });
         } catch (error: any) {
-            toast.error(error.message || 'Failed to delete user');
+            toast.error(error.message || 'Falha ao deletar usuário');
         } finally {
             setIsLoading(undefined);
         }
@@ -136,9 +129,9 @@ export  function MembersList() {
         setIsLoading(`revoke-${id}`);
         try {
             await authClient.admin.revokeUserSessions({ userId: id });
-            toast.success('Sessions revoked for user');
+            toast.success('Sessões revogadas para o usuário');
         } catch (error: any) {
-            toast.error(error.message || 'Failed to revoke sessions');
+            toast.error(error.message || 'Falha ao revogar sessões');
         } finally {
             setIsLoading(undefined);
         }
@@ -148,10 +141,10 @@ export  function MembersList() {
         setIsLoading(`impersonate-${id}`);
         try {
             await authClient.admin.impersonateUser({ userId: id });
-            toast.success('Impersonated user');
-            router.push('/dashboard');
+            toast.success('Usuário imitato com sucesso');
+            router.push('/');
         } catch (error: any) {
-            toast.error(error.message || 'Failed to impersonate user');
+            toast.error(error.message || 'Falha ao imitar usuário');
         } finally {
             setIsLoading(undefined);
         }
@@ -162,7 +155,7 @@ export  function MembersList() {
         setIsLoading(`ban-${banForm.userId}`);
         try {
             if (!banForm.expirationDate) {
-                throw new Error('Expiration date is required');
+                throw new Error('Data de expiração é obrigatória');
             }
             await authClient.admin.banUser({
                 userId: banForm.userId,
@@ -170,13 +163,13 @@ export  function MembersList() {
                 banExpiresIn:
                     banForm.expirationDate.getTime() - new Date().getTime(),
             });
-            toast.success('User banned successfully');
+            toast.success('Usuário banido com sucesso');
             setIsBanDialogOpen(false);
             queryClient.invalidateQueries({
                 queryKey: ['users'],
             });
         } catch (error: any) {
-            toast.error(error.message || 'Failed to ban user');
+            toast.error(error.message || 'Falha ao banir usuário');
         } finally {
             setIsLoading(undefined);
         }
@@ -184,19 +177,18 @@ export  function MembersList() {
 
     return (
         <div className="container mx-auto p-4 space-y-8">
-            <Toaster richColors />
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="text-2xl">Admin Dashboard</CardTitle>
+                    <CardTitle className="text-2xl">Usuários</CardTitle>
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
                             <Button>
-                                <Plus className="mr-2 h-4 w-4" /> Create User
+                                Criar Usuário
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Create New User</DialogTitle>
+                                <DialogTitle>Criar Novo Usuário</DialogTitle>
                             </DialogHeader>
                             <form
                                 onSubmit={handleCreateUser}
@@ -218,7 +210,7 @@ export  function MembersList() {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">Senha</Label>
                                     <Input
                                         id="password"
                                         type="password"
@@ -233,7 +225,7 @@ export  function MembersList() {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor="name">Nome</Label>
                                     <Input
                                         id="name"
                                         value={newUser.name}
@@ -247,7 +239,7 @@ export  function MembersList() {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="role">Role</Label>
+                                    <Label htmlFor="role">Função</Label>
                                     <Select
                                         value={newUser.role}
                                         onValueChange={(
@@ -260,14 +252,14 @@ export  function MembersList() {
                                         }
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select role" />
+                                            <SelectValue placeholder="Selecione a função" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="admin">
-                                                Admin
+                                                Administrador
                                             </SelectItem>
                                             <SelectItem value="user">
-                                                User
+                                                Usuário
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -280,10 +272,10 @@ export  function MembersList() {
                                     {isLoading === 'create' ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Creating...
+                                            Criando...
                                         </>
                                     ) : (
-                                        'Create User'
+                                        'Criar Usuário'
                                     )}
                                 </Button>
                             </form>
@@ -295,14 +287,14 @@ export  function MembersList() {
                     >
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Ban User</DialogTitle>
+                                <DialogTitle>Banir Usuário</DialogTitle>
                             </DialogHeader>
                             <form
                                 onSubmit={handleBanUser}
                                 className="space-y-4"
                             >
                                 <div>
-                                    <Label htmlFor="reason">Reason</Label>
+                                    <Label htmlFor="reason">Motivo</Label>
                                     <Input
                                         id="reason"
                                         value={banForm.reason}
@@ -317,7 +309,7 @@ export  function MembersList() {
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="expirationDate">
-                                        Expiration Date
+                                        Data de Expiração
                                     </Label>
                                     <Popover>
                                         <PopoverTrigger asChild>
@@ -337,7 +329,7 @@ export  function MembersList() {
                                                         'PPP'
                                                     )
                                                 ) : (
-                                                    <span>Pick a date</span>
+                                                    <span>Selecione uma data</span>
                                                 )}
                                             </Button>
                                         </PopoverTrigger>
@@ -368,10 +360,10 @@ export  function MembersList() {
                                     {isLoading === `ban-${banForm.userId}` ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Banning...
+                                            Banindo...
                                         </>
                                     ) : (
-                                        'Ban User'
+                                        'Banir Usuário'
                                     )}
                                 </Button>
                             </form>
@@ -388,10 +380,10 @@ export  function MembersList() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Email</TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Role</TableHead>
-                                    <TableHead>Banned</TableHead>
-                                    <TableHead>Actions</TableHead>
+                                    <TableHead>Nome</TableHead>
+                                    <TableHead>Função</TableHead>
+                                    <TableHead>Banido</TableHead>
+                                    <TableHead>Ações</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

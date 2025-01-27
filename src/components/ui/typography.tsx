@@ -19,7 +19,7 @@ const H2 = forwardRef<HTMLHeadingElement, ComponentPropsWithoutRef<"h2">>(
     <h2
       ref={ref}
       className={cn(
-        "mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0",
+        "mt-10 scroll-m-20 text-3xl font-semibold tracking-tight transition-colors first:mt-0",
         className,
       )}
       {...props}

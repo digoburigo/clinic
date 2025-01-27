@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { ChevronsUpDown, Plus } from "lucide-react";
 
 import {
@@ -22,13 +21,18 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { authClient } from "~/lib/auth-client";
 import { Organization } from "@prisma/client";
 import { api } from "~/trpc/react";
+import { useState } from "react";
 
 export function OrganizationSwitcher({
   organizations,
 }: {
   organizations: Organization[];
 }) {
+  console.log(`organizations:`, organizations);
   const { isMobile } = useSidebar();
+
+  const [isOpen, setIsOpen] = useState(false);
+
   const { data: activeOrganization, isPending } =
     authClient.useActiveOrganization();
   const utils = api.useUtils();
@@ -46,11 +50,12 @@ export function OrganizationSwitcher({
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="disabled:opacity-100 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              disabled={organizations.length <= 1}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <Plus className="size-4" />
@@ -64,7 +69,9 @@ export function OrganizationSwitcher({
                   )}
                 </span>
               </div>
-              <ChevronsUpDown className="ml-auto" />
+              {organizations.length > 1 && (
+                <ChevronsUpDown className="ml-auto" />
+              )}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent

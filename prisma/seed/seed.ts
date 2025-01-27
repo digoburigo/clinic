@@ -9,102 +9,138 @@ async function main() {
   await prisma.organization.deleteMany();
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
-  await prisma.post.deleteMany();
 
-  const adminUser = await auth.api.signUpEmail({
-    body: {
-      email: "admin@test.com",
-      password: "12345678",
-      name: "admin-user",
-    },
-  }); 
-
-  const memberUser = await auth.api.signUpEmail({
-    body: {
-      email: "member@test.com",
-      password: "12345678",
-      name: "member-user",
-    },
-  });
-
-  const ownerUser = await auth.api.signUpEmail({
-    body: {
-      email: "owner@test.com",
-      password: "12345678",
-      name: "owner-user",
-    },
-  });
-
-
-  const organization1 = await prisma.organization.create({
-    data: {
-      name: "Test Organization",
-      slug: "test-organization",
-    },
-  });
-
-  const organization2 = await prisma.organization.create({
-    data: {
-      name: "Test Organization 2",
-      slug: "test-organization-2",
-    },
-  });
-
-  await prisma.member.create({
-    data: {
-      organizationId: organization1?.id,
-      userId: ownerUser.id,
-      role: "owner",
-    },
-  });
-
-  await prisma.member.create({
-    data: {
-      organizationId: organization1?.id,
-      userId: memberUser.id,
-      role: "member",
-    },
-  });
-
-  await prisma.member.create({
-    data: {
-      organizationId: organization1?.id,
-      userId: adminUser.id,
-      role: "admin",
-    },
-  });
-
-  await prisma.member.create({
-    data: {
-      organizationId: organization2?.id,
-      userId: ownerUser.id,
-      role: "owner",
-    },
-  });
-
-  if (organization1) {
-     await prisma.post.create({
-      data: {
-        title: "Test Post 1",
-        slug: "test-post-1",
-        description: "This is a test post",
-        organizationId: organization1.id,
-        ownerId: ownerUser.id,
+  const [superAdminUser, adminUser, memberUser, ownerUser, patientUser] = await Promise.all([
+    auth.api.signUpEmail({
+      body: {
+        email: "superadmin@test.com",
+        password: "12345678",
+        name: "super-admin-user",
       },
-    });
-  }
-
-  if (organization2) {
-    await prisma.post.create({
-      data: {
-        title: "Test Post 2",
-        slug: "test-post-2",
-        description: "This is a test post",
-        organizationId: organization2.id,
-        ownerId: ownerUser.id,
+    }),
+    auth.api.signUpEmail({
+      body: {
+        email: "admin@test.com",
+        password: "12345678",
+        name: "admin-user",
       },
+    }),
+    auth.api.signUpEmail({
+      body: {
+        email: "member@test.com",
+        password: "12345678",
+        name: "member-user",
+      },
+    }),
+    auth.api.signUpEmail({
+      body: {
+        email: "owner@test.com",
+        password: "12345678",
+        name: "owner-user",
+      },
+    }),
+    auth.api.signUpEmail({
+      body: {
+        email: "patient@test.com",
+        password: "12345678",
+        name: "patient-user",
+      },
+    }),
+  ]);
+  
+
+  const [organization1, organization2] =
+    await prisma.organization.createManyAndReturn({
+      data: [
+        {
+          name: "Test Organization",
+          slug: "test-organization",
+        },
+        {
+          name: "Test Organization 2",
+          slug: "test-organization-2",
+        },
+      ],
     });
-  }
+
+  await Promise.all([
+    prisma.user.update({
+      where: {
+        id: superAdminUser.user.id,
+      },
+      data: {
+        role: "admin",
+        emailVerified: true,
+      },
+    }),
+    prisma.user.update({
+      where: {
+        id: adminUser.user.id,
+      },
+      data: {
+        emailVerified: true,
+      },
+    }),
+    prisma.user.update({
+      where: {
+        id: ownerUser.user.id,
+      },
+      data: {
+        emailVerified: true,
+      },
+    }),
+    prisma.user.update({
+      where: {
+        id: patientUser.user.id,
+      },
+      data: {
+        emailVerified: true,
+      },
+    }),
+    prisma.user.update({
+      where: {
+        id: memberUser.user.id,
+      },
+      data: {
+        emailVerified: true,
+      },
+    }),
+    prisma.member.create({
+      data: {
+        organizationId: organization1?.id as string,
+        userId: ownerUser.user.id as string,
+        role: "owner",
+      },
+    }),
+    prisma.member.create({
+      data: {
+        organizationId: organization2?.id as string,
+        userId: ownerUser.user.id as string,
+        role: "owner",
+      },
+    }),
+    prisma.member.create({
+      data: {
+        organizationId: organization1?.id as string,
+        userId: memberUser.user.id as string,
+        role: "member",
+      },
+    }),
+    prisma.member.create({
+      data: {
+        organizationId: organization1?.id as string,
+        userId: adminUser.user.id as string,
+        role: "admin",
+      },
+    }),
+    prisma.member.create({
+      data: {
+        organizationId: organization1?.id as string,
+        userId: patientUser.user.id as string,
+        role: "patient",
+      },
+    }),
+  ]);
 }
 
 main()
