@@ -188,6 +188,7 @@ model Patient {
   comorbidities     String?
   surgeries         String?
   healthInsurance   String
+  password          String?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt()
   ownerId           String

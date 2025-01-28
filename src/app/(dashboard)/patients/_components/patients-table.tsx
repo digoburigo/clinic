@@ -22,6 +22,9 @@ import {
 import * as React from "react";
 import { DataTable } from "~/components/ui/data-table";
 import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
+import { PlusIcon } from "lucide-react";
+import Link from "next/link";
 
 export function PatientsTable() {
   const [rowAction, setRowAction] =
@@ -41,7 +44,7 @@ export function PatientsTable() {
     // skip: pagination.pageIndex * pagination.pageSize,
     orderBy: [
       {
-        createdAt: "desc",
+        createdAt: "desc",  
       },
     ],
   });
@@ -82,14 +85,24 @@ export function PatientsTable() {
 
   return (
     <>
-      <Input
-        placeholder="Procurar por nome"
-        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-        onChange={(event) =>
-          table.getColumn("name")?.setFilterValue(event.target.value)
-        }
-        className="max-w-sm"
-      />
+      <div className="flex justify-between gap-4">
+        <Input
+          placeholder="Procurar por nome"
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("name")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+
+        <Button asChild>
+          <Link href="/patients/new">
+            <PlusIcon className="w-4 h-4" />
+            Novo paciente
+          </Link>
+        </Button>
+      </div>
+
       <DataTable table={table} />
     </>
   );

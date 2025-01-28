@@ -3,9 +3,9 @@
 import { api } from "~/trpc/react";
 import { DataTable } from "~/components/ui/data-table";
 
-import type { Invitation } from "@prisma/client";
+import type { Invitation } from "@zenstackhq/runtime/models";
 
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, useReactTable, getCoreRowModel } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Invitation>[] = [
   {
@@ -34,12 +34,18 @@ export function InvitesList({ organizationId }: { organizationId: string | null 
     },
   );
 
-  console.log(`invitations:`, invitations)
+
+  const table = useReactTable<Invitation>({
+    data: invitations ?? [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
 
   if (isPending) return <div>Loading...</div>;
 
   if (!invitations) return <div>Nenhum convite encontrado</div>;
 
-  return <DataTable columns={columns} data={invitations} emptyMessage="Nenhum convite encontrado" />;
+ 
+  return <DataTable table={table} emptyMessage="Nenhum convite encontrado" />;
 }

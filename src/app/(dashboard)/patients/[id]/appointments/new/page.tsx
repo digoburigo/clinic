@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Textarea } from "~/components/ui/textarea";
 import { Button } from "~/components/ui/button";
+import { InviteButton } from "~/app/(dashboard)/invite-button";
+import { CidMultiSelect } from "~/components/cid-multi-select";
 
 export default function Page() {
   return (
@@ -52,6 +54,7 @@ export default function Page() {
                   placeholder="Digite a avaliação do paciente"
                   className="min-h-[150px]"
                 />
+                <CidMultiSelect />
               </div>
             </TabsContent>
             <TabsContent value="plano">

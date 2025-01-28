@@ -170,7 +170,6 @@ export default async function Page() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <CidMultiSelect />
               <InviteButton />
             </CardContent>
           </Card>
