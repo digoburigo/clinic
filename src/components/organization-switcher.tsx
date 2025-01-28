@@ -28,7 +28,6 @@ export function OrganizationSwitcher({
 }: {
   organizations: Organization[];
 }) {
-  console.log(`organizations:`, organizations);
   const { isMobile } = useSidebar();
 
   const { data: activeOrganization, isPending } =

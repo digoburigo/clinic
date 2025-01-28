@@ -1,8 +1,10 @@
-import * as React from "react"
-import { flexRender, type Table as TanstackTable } from "@tanstack/react-table"
+"use client";
+"use no memo";
 
-import { getCommonPinningStyles } from "~/lib/data-table"
-import { cn } from "~/lib/utils"
+import * as React from "react";
+import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
+
+import { cn } from "~/lib/utils";
 import {
   Table,
   TableBody,
@@ -10,15 +12,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
-import { DataTablePagination } from "~/components/ui/data-table-pagination"
+} from "~/components/ui/table";
+import { getCommonPinningStyles } from "./config/utils";
+import { DataTablePagination } from "./data-table-pagination";
 
 interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * The table instance returned from useDataTable hook with pagination, sorting, filtering, etc.
    * @type TanstackTable<TData>
    */
-  table: TanstackTable<TData>
+  table: TanstackTable<TData>;
 
   /**
    * The floating bar to render at the bottom of the table on row selection.
@@ -26,7 +29,7 @@ interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
    * @type React.ReactNode | null
    * @example floatingBar={<TasksTableFloatingBar table={table} />}
    */
-  floatingBar?: React.ReactNode | null
+  floatingBar?: React.ReactNode | null;
 }
 
 export function DataTable<TData>({
@@ -60,10 +63,10 @@ export function DataTable<TData>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -84,7 +87,7 @@ export function DataTable<TData>({
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -96,7 +99,7 @@ export function DataTable<TData>({
                   colSpan={table.getAllColumns().length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Nenhum resultado.
                 </TableCell>
               </TableRow>
             )}
@@ -108,5 +111,5 @@ export function DataTable<TData>({
         {table.getFilteredSelectedRowModel().rows.length > 0 && floatingBar}
       </div>
     </div>
-  )
+  );
 }

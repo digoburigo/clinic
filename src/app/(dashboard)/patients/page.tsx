@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { useSession } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
-import { PatientsList } from "./_components/patients-list";
-import { ClientsList } from "~/components/clients-list";
+import { PatientsTable } from "./_components/patients-table";
+import { DataTableSkeleton } from "~/components/ui/data-table/data-table-skeleton";
 
 export const metadata: Metadata = {
   title: "Pacientes",
@@ -18,26 +18,38 @@ export default async function Page() {
     return redirect("/");
   }
 
-  const page = 1;
+  const page = 0;
   const limit = 10;
-  const skip = (page - 1) * limit;
+  const skip = page * limit;
   const take = limit;
+
   void api.patient.findMany.prefetch({
-    take,
-    skip,
-    orderBy: {
-      createdAt: "desc",
-      name: "asc",
-    },
+    // take,
+    // skip,
+    orderBy: [
+      {
+        createdAt: "desc",
+      },
+    ],
   });
+
+  void api.patient.count.prefetch();
 
   return (
     <HydrateClient>
-      <Suspense fallback={<div>Loading...</div>}>
-        {/* <PatientsList />   */}
-        <ClientsList />
+      <Suspense
+        fallback={
+          <DataTableSkeleton
+            columnCount={6}
+            searchableColumnCount={1}
+            filterableColumnCount={2}
+            cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
+            shrinkZero
+          />
+        }
+      >
+        <PatientsTable />
       </Suspense>
     </HydrateClient>
   );
 }
-

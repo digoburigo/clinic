@@ -5,6 +5,7 @@ import { Viewport, type Metadata } from "next";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Toaster } from "~/components/ui/sonner";
 import { cn } from "~/lib/utils";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -38,6 +39,7 @@ export default function RootLayout({
             `,
           }}
         />
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
       </head>
       <body
         className={cn(
@@ -45,7 +47,9 @@ export default function RootLayout({
           GeistSans.variable,
         )}
       >
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </TRPCReactProvider>
         <Toaster richColors />
       </body>
     </html>

@@ -24,6 +24,9 @@ export const patientRouter = createTRPCRouter({
           });
         }
   
+        console.log(`user.email:`, user.email)
+
+
         const patient = await ctx.db.patient.findFirst({
           where: {
             email: user.email,
@@ -53,9 +56,11 @@ export const patientRouter = createTRPCRouter({
 
         return patient;
       } catch (error) {
+        console.error(error)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Internal server error",
+          cause: error,
         });
       }
     }),

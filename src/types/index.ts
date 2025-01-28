@@ -1,9 +1,9 @@
 import type { ColumnSort, Row } from "@tanstack/react-table"
-import { type SQL } from "drizzle-orm"
+import type { Prisma } from "@prisma/client"
 import { type z } from "zod"
 
-import { type DataTableConfig } from "@/config/data-table"
-import { type filterSchema } from "@/lib/parsers"
+import { type DataTableConfig } from "~/components/ui/data-table/config/operations"
+import { type filterSchema } from "~/components/ui/data-table/config/parsers"
 
 export type Prettify<T> = {
   [K in keyof T]: T[K]
@@ -57,9 +57,9 @@ export interface DataTableRowAction<TData> {
   type: "update" | "delete"
 }
 
-export interface QueryBuilderOpts {
-  where?: SQL
-  orderBy?: SQL
+export interface PatientQueryBuilderOpts {
+  where?: Prisma.PatientWhereInput
+  orderBy?: Prisma.PatientOrderByWithRelationInput[]
   distinct?: boolean
   nullish?: boolean
 }

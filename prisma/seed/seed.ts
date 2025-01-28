@@ -148,33 +148,130 @@ async function main() {
     }),
   ]);
 
-  const mockPatients = Array.from({ length: 100 }, () => ({
-    name: faker.person.fullName(),
-    email: faker.internet.email(),
-    cpf: faker.string.numeric(11),
-    phone: faker.phone.number(),
-    gender: faker.person.gender(),
-    nationality: faker.location.country(),
-    ethnicity: faker.person.zodiacSign(),
-    state: faker.location.state(),
-    city: faker.location.city(),
-    zipCode: faker.location.zipCode(),
-    neighborhood: faker.location.streetAddress(),
-    street: faker.location.streetAddress(),
-    number: faker.location.buildingNumber(),
-    ownerId: ownerUser.user.id as string,
-    organizationId: organization1?.id as string,
-    occupation: faker.person.jobTitle(),
-    maritalStatus: faker.color.human(),
-    bloodType: faker.word.verb(),
-    genderIdentity: faker.person.sex(),
-    vaccination: faker.word.verb(),
-    healthInsurance: faker.word.verb(),
-  }));
-
-  await prisma.patient.createMany({
-    data: mockPatients,
+  const mockPatients = Array.from({ length: 99 }, (_, index) => {
+    const baseDate = new Date();
+    const createdAt = new Date(baseDate.setDate(baseDate.getDate() - index));
+    
+    return {
+      id: faker.string.nanoid(),
+      name: faker.person.fullName().replace(/'/g, "''"),
+      email: faker.internet.email().replace(/'/g, "''"),
+      cpf: faker.string.numeric(11),
+      phone: faker.phone.number().replace(/'/g, "''"),
+      gender: faker.person.gender().replace(/'/g, "''"),
+      nationality: faker.location.country().replace(/'/g, "''"),
+      ethnicity: faker.person.zodiacSign().replace(/'/g, "''"),
+      state: faker.location.state().replace(/'/g, "''"),
+      city: faker.location.city().replace(/'/g, "''"),
+      zipCode: faker.location.zipCode().replace(/'/g, "''"),
+      neighborhood: faker.location.streetAddress().replace(/'/g, "''"),
+      street: faker.location.streetAddress().replace(/'/g, "''"),
+      number: faker.location.buildingNumber().replace(/'/g, "''"),
+      ownerId: ownerUser.user.id as string,
+      organizationId: organization1?.id as string,
+      occupation: faker.person.jobTitle().replace(/'/g, "''"),
+      maritalStatus: faker.color.human().replace(/'/g, "''"),
+      bloodType: faker.word.verb().replace(/'/g, "''"),
+      genderIdentity: faker.person.sex().replace(/'/g, "''"),
+      vaccination: faker.word.verb().replace(/'/g, "''"),
+      healthInsurance: faker.word.verb().replace(/'/g, "''"),
+      createdAt: createdAt.toISOString(),
+      updatedAt: createdAt.toISOString(),
+    };
   });
+
+  // relate to user patient@test.com
+  const baseDate = new Date();
+  const createdAt = new Date(baseDate.setDate(baseDate.getDate() - 8));
+  const patientFromUser = {
+    id: faker.string.nanoid(),
+      name: faker.person.fullName().replace(/'/g, "''"),
+      email: "patient@test.com",
+      cpf: faker.string.numeric(11),
+      phone: faker.phone.number().replace(/'/g, "''"),
+      gender: faker.person.gender().replace(/'/g, "''"),
+      nationality: faker.location.country().replace(/'/g, "''"),
+      ethnicity: faker.person.zodiacSign().replace(/'/g, "''"),
+      state: faker.location.state().replace(/'/g, "''"),
+      city: faker.location.city().replace(/'/g, "''"),
+      zipCode: faker.location.zipCode().replace(/'/g, "''"),
+      neighborhood: faker.location.streetAddress().replace(/'/g, "''"),
+      street: faker.location.streetAddress().replace(/'/g, "''"),
+      number: faker.location.buildingNumber().replace(/'/g, "''"),
+      ownerId: ownerUser.user.id as string,
+      organizationId: organization1?.id as string,
+      occupation: faker.person.jobTitle().replace(/'/g, "''"),
+      maritalStatus: faker.color.human().replace(/'/g, "''"),
+      bloodType: faker.word.verb().replace(/'/g, "''"),
+      genderIdentity: faker.person.sex().replace(/'/g, "''"),
+      vaccination: faker.word.verb().replace(/'/g, "''"),
+      healthInsurance: faker.word.verb().replace(/'/g, "''"),
+      createdAt: createdAt.toISOString(),
+      updatedAt: createdAt.toISOString(),
+  }
+
+  mockPatients.push(patientFromUser)
+
+  
+  // Generate SQL values string
+  const values = mockPatients
+    .map(p => `(
+      '${p.id}',
+      '${p.name}',
+      '${p.email}',
+      '${p.cpf}',
+      '${p.phone}',
+      '${p.gender}',
+      '${p.nationality}',
+      '${p.ethnicity}',
+      '${p.state}',
+      '${p.city}',
+      '${p.zipCode}',
+      '${p.neighborhood}',
+      '${p.street}',
+      '${p.number}',
+      '${p.ownerId}',
+      '${p.organizationId}',
+      '${p.occupation}',
+      '${p.maritalStatus}',
+      '${p.bloodType}',
+      '${p.genderIdentity}',
+      '${p.vaccination}',
+      '${p.healthInsurance}',
+      '${p.createdAt}',
+      '${p.updatedAt}'
+    )`)
+    .join(',\n');
+  
+  // Raw SQL query for SQLite
+  await prisma.$executeRawUnsafe(`
+    INSERT INTO "Patient" (
+      "id",
+      "name",
+      "email",
+      "cpf",
+      "phone",
+      "gender",
+      "nationality",
+      "ethnicity",
+      "state",
+      "city",
+      "zipCode",
+      "neighborhood",
+      "street",
+      "number",
+      "ownerId",
+      "organizationId",
+      "occupation",
+      "maritalStatus",
+      "bloodType",
+      "genderIdentity",
+      "vaccination",
+      "healthInsurance",
+      "createdAt",
+      "updatedAt"
+    ) VALUES ${values};
+  `);
 }
 
 main()
