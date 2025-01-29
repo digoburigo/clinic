@@ -115,8 +115,7 @@ export const auth = betterAuth({
             },
           });
 
-          const isDev = process.env.NODE_ENV === "development";
-          const domain = isDev ? "http://localhost:3000" : "https://clinic.com";
+          const domain = process.env.BETTER_AUTH_URL as string;
           const inviteLinkUrl = new URL(domain);
 
           const isPatient = data.role === "patient";
