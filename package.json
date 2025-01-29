@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "vercel-build": "zenstack generate && next build",
     "check": "next lint && tsc --noEmit",
     "db:generate": "prisma migrate dev",
+    "db:schema": "turso db shell doc-db < ./prisma/migrations/20250129011433_init/migration.sql",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio --browser none",
@@ -37,8 +39,10 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^3.10.0",
+    "@libsql/client": "0.14.0",
     "@maskito/core": "^3.2.1",
     "@maskito/react": "^3.2.1",
+    "@prisma/adapter-libsql": "6.3.0",
     "@prisma/client": "^6.3.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.5",
@@ -110,6 +114,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.4.0",
+
     "@total-typescript/ts-reset": "^0.6.1",
     "@tanstack/react-query-devtools": "^5.65.1",
     "@types/eslint": "^9.6.1",
@@ -141,6 +146,8 @@
   "overrides": {
     "@prisma/client": "^6.3.0",
     "prisma": "^6.3.0",
-    "react-is": "19.0.0"
+    "@libsql/client": "0.14.0",
+    "@prisma/adapter-libsql": "6.3.0",
+    "react-is": "19.0.0"  
   }
 }

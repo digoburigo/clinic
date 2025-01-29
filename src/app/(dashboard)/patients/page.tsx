@@ -33,7 +33,7 @@ export default async function Page() {
     ],
   });
 
-  void api.patient.count.prefetch();
+  void api.patient.count.prefetch({});
 
   return (
     <HydrateClient>
