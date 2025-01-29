@@ -29,6 +29,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
       {/* <script src="https://unpkg.com/react-scan/dist/auto.global.js" async /> */}
+      
         <script
           dangerouslySetInnerHTML={{
             __html: `
