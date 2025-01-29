@@ -4,13 +4,13 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 model Post {
@@ -26,6 +26,7 @@ model Post {
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([slug])
+  @@map("post")
 }
 
 model Cid {
@@ -34,6 +35,7 @@ model Cid {
   description String
 
   @@unique([code])
+  @@map("cid")
 }
 
 model User {
@@ -158,6 +160,8 @@ model Appointment {
   patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+
+  @@map("appointment")
 }
 
 model Patient {
@@ -201,4 +205,5 @@ model Patient {
   appointments      Appointment[]
 
   @@unique([userId, organizationId])
+  @@map("patient")
 }

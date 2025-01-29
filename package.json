@@ -7,9 +7,9 @@
     "build": "next build",
     "vercel-build": "zenstack generate && next build",
     "check": "next lint && tsc --noEmit",
-    "db:generate": "prisma migrate dev",
-    "db:schema": "turso db shell doc-db < ./prisma/migrations/20250129011433_init/migration.sql",
-    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:turso:migrate": "turso db shell doc-db < ./prisma/migrations/20250129011433_init/migration.sql",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio --browser none",
     "db:seed": "SEED=true pnpx tsx ./prisma/seed/seed.ts",
@@ -38,7 +38,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^3.10.0",
-    "@libsql/client": "0.14.0",
+    "@libsql/client": "0.8.0",
     "@maskito/core": "^3.2.1",
     "@maskito/react": "^3.2.1",
     "@prisma/adapter-libsql": "6.3.0",
@@ -80,9 +80,9 @@
     "@trpc/react-query": "11.0.0-rc.730",
     "@trpc/server": "11.0.0-rc.730",
     "@uidotdev/usehooks": "^2.4.1",
-    "@zenstackhq/runtime": "2.11.4",
-    "@zenstackhq/server": "2.11.4",
-    "better-auth": "^1.1.14",
+    "@zenstackhq/runtime": "2.11.5",
+    "@zenstackhq/server": "2.11.5",
+    "better-auth": "^1.1.15",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
@@ -104,7 +104,7 @@
     "react-resizable-panels": "^2.1.7",
     "recharts": "^2.15.1",
     "server-only": "^0.0.1",
-    "sonner": "^1.7.2",
+    "sonner": "^1.7.3",
     "superjson": "^2.2.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
@@ -122,7 +122,7 @@
     "@types/react-dom": "19.0.3",
     "@typescript-eslint/eslint-plugin": "^8.22.0",
     "@typescript-eslint/parser": "^8.22.0",
-    "@zenstackhq/trpc": "2.11.4",
+    "@zenstackhq/trpc": "2.11.5",
     "babel-plugin-react-compiler": "^19.0.0-beta-27714ef-20250124",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
@@ -136,16 +136,12 @@
     "react-email": "3.0.6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
-    "zenstack": "2.11.4"
+    "zenstack": "2.11.5"
   },
   "ct3aMetadata": {
     "initVersion": "7.38.1"
   },
   "overrides": {
-    "@prisma/client": "^6.3.0",
-    "prisma": "^6.3.0",
-    "@libsql/client": "0.14.0",
-    "@prisma/adapter-libsql": "6.3.0",
-    "react-is": "19.0.0"  
+    "react-is": "19.0.0"
   }
 }

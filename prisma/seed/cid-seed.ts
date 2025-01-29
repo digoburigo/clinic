@@ -1,13 +1,12 @@
 
-import { PrismaClient } from "@prisma/client";
 import { CID_LIST } from "../data/listacid";
+import { db } from "~/server/db";
 
-const prisma = new PrismaClient();
 
 async function main() {
 	console.info("Seeding...");
 
-	await prisma.cid.createMany({
+	await db.cid.createMany({
 		data: CID_LIST,
 	});
 }
@@ -17,6 +16,8 @@ main()
 		console.error(e);
 		process.exit(1);
 	})
-	.finally(() => {
-		void prisma.$disconnect();
+	.finally(async () => {
+		console.log("Database seeded successfully");
+		await db.$disconnect();
 	});
+

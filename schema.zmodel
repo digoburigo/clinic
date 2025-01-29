@@ -3,12 +3,13 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 plugin trpc {
@@ -58,6 +59,8 @@ model Post {
 
   // if the post belongs to an org, it's readable to all members
   @@allow('read', organizationId != null)
+
+  @@map("post")
 }
 
 model Cid {
@@ -68,6 +71,8 @@ model Cid {
   @@unique([code])
 
   @@allow('read', true)
+
+  @@map("cid")
 }
 
 model User {
@@ -165,9 +170,10 @@ model Organization {
   patients Patient[]
 
   @@unique([slug])
-  @@map("organization")
 
   @@allow('create,read', true)
+
+  @@map("organization")
 }
 
 model Member {
@@ -216,6 +222,8 @@ model Appointment {
   patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("appointment")
 }
 
 model Patient {
@@ -285,4 +293,6 @@ model Patient {
 
   // unique constraint to prevent duplicate patients of same user from being created
   @@unique([userId, organizationId])
+
+  @@map("patient")
 }

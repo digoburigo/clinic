@@ -1,161 +1,156 @@
-import { PrismaClient } from "@prisma/client";
 import { auth } from "~/server/auth";
 import { faker } from "@faker-js/faker";
-
-const prisma = new PrismaClient();
+import { db } from "~/server/db";
 
 async function main() {
   console.log("Seeding database...");
 
-  // await prisma.organization.deleteMany();
-  // await prisma.account.deleteMany();
-  // await prisma.user.deleteMany();
-  // await prisma.session.deleteMany();
-  // await prisma.verification.deleteMany();
-  // await prisma.invitation.deleteMany();
+  await Promise.all([
+    db.organization.deleteMany(),
+    db.account.deleteMany(),
+    db.user.deleteMany(),
+    db.session.deleteMany(),
+    db.verification.deleteMany(),
+    db.invitation.deleteMany(),
+  ]);
 
-  const superAdminUser = await auth.api.signUpEmail({
-    body: {
-      email: "superadmin@test.com",
-      password: "12345678",
-      name: "super-admin-user",
-    },
-  });
+  const [superAdminUser, adminUser, memberUser, ownerUser, patientUser] =
+    await Promise.all([
+      auth.api.signUpEmail({
+        body: {
+          email: "superadmin@test.com",
+          password: "12345678",
+          name: "super-admin-user",
+        },
+      }),
+      auth.api.signUpEmail({
+        body: {
+          email: "admin@test.com",
+          password: "12345678",
+          name: "admin-user",
+        },
+      }),
+      auth.api.signUpEmail({
+        body: {
+          email: "member@test.com",
+          password: "12345678",
+          name: "member-user",
+        },
+      }),
+      auth.api.signUpEmail({
+        body: {
+          email: "owner@test.com",
+          password: "12345678",
+          name: "owner-user",
+        },
+      }),
+      auth.api.signUpEmail({
+        body: {
+          email: "patient@test.com",
+          password: "12345678",
+          name: "patient-user",
+        },
+      }),
+    ]);
 
-  const adminUser = await auth.api.signUpEmail({
-    body: {
-      email: "admin@test.com",
-      password: "12345678",
-      name: "admin-user",
-    },
-  });
+  const [organization1, organization2] = await Promise.all([
+    db.organization.create({
+      data: {
+        name: "Clínica 1",
+        slug: "clinica-1",
+      },
+    }),
+    db.organization.create({
+      data: {
+        name: "Clínica 2",
+        slug: "clinica-2",
+      },
+    }),
+  ]);
 
-  const memberUser = await auth.api.signUpEmail({
-    body: {
-      email: "member@test.com",
-      password: "12345678",
-      name: "member-user",
-    },
-  });
+  await Promise.all([
+    db.user.update({
+      where: {
+        id: superAdminUser.user.id,
+      },
+      data: {
+        role: "admin",
+        emailVerified: true,
+      },
+    }),
+    db.user.update({
+      where: {
+        id: adminUser.user.id,
+      },
+      data: {
+        role: "admin",
+        emailVerified: true,
+      },
+    }),
+    db.user.update({
+      where: {
+        id: memberUser.user.id,
+      },
+      data: {
+        role: "member",
+        emailVerified: true,
+      },
+    }),
+    db.user.update({
+      where: {
+        id: ownerUser.user.id,
+      },
+      data: {
+        role: "owner",
+        emailVerified: true,
+      },
+    }),
+    db.user.update({
+      where: {
+        id: patientUser.user.id,
+      },
+      data: {
+        role: "patient",
+        emailVerified: true,
+      },
+    }),
 
-  const ownerUser = await auth.api.signUpEmail({
-    body: {
-      email: "owner@test.com",
-      password: "12345678",
-      name: "owner-user",
-    },
-  });
-
-  const patientUser = await auth.api.signUpEmail({
-    body: {
-      email: "patient@test.com",
-      password: "12345678",
-      name: "patient-user",
-    },
-  });
-
-  const organization1 = await prisma.organization.create({
-    data: {
-      name: "Clínica 1",
-      slug: "clinica-1",
-    },
-  });
-
-  const organization2 = await prisma.organization.create({
-    data: {
-      name: "Clínica 2",
-      slug: "clinica-2",
-    },
-  });
-
-  await prisma.user.update({
-    where: {
-      id: superAdminUser.user.id,
-    },
-    data: {
-      role: "admin",
-      emailVerified: true,
-    },
-  });
-
-  await prisma.user.update({
-    where: {
-      id: adminUser.user.id,
-    },
-    data: {
-      role: "admin",
-      emailVerified: true,
-    },
-  });
-
-  await prisma.user.update({
-    where: {
-      id: memberUser.user.id,
-    },
-    data: {
-      role: "member",
-      emailVerified: true,
-    },
-  });
-
-  await prisma.user.update({
-    where: {
-      id: ownerUser.user.id,
-    },
-    data: {
-      role: "owner",
-      emailVerified: true,
-    },
-  });
-
-  await prisma.user.update({
-    where: {
-      id: patientUser.user.id,
-    },
-    data: {
-      role: "patient",
-      emailVerified: true,
-    },
-  });
-
-  await prisma.member.create({
-    data: {
-      organizationId: organization1?.id as string,
-      userId: ownerUser.user.id,
-      role: "owner",
-    },
-  });
-
-  await prisma.member.create({
-    data: {
-      organizationId: organization1?.id as string,
-      userId: adminUser.user.id,
-      role: "admin",
-    },
-  }),
-    await prisma.member.create({
+    db.member.create({
+      data: {
+        organizationId: organization1?.id as string,
+        userId: ownerUser.user.id,
+        role: "owner",
+      },
+    }),
+    db.member.create({
+      data: {
+        organizationId: organization1?.id as string,
+        userId: adminUser.user.id,
+        role: "admin",
+      },
+    }),
+    db.member.create({
       data: {
         organizationId: organization2?.id as string,
         userId: ownerUser.user.id,
         role: "owner",
       },
-    });
-
-  await prisma.member.create({
-    data: {
-      organizationId: organization1?.id as string,
-      userId: memberUser.user.id,
-      role: "member",
-    },
-  });
-
-  await prisma.member.create({
-    data: {
-      organizationId: organization1?.id as string,
-      userId: patientUser.user.id,
-      role: "patient",
-    },
-  });
+    }),
+    db.member.create({
+      data: {
+        organizationId: organization1?.id as string,
+        userId: memberUser.user.id,
+        role: "member",
+      },
+    }),
+    db.member.create({
+      data: {
+        organizationId: organization1?.id as string,
+        userId: patientUser.user.id,
+        role: "patient",
+      },
+    }),
+  ]);
 
   const mockPatients = Array.from({ length: 99 }, (_, index) => {
     const baseDate = new Date();
@@ -254,7 +249,7 @@ async function main() {
     .join(",\n");
 
   // Raw SQL query for SQLite
-  await prisma.$executeRawUnsafe(`
+  await db.$executeRawUnsafe(`
     INSERT INTO "Patient" (
       "id",
       "name",
@@ -291,5 +286,5 @@ main()
   })
   .finally(async () => {
     console.log("Database seeded successfully");
-    await prisma.$disconnect();
+    await db.$disconnect();
   });
