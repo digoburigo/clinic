@@ -19,7 +19,6 @@
     "dev": "concurrently \"pnpm dev:next\" \"pnpm dev:email\" \"pnpm db:studio\"",
     "dev:next": "next dev --turbopack",
     "dev:email": "email dev --port 3001 --dir ./src/server/email/templates",
-    "postinstall": "prisma generate",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
@@ -114,7 +113,6 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.4.0",
-
     "@total-typescript/ts-reset": "^0.6.1",
     "@tanstack/react-query-devtools": "^5.65.1",
     "@types/eslint": "^9.6.1",
