@@ -5,7 +5,7 @@ import { api } from "~/trpc/react";
 
 import type { Patient } from "@zenstackhq/runtime/models";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { DataTableRowAction } from "~/types";
 import { useState } from "react";
 import { getColumns } from "./patients-table-columns";
@@ -95,7 +95,7 @@ export function PatientsTable() {
           className="max-w-sm"
         />
 
-        <Button asChild className="dark:bg-white dark:text-black">
+        <Button asChild className="dark:bg-white dark:text-black" >
           <Link href="/patients/new">
             <PlusIcon className="w-4 h-4" />
             Novo paciente
