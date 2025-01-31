@@ -60,7 +60,7 @@ export default async function Page() {
   }
 
   return (
-    <div className="mx-auto max-w-screen-2xl">
+    <div className="mx-auto max-w-(--breakpoint-2xl)">
       <div className="border-b">
         <div className="flex h-16 items-center px-4">
           <PatientAreaNav className="mx-6" />

@@ -28,8 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-      {/* <script src="https://unpkg.com/react-scan/dist/auto.global.js" async /> */}
-      
+        {/* <script src="https://unpkg.com/react-scan/dist/auto.global.js" async /> */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -44,7 +43,7 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-svh bg-background font-sans antialiased",
+          "bg-background min-h-svh font-sans antialiased",
           GeistSans.variable,
         )}
       >

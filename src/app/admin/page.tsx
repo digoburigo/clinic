@@ -25,7 +25,7 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="mx-auto max-w-screen-2xl">
+    <div className="mx-auto max-w-(--breakpoint-2xl)">
       <div className="border-b">
         <div className="flex h-16 items-center px-4">
           <div className="mx-6">

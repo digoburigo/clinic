@@ -95,7 +95,7 @@ export function PatientsTable() {
           className="max-w-sm"
         />
 
-        <Button asChild>
+        <Button asChild className="dark:bg-white dark:text-black">
           <Link href="/patients/new">
             <PlusIcon className="w-4 h-4" />
             Novo paciente
