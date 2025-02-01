@@ -17,7 +17,7 @@ main()
 		process.exit(1);
 	})
 	.finally(async () => {
-		console.log("Database seeded successfully");
+		console.info("Database seeded successfully");
 		await db.$disconnect();
 	});
 

@@ -20,8 +20,8 @@ import { InviteButton } from "./invite-button";
 import { headers } from "next/headers";
 
 export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Example dashboard app built using the components.",
+  title: "Painel de informações",
+  description: "Painel de informações do sistema de gerenciamento de pacientes.",
 };
 
 export default async function Page() {

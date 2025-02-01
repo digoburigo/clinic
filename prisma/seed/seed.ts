@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 import { db } from "~/server/db";
 
 async function main() {
-  console.log("Seeding database...");
+  console.info("Seeding database...");
 
   await Promise.all([
     db.organization.deleteMany(),
@@ -285,6 +285,6 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    console.log("Database seeded successfully");
+    console.info("Database seeded successfully");
     await db.$disconnect();
   });

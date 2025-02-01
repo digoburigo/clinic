@@ -165,7 +165,7 @@ model Appointment {
 }
 
 model Patient {
-  id                String        @id() @default(nanoid())
+  id                String          @id() @default(nanoid())
   name              String
   cpf               String
   phone             String
@@ -186,24 +186,131 @@ model Patient {
   maritalStatus     String
   bloodType         String
   genderIdentity    String
-  vaccination       String
-  allergies         String?
-  medications       String?
-  examResults       String?
-  comorbidities     String?
-  surgeries         String?
-  healthInsurance   String
   password          String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt()
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt()
   ownerId           String
-  owner             User          @relation("patientsOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  owner             User            @relation("patientsOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   organizationId    String?
-  organization      Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization      Organization?   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   userId            String?
-  user              User?         @relation("patientUser", fields: [userId], references: [id], onDelete: Cascade)
+  user              User?           @relation("patientUser", fields: [userId], references: [id], onDelete: Cascade)
   appointments      Appointment[]
+  vaccinations      Vaccination[]
+  allergies         Allergies[]
+  medications       Medications[]
+  examResults       ExamResults[]
+  comorbidities     Comorbidities[]
+  surgeries         Surgeries[]
 
   @@unique([userId, organizationId])
   @@map("patient")
+}
+
+model Vaccination {
+  id                  String            @id() @default(nanoid())
+  patientId           String
+  patient             Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  vaccinationValuesId String
+  vaccinationValues   VaccinationValues @relation(fields: [vaccinationValuesId], references: [id], onDelete: Cascade)
+
+  @@map("vaccination")
+}
+
+model VaccinationValues {
+  id           String        @id() @default(nanoid())
+  value        String
+  vaccinations Vaccination[]
+
+  @@map("vaccination_values")
+}
+
+model Allergies {
+  id                String          @id() @default(nanoid())
+  patientId         String
+  patient           Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  allergiesValuesId String
+  allergiesValues   AllergiesValues @relation(fields: [allergiesValuesId], references: [id], onDelete: Cascade)
+
+  @@map("allergies")
+}
+
+model AllergiesValues {
+  id        String      @id() @default(nanoid())
+  value     String
+  allergies Allergies[]
+
+  @@map("allergies_values")
+}
+
+model Medications {
+  id                  String            @id() @default(nanoid())
+  patientId           String
+  patient             Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  medicationsValuesId String
+  medicationsValues   MedicationsValues @relation(fields: [medicationsValuesId], references: [id], onDelete: Cascade)
+
+  @@map("medications")
+}
+
+model MedicationsValues {
+  id          String        @id() @default(nanoid())
+  value       String
+  medications Medications[]
+
+  @@map("medications_values")
+}
+
+model ExamResults {
+  id                  String            @id() @default(nanoid())
+  patientId           String
+  patient             Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  examResultsValuesId String
+  examResultsValues   ExamResultsValues @relation(fields: [examResultsValuesId], references: [id], onDelete: Cascade)
+
+  @@map("exam_results")
+}
+
+model ExamResultsValues {
+  id          String        @id() @default(nanoid())
+  value       String
+  examResults ExamResults[]
+
+  @@map("exam_results_values")
+}
+
+model Comorbidities {
+  id                    String              @id() @default(nanoid())
+  patientId             String
+  patient               Patient             @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  comorbiditiesValuesId String
+  comorbiditiesValues   ComorbiditiesValues @relation(fields: [comorbiditiesValuesId], references: [id], onDelete: Cascade)
+
+  @@map("comorbidities")
+}
+
+model ComorbiditiesValues {
+  id            String          @id() @default(nanoid())
+  value         String
+  comorbidities Comorbidities[]
+
+  @@map("comorbidities_values")
+}
+
+model Surgeries {
+  id                String          @id() @default(nanoid())
+  patientId         String
+  patient           Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  surgeriesValuesId String
+  surgeriesValues   SurgeriesValues @relation(fields: [surgeriesValuesId], references: [id], onDelete: Cascade)
+
+  @@map("surgeries")
+}
+
+model SurgeriesValues {
+  id        String      @id() @default(nanoid())
+  value     String
+  surgeries Surgeries[]
+
+  @@map("surgeries_values")
 }

@@ -24,9 +24,6 @@ export const patientRouter = createTRPCRouter({
           });
         }
   
-        console.log(`user.email:`, user.email)
-
-
         const patient = await ctx.db.patient.findFirst({
           where: {
             email: user.email,

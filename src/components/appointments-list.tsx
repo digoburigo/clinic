@@ -199,7 +199,6 @@ export function AppointmentsList({ patientId }: { patientId: string }) {
             (table.getColumn("patientName")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) => {
-            console.log(event.target.value);
             table.getColumn("patientName")?.setFilterValue(event.target.value);
           }}
           className="max-w-sm"

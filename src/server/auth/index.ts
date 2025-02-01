@@ -58,7 +58,7 @@ export const auth = betterAuth({
   emailVerification: {
     autoSignInAfterVerification: false,
     async sendVerificationEmail({ user, url }) {
-      console.log("Sending verification email to", user.email);
+      console.info("Sending verification email to", user.email);
 
       // change callback url to /
       const parsedUrl = new URL(url);
@@ -73,7 +73,6 @@ export const auth = betterAuth({
         to: user.email,
         subject: "Verifique seu email",
       });
-      console.log(res, user.email);
     },
   },
   emailAndPassword: {

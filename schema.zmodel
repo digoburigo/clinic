@@ -254,15 +254,6 @@ model Patient {
   maritalStatus String
   bloodType String
   genderIdentity String
-  
-  // Fourth Form Fields
-  vaccination String
-  allergies String?
-  medications String?
-  examResults String?
-  comorbidities String?
-  surgeries String?
-  healthInsurance String
 
   password String?
   
@@ -283,6 +274,12 @@ model Patient {
 
   // Existing relationships
   appointments Appointment[]
+  vaccinations Vaccination[]
+  allergies Allergies[]
+  medications Medications[]
+  examResults ExamResults[]
+  comorbidities Comorbidities[]
+  surgeries Surgeries[]
 
   // Access rules
   @@deny('all', auth() == null)
@@ -296,3 +293,160 @@ model Patient {
 
   @@map("patient")
 }
+
+model Vaccination {
+  id String @id @default(nanoid())
+  patientId String
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  vaccinationValuesId String
+  vaccinationValues VaccinationValues @relation(fields: [vaccinationValuesId], references: [id], onDelete: Cascade)
+
+  @@map("vaccination")
+}
+
+model VaccinationValues {
+  id String @id @default(nanoid())
+  value String @unique
+
+  vaccinations Vaccination[]
+
+  // deny anonymous users
+  @@deny('all', auth() == null)
+
+  // allow read and create access to all users
+  @@allow('create,read', true)
+
+  @@map("vaccination_values")
+}
+
+model Allergies {
+  id String @id @default(nanoid())
+  patientId String
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  allergiesValuesId String
+  allergiesValues AllergiesValues @relation(fields: [allergiesValuesId], references: [id], onDelete: Cascade)
+
+  @@map("allergies")
+}
+
+
+model AllergiesValues {
+  id String @id @default(nanoid())
+  value String @unique
+
+  allergies Allergies[]
+
+  // deny anonymous users
+  @@deny('all', auth() == null)
+
+  // allow read and create access to all users
+  @@allow('create,read', true)
+  
+  @@map("allergies_values")
+}
+
+model Medications {
+  id String @id @default(nanoid())
+  patientId String
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  medicationsValuesId String
+  medicationsValues MedicationsValues @relation(fields: [medicationsValuesId], references: [id], onDelete: Cascade)
+
+  @@map("medications")
+}
+
+model MedicationsValues {
+  id String @id @default(nanoid())
+  value String @unique
+
+  medications Medications[]
+
+  // deny anonymous users
+  @@deny('all', auth() == null)
+
+  // allow read and create access to all users
+  @@allow('create,read', true)
+
+  @@map("medications_values")
+}
+
+model ExamResults {
+  id String @id @default(nanoid())
+  patientId String
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  examResultsValuesId String
+  examResultsValues ExamResultsValues @relation(fields: [examResultsValuesId], references: [id], onDelete: Cascade)
+
+  @@map("exam_results")
+}   
+
+model ExamResultsValues {
+  id String @id @default(nanoid())
+  value String @unique
+
+  examResults ExamResults[]
+
+  // deny anonymous users
+  @@deny('all', auth() == null)
+
+  // allow read and create access to all users
+  @@allow('create,read', true)
+
+  @@map("exam_results_values")
+}
+
+model Comorbidities {
+  id String @id @default(nanoid())
+  patientId String
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  comorbiditiesValuesId String
+  comorbiditiesValues ComorbiditiesValues @relation(fields: [comorbiditiesValuesId], references: [id], onDelete: Cascade)
+
+  @@map("comorbidities")
+}
+
+model ComorbiditiesValues {
+  id String @id @default(nanoid())
+  value String @unique
+
+  comorbidities Comorbidities[]
+
+  // deny anonymous users
+  @@deny('all', auth() == null)
+
+  // allow read and create access to all users
+  @@allow('create,read', true)
+
+  @@map("comorbidities_values")
+}
+
+model Surgeries {
+  id String @id @default(nanoid())
+  patientId String
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  surgeriesValuesId String
+  surgeriesValues SurgeriesValues @relation(fields: [surgeriesValuesId], references: [id], onDelete: Cascade)
+
+  @@map("surgeries")
+}
+
+model SurgeriesValues {
+  id String @id @default(nanoid())
+  value String @unique
+
+  surgeries Surgeries[]
+
+  // deny anonymous users
+  @@deny('all', auth() == null)
+
+  // allow read and create access to all users
+  @@allow('create,read', true)
+
+  @@map("surgeries_values")
+}
+

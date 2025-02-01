@@ -73,6 +73,7 @@
     "@radix-ui/react-tooltip": "^1.1.7",
     "@radix-ui/react-use-controllable-state": "^1.1.0",
     "@react-email/components": "0.0.32",
+    "@stepperize/react": "^5.0.1",
     "@t3-oss/env-nextjs": "^0.12.0",
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-table": "^8.20.6",
@@ -108,6 +109,7 @@
     "superjson": "^2.2.2",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "use-mask-input": "^3.4.2",
     "vaul": "^1.1.2",
     "zod": "^3.24.1"
   },

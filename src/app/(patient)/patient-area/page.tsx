@@ -51,8 +51,6 @@ export default async function Page() {
   });
 
   if (!patient?.userId) {
-  console.log(`patient:`, patient)
-
     await api._patient.relateToUser({
       userId: authSession.user.id,
       organizationId: authSession.session.activeOrganizationId as string,

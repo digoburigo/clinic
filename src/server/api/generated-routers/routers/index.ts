@@ -19,6 +19,18 @@ import createMemberRouter from "./Member.router";
 import createInvitationRouter from "./Invitation.router";
 import createAppointmentRouter from "./Appointment.router";
 import createPatientRouter from "./Patient.router";
+import createVaccinationRouter from "./Vaccination.router";
+import createVaccinationValuesRouter from "./VaccinationValues.router";
+import createAllergiesRouter from "./Allergies.router";
+import createAllergiesValuesRouter from "./AllergiesValues.router";
+import createMedicationsRouter from "./Medications.router";
+import createMedicationsValuesRouter from "./MedicationsValues.router";
+import createExamResultsRouter from "./ExamResults.router";
+import createExamResultsValuesRouter from "./ExamResultsValues.router";
+import createComorbiditiesRouter from "./Comorbidities.router";
+import createComorbiditiesValuesRouter from "./ComorbiditiesValues.router";
+import createSurgeriesRouter from "./Surgeries.router";
+import createSurgeriesValuesRouter from "./SurgeriesValues.router";
 
 export function db(ctx: any) {
     if (!ctx.prisma) {
@@ -40,6 +52,18 @@ export function createRouter() {
         invitation: createInvitationRouter(),
         appointment: createAppointmentRouter(),
         patient: createPatientRouter(),
+        vaccination: createVaccinationRouter(),
+        vaccinationValues: createVaccinationValuesRouter(),
+        allergies: createAllergiesRouter(),
+        allergiesValues: createAllergiesValuesRouter(),
+        medications: createMedicationsRouter(),
+        medicationsValues: createMedicationsValuesRouter(),
+        examResults: createExamResultsRouter(),
+        examResultsValues: createExamResultsValuesRouter(),
+        comorbidities: createComorbiditiesRouter(),
+        comorbiditiesValues: createComorbiditiesValuesRouter(),
+        surgeries: createSurgeriesRouter(),
+        surgeriesValues: createSurgeriesValuesRouter(),
     }
     );
 }
