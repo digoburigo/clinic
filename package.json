@@ -107,6 +107,7 @@
     "react-resizable-panels": "^2.1.7",
     "react-select": "^5.10.0",
     "recharts": "^2.15.1",
+    "resend": "^4.1.2",
     "server-only": "^0.0.1",
     "sonner": "^1.7.4",
     "superjson": "^2.2.2",
