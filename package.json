@@ -14,6 +14,7 @@
     "db:studio": "prisma studio --browser none",
     "db:seed": "SEED=true pnpx tsx ./prisma/seed/seed.ts",
     "db:seed:prod": "SEED=true pnpx tsx ./prisma/seed/seed-prod.ts",
+    "db:seed:supa": "SEED=true pnpx tsx ./prisma/seed/supa.ts",
     "db:seed:cid": "SEED=true pnpx tsx ./prisma/seed/cid-seed.ts",
     "w:db:seed": "cross-env SEED=true pnpx tsx ./prisma/seed/seed.ts",
     "w:db:seed:cid": "cross-env SEED=true pnpx tsx ./prisma/seed/cid-seed.ts",
