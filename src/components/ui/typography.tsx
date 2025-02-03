@@ -53,6 +53,32 @@ const H4 = forwardRef<HTMLHeadingElement, ComponentPropsWithoutRef<"h4">>(
   ),
 );
 
+const H5 = forwardRef<HTMLHeadingElement, ComponentPropsWithoutRef<"h5">>(
+  ({ className, ...props }, ref) => (
+    <h5
+      ref={ref}
+      className={cn(
+        "scroll-m-20 text-lg font-semibold tracking-tight",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
+
+const H6 = forwardRef<HTMLHeadingElement, ComponentPropsWithoutRef<"h6">>(
+  ({ className, ...props }, ref) => (
+    <h6
+      ref={ref}
+      className={cn(
+        "scroll-m-20 text-base font-semibold tracking-tight",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
+
 const P = forwardRef<HTMLParagraphElement, ComponentPropsWithoutRef<"p">>(
   ({ className, ...props }, ref) => (
     <p

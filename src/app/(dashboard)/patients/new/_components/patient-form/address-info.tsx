@@ -10,9 +10,8 @@ import { Input } from "~/components/ui/input";
 import { Select, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { withMask } from "use-mask-input";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 
-export const adressInfoSchema = z.object({
+export const addressInfoSchema = z.object({
   zipcode: z.string().min(8, {
     message: "CEP must be at least 8 characters.",
   }),
@@ -34,7 +33,7 @@ export const adressInfoSchema = z.object({
   complement: z.string().optional(),
 });
 
-export type AdressInfoForm = z.infer<typeof adressInfoSchema>;
+export type AddressInfoForm = z.infer<typeof addressInfoSchema>;
 
 interface ViaCepResponse {
   cep: string;
@@ -58,24 +57,23 @@ async function getCep(cep: string): Promise<ViaCepResponse | null> {
   return data;
 }
 
-export function AdressInfoForm() {
-  const { control, setValue, getValues } =
-    useFormContext<AdressInfoForm>();
+export function AddressInfoForm() {
+  const { control, setValue, getValues } = useFormContext<AddressInfoForm>();
 
   const cepQuery = useQuery({
     queryKey: ["zipcode", getValues("zipcode")],
-    queryFn: () => getCep(getValues("zipcode")),
+    queryFn: async () => {
+      const data = await getCep(getValues("zipcode"));
+      if (data) {
+        setValue("state", data.uf);
+        setValue("city", data.localidade);
+        setValue("neighborhood", data.bairro);
+        setValue("street", data.logradouro);
+      }
+      return data;
+    },
     enabled: getValues("zipcode").length === 9,
   });
-
-  useEffect(() => {
-    if (cepQuery.data) {
-      setValue("state", cepQuery.data.uf);
-      setValue("city", cepQuery.data.localidade);
-      setValue("neighborhood", cepQuery.data.bairro);
-      setValue("street", cepQuery.data.logradouro);
-    }
-  }, [cepQuery.data]);
 
   return (
     <div className="space-y-4">
@@ -85,12 +83,17 @@ export function AdressInfoForm() {
         render={({ field }) => (
           <FormItem>
             <FormLabel required>CEP</FormLabel>
-            <FormControl ref={withMask("99999-999")}>
+            <FormControl ref={withMask("99999-999", {
+              jitMasking: true,
+            })}>
               <Input
                 placeholder="Ex.: 00000-000"
                 {...field}
-                onBlur={() => {
-                  cepQuery.refetch();
+                onChange={(e) => {
+                  field.onChange(e);
+                  if (e.target.value.length === 9) {
+                    cepQuery.refetch();
+                  }
                 }}
               />
             </FormControl>

@@ -4,7 +4,7 @@ import * as Stepperize from "@stepperize/react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "~/lib/utils"
-import { Button } from "./button"
+import { Button } from "~/components/ui/button"
 
 //#region Types
 type StepperVariant = "horizontal" | "vertical" | "circle"

@@ -12,6 +12,9 @@ async function main() {
     db.session.deleteMany(),
     db.verification.deleteMany(),
     db.invitation.deleteMany(),
+    db.patient.deleteMany(),
+    db.vaccinationsValues.deleteMany(),
+    db.healthPlansValues.deleteMany(),
   ]);
 
   const [superAdminUser, adminUser, memberUser, ownerUser, patientUser] =
@@ -152,6 +155,86 @@ async function main() {
     }),
   ]);
 
+  const [vaccine1, vaccine2, healthPlan1, healthPlan2] = await Promise.all([
+    db.vaccinationsValues.create({
+      data: {
+        value: "Vacina 1",
+      },
+    }),
+    db.vaccinationsValues.create({
+      data: {
+        value: "Vacina 2",
+      },
+    }),
+    db.healthPlansValues.create({
+      data: {
+        value: "Plano de Saúde 1",
+      },
+    }),
+    db.healthPlansValues.create({
+      data: {
+        value: "Plano de Saúde 2",
+      },
+    }),
+  ]);
+
+  await db.patient.create({
+    data: {
+      name: faker.person.fullName().replace(/'/g, "''"),
+      email: "patient@test.com",
+      cpf: faker.string.numeric(11),
+      cellphone: faker.phone.number().replace(/'/g, "''"),
+      sex: faker.person.sex().replace(/'/g, "''"),
+      responsible: faker.person.fullName().replace(/'/g, "''"),
+      nationality: faker.location.country().replace(/'/g, "''"),
+      race: faker.helpers
+        .arrayElement(["white", "black", "brown", "yellow", "indigenous"])
+        .replace(/'/g, "''"),
+      state: faker.location.state().replace(/'/g, "''"),
+      city: faker.location.city().replace(/'/g, "''"),
+      zipcode: faker.location.zipCode().replace(/'/g, "''"),
+      neighborhood: faker.location.streetAddress().replace(/'/g, "''"),
+      street: faker.location.streetAddress().replace(/'/g, "''"),
+      number: faker.location.buildingNumber().replace(/'/g, "''"),
+      complement: faker.location.secondaryAddress().replace(/'/g, "''"),
+      ownerId: ownerUser.user.id,
+      organizationId: organization1?.id as string,
+      occupation: faker.person.jobTitle().replace(/'/g, "''"),
+      sexualOrientation: faker.helpers
+        .arrayElement(["Heterossexual", "Homossexual", "Bissexual"])
+        .replace(/'/g, "''"),
+      civilStatus: faker.helpers
+        .arrayElement(["single", "married", "divorced", "widowed", "separated"])
+        .replace(/'/g, "''"),
+      bloodType: faker.helpers
+        .arrayElement(["a+", "a-", "b+", "b-", "ab+", "ab-", "o+", "o-"])
+        .replace(/'/g, "''"),
+      genderIdentity: faker.helpers
+        .arrayElement(["cisgender", "transgender", "non-binary"])
+        .replace(/'/g, "''"),
+      vaccinations: {
+        create: [
+          {
+            vaccinationsValuesId: vaccine1.id,
+          },
+          {
+            vaccinationsValuesId: vaccine2.id,
+          },
+        ],
+      },
+      healthPlans: {
+        create: [
+          {
+            healthPlansValuesId: healthPlan1.id,
+          },
+          {
+            healthPlansValuesId: healthPlan2.id,
+          },
+        ],
+      },
+    },
+  });
+
   const mockPatients = Array.from({ length: 99 }, (_, index) => {
     const baseDate = new Date();
     const createdAt = new Date(baseDate.setDate(baseDate.getDate() - index));
@@ -161,60 +244,39 @@ async function main() {
       name: faker.person.fullName().replace(/'/g, "''"),
       email: faker.internet.email().replace(/'/g, "''"),
       cpf: faker.string.numeric(11),
-      phone: faker.phone.number().replace(/'/g, "''"),
-      gender: faker.person.gender().replace(/'/g, "''"),
+      cellphone: faker.phone.number().replace(/'/g, "''"),
+      sex: faker.person.sex().replace(/'/g, "''"),
+      responsible: faker.person.fullName().replace(/'/g, "''"),
       nationality: faker.location.country().replace(/'/g, "''"),
-      ethnicity: faker.person.zodiacSign().replace(/'/g, "''"),
+      race: faker.helpers
+        .arrayElement(["white", "black", "brown", "yellow", "indigenous"])
+        .replace(/'/g, "''"),
       state: faker.location.state().replace(/'/g, "''"),
       city: faker.location.city().replace(/'/g, "''"),
-      zipCode: faker.location.zipCode().replace(/'/g, "''"),
+      zipcode: faker.location.zipCode().replace(/'/g, "''"),
       neighborhood: faker.location.streetAddress().replace(/'/g, "''"),
       street: faker.location.streetAddress().replace(/'/g, "''"),
       number: faker.location.buildingNumber().replace(/'/g, "''"),
+      complement: faker.location.secondaryAddress().replace(/'/g, "''"),
       ownerId: ownerUser.user.id,
       organizationId: organization1?.id as string,
       occupation: faker.person.jobTitle().replace(/'/g, "''"),
-      maritalStatus: faker.color.human().replace(/'/g, "''"),
-      bloodType: faker.word.verb().replace(/'/g, "''"),
-      genderIdentity: faker.person.sex().replace(/'/g, "''"),
-      vaccination: faker.word.verb().replace(/'/g, "''"),
-      healthInsurance: faker.word.verb().replace(/'/g, "''"),
+      sexualOrientation: faker.helpers
+        .arrayElement(["Heterossexual", "Homossexual", "Bissexual"])
+        .replace(/'/g, "''"),
+      civilStatus: faker.helpers
+        .arrayElement(["single", "married", "divorced", "widowed", "separated"])
+        .replace(/'/g, "''"),
+      bloodType: faker.helpers
+        .arrayElement(["a+", "a-", "b+", "b-", "ab+", "ab-", "o+", "o-"])
+        .replace(/'/g, "''"),
+      genderIdentity: faker.helpers
+        .arrayElement(["cisgender", "transgender", "non-binary"])
+        .replace(/'/g, "''"),
       createdAt: createdAt.toISOString(),
       updatedAt: createdAt.toISOString(),
     };
   });
-
-  // relate to user patient@test.com
-  const baseDate = new Date();
-  const createdAt = new Date(baseDate.setDate(baseDate.getDate() - 8));
-  const patientFromUser = {
-    id: faker.string.nanoid(),
-    name: faker.person.fullName().replace(/'/g, "''"),
-    email: "patient@test.com",
-    cpf: faker.string.numeric(11),
-    phone: faker.phone.number().replace(/'/g, "''"),
-    gender: faker.person.gender().replace(/'/g, "''"),
-    nationality: faker.location.country().replace(/'/g, "''"),
-    ethnicity: faker.person.zodiacSign().replace(/'/g, "''"),
-    state: faker.location.state().replace(/'/g, "''"),
-    city: faker.location.city().replace(/'/g, "''"),
-    zipCode: faker.location.zipCode().replace(/'/g, "''"),
-    neighborhood: faker.location.streetAddress().replace(/'/g, "''"),
-    street: faker.location.streetAddress().replace(/'/g, "''"),
-    number: faker.location.buildingNumber().replace(/'/g, "''"),
-    ownerId: ownerUser.user.id,
-    organizationId: organization1?.id as string,
-    occupation: faker.person.jobTitle().replace(/'/g, "''"),
-    maritalStatus: faker.color.human().replace(/'/g, "''"),
-    bloodType: faker.word.verb().replace(/'/g, "''"),
-    genderIdentity: faker.person.sex().replace(/'/g, "''"),
-    vaccination: faker.word.verb().replace(/'/g, "''"),
-    healthInsurance: faker.word.verb().replace(/'/g, "''"),
-    createdAt: createdAt.toISOString(),
-    updatedAt: createdAt.toISOString(),
-  };
-
-  mockPatients.push(patientFromUser);
 
   // Generate SQL values string
   const values = mockPatients
@@ -224,24 +286,25 @@ async function main() {
       '${p.name}',
       '${p.email}',
       '${p.cpf}',
-      '${p.phone}',
-      '${p.gender}',
+      '${p.cellphone}',
+      '${p.sex}',
+      '${p.responsible}',
       '${p.nationality}',
-      '${p.ethnicity}',
+      '${p.race}',
       '${p.state}',
       '${p.city}',
-      '${p.zipCode}',
+      '${p.zipcode}',
       '${p.neighborhood}',
       '${p.street}',
       '${p.number}',
+      '${p.complement}',
       '${p.ownerId}',
       '${p.organizationId}',
       '${p.occupation}',
-      '${p.maritalStatus}',
+      '${p.sexualOrientation}',
+      '${p.civilStatus}',
       '${p.bloodType}',
       '${p.genderIdentity}',
-      '${p.vaccination}',
-      '${p.healthInsurance}',
       '${p.createdAt}',
       '${p.updatedAt}'
     )`,
@@ -255,24 +318,25 @@ async function main() {
       "name",
       "email",
       "cpf",
-      "phone",
-      "gender",
+      "cellphone",
+      "sex",
+      "responsible",
       "nationality",
-      "ethnicity",
+      "race",
       "state",
       "city",
-      "zipCode",
+      "zipcode",
       "neighborhood",
       "street",
       "number",
+      "complement",
       "ownerId",
       "organizationId",
       "occupation",
-      "maritalStatus",
+      "sexualOrientation",
+      "civilStatus",
       "bloodType",
       "genderIdentity",
-      "vaccination",
-      "healthInsurance",
       "createdAt",
       "updatedAt"
     ) VALUES ${values};

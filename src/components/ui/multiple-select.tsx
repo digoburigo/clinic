@@ -83,6 +83,7 @@ interface MultipleSelectorProps {
   >;
   /** hide the clear all button. */
   hideClearAllButton?: boolean;
+  isFetching?: boolean;
 }
 
 export interface MultipleSelectorRef {
@@ -205,6 +206,7 @@ const MultipleSelector = React.forwardRef<
       commandProps,
       inputProps,
       hideClearAllButton = false,
+      isFetching = false,
     }: MultipleSelectorProps,
     ref: React.Ref<MultipleSelectorRef>,
   ) => {
@@ -226,7 +228,8 @@ const MultipleSelector = React.forwardRef<
       () => ({
         selectedValue: [...selected],
         input: inputRef.current as HTMLInputElement,
-        focus: () => inputRef?.current?.focus(),
+        // focus: () => inputRef?.current?.focus(),
+        focus: () => {},
         reset: () => setSelected([]),
       }),
       [selected],
@@ -395,7 +398,7 @@ const MultipleSelector = React.forwardRef<
       }
 
       // For async search creatable. avoid showing creatable item before loading at first.
-      if (onSearch && debouncedSearchTerm.length > 0 && !isLoading) {
+      if (onSearch && debouncedSearchTerm.length > 0 && !isLoading && !isFetching) {
         return Item;
       }
 
@@ -514,6 +517,7 @@ const MultipleSelector = React.forwardRef<
               disabled={disabled}
               onValueChange={(value) => {
                 setInputValue(value);
+                // setOpen(value.length > 0);
                 inputProps?.onValueChange?.(value);
               }}
               onBlur={(event) => {
@@ -574,7 +578,7 @@ const MultipleSelector = React.forwardRef<
                 inputRef?.current?.focus();
               }}
             >
-              {isLoading ? (
+              {isLoading || isFetching ? (
                 <>{loadingIndicator}</>
               ) : (
                 <>

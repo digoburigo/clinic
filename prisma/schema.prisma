@@ -155,11 +155,12 @@ model Invitation {
 }
 
 model Appointment {
-  id        String   @id() @default(nanoid())
-  patientId String
-  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  id           String         @id() @default(nanoid())
+  patientId    String
+  patient      Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt()
+  vaccinations Vaccinations[]
 
   @@map("appointment")
 }
@@ -168,22 +169,22 @@ model Patient {
   id                String          @id() @default(nanoid())
   name              String
   cpf               String
-  phone             String
+  cellphone         String
   email             String
-  gender            String
+  sex               String
   responsible       String?
   nationality       String
-  ethnicity         String
+  race              String
   state             String
   city              String
-  zipCode           String
+  zipcode           String
   neighborhood      String
   street            String
   number            String
   complement        String?
   occupation        String
   sexualOrientation String?
-  maritalStatus     String
+  civilStatus       String
   bloodType         String
   genderIdentity    String
   password          String?
@@ -196,48 +197,57 @@ model Patient {
   userId            String?
   user              User?           @relation("patientUser", fields: [userId], references: [id], onDelete: Cascade)
   appointments      Appointment[]
-  vaccinations      Vaccination[]
+  vaccinations      Vaccinations[]
   allergies         Allergies[]
   medications       Medications[]
   examResults       ExamResults[]
   comorbidities     Comorbidities[]
   surgeries         Surgeries[]
+  healthPlans       HealthPlans[]
 
   @@unique([userId, organizationId])
   @@map("patient")
 }
 
-model Vaccination {
-  id                  String            @id() @default(nanoid())
-  patientId           String
-  patient             Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  vaccinationValuesId String
-  vaccinationValues   VaccinationValues @relation(fields: [vaccinationValuesId], references: [id], onDelete: Cascade)
+model Vaccinations {
+  id                   String             @id() @default(nanoid())
+  createdAt            DateTime           @default(now())
+  patientId            String
+  patient              Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  vaccinationsValuesId String
+  vaccinationsValues   VaccinationsValues @relation(fields: [vaccinationsValuesId], references: [id], onDelete: Cascade)
+  appointmentId        String?
+  appointment          Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
-  @@map("vaccination")
+  @@unique([patientId, vaccinationsValuesId])
+  @@map("vaccinations")
 }
 
-model VaccinationValues {
-  id           String        @id() @default(nanoid())
-  value        String
-  vaccinations Vaccination[]
+model VaccinationsValues {
+  id           String         @id() @default(nanoid())
+  value        String         @unique()
+  createdAt    DateTime       @default(now())
+  vaccinations Vaccinations[]
 
-  @@map("vaccination_values")
+  @@map("vaccinations_values")
 }
 
 model Allergies {
   id                String          @id() @default(nanoid())
+  createdAt         DateTime        @default(now())
   patientId         String
   patient           Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
   allergiesValuesId String
   allergiesValues   AllergiesValues @relation(fields: [allergiesValuesId], references: [id], onDelete: Cascade)
 
+  @@unique([patientId, allergiesValuesId])
   @@map("allergies")
 }
 
 model AllergiesValues {
   id        String      @id() @default(nanoid())
-  value     String
+  value     String      @unique()
+  createdAt DateTime    @default(now())
   allergies Allergies[]
 
   @@map("allergies_values")
@@ -245,17 +255,20 @@ model AllergiesValues {
 
 model Medications {
   id                  String            @id() @default(nanoid())
+  createdAt           DateTime          @default(now())
   patientId           String
   patient             Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
   medicationsValuesId String
   medicationsValues   MedicationsValues @relation(fields: [medicationsValuesId], references: [id], onDelete: Cascade)
 
+  @@unique([patientId, medicationsValuesId])
   @@map("medications")
 }
 
 model MedicationsValues {
   id          String        @id() @default(nanoid())
-  value       String
+  value       String        @unique()
+  createdAt   DateTime      @default(now())
   medications Medications[]
 
   @@map("medications_values")
@@ -263,17 +276,20 @@ model MedicationsValues {
 
 model ExamResults {
   id                  String            @id() @default(nanoid())
+  createdAt           DateTime          @default(now())
   patientId           String
   patient             Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
   examResultsValuesId String
   examResultsValues   ExamResultsValues @relation(fields: [examResultsValuesId], references: [id], onDelete: Cascade)
 
+  @@unique([patientId, examResultsValuesId])
   @@map("exam_results")
 }
 
 model ExamResultsValues {
   id          String        @id() @default(nanoid())
-  value       String
+  value       String        @unique()
+  createdAt   DateTime      @default(now())
   examResults ExamResults[]
 
   @@map("exam_results_values")
@@ -281,17 +297,20 @@ model ExamResultsValues {
 
 model Comorbidities {
   id                    String              @id() @default(nanoid())
+  createdAt             DateTime            @default(now())
   patientId             String
   patient               Patient             @relation(fields: [patientId], references: [id], onDelete: Cascade)
   comorbiditiesValuesId String
   comorbiditiesValues   ComorbiditiesValues @relation(fields: [comorbiditiesValuesId], references: [id], onDelete: Cascade)
 
+  @@unique([patientId, comorbiditiesValuesId])
   @@map("comorbidities")
 }
 
 model ComorbiditiesValues {
   id            String          @id() @default(nanoid())
-  value         String
+  value         String          @unique()
+  createdAt     DateTime        @default(now())
   comorbidities Comorbidities[]
 
   @@map("comorbidities_values")
@@ -299,18 +318,42 @@ model ComorbiditiesValues {
 
 model Surgeries {
   id                String          @id() @default(nanoid())
+  createdAt         DateTime        @default(now())
   patientId         String
   patient           Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
   surgeriesValuesId String
   surgeriesValues   SurgeriesValues @relation(fields: [surgeriesValuesId], references: [id], onDelete: Cascade)
 
+  @@unique([patientId, surgeriesValuesId])
   @@map("surgeries")
 }
 
 model SurgeriesValues {
   id        String      @id() @default(nanoid())
-  value     String
+  value     String      @unique()
+  createdAt DateTime    @default(now())
   surgeries Surgeries[]
 
   @@map("surgeries_values")
+}
+
+model HealthPlans {
+  id                  String            @id() @default(nanoid())
+  createdAt           DateTime          @default(now())
+  patientId           String
+  patient             Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  healthPlansValuesId String
+  healthPlansValues   HealthPlansValues @relation(fields: [healthPlansValuesId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, healthPlansValuesId])
+  @@map("health_plans")
+}
+
+model HealthPlansValues {
+  id          String        @id() @default(nanoid())
+  value       String        @unique()
+  createdAt   DateTime      @default(now())
+  healthPlans HealthPlans[]
+
+  @@map("health_plans_values")
 }

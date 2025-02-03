@@ -4,9 +4,9 @@
 import * as React from "react";
 import { type DataTableRowAction } from "~/types";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Ellipsis } from "lucide-react";
-  
-import { formatDate } from "~/lib/utils";
+import { ArrowUpDown, Ellipsis, EyeIcon } from "lucide-react";
+
+import { formatDate, textFormatter } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -18,6 +18,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import type { Patient } from "@zenstackhq/runtime/models";
+import Link from "next/link";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
@@ -65,9 +66,23 @@ export function getColumns({
             Nome
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
-      cell: ({ row }) => <div>{row.getValue("name")}</div>,
+      cell: ({ row }) => (
+        <Button variant="link">
+          <Link href={`/patients/${row.original.id}`}>
+            {row.getValue("name")}
+          </Link>
+        </Button>
+      ),
+      sortingFn: "text",
+      minSize: 30,
+    },
+    {
+      id: "cpf",
+      accessorKey: "cpf",
+      header: "CPF",
+      cell: ({ row }) => <div>{textFormatter(row.getValue("cpf"), "cpf")}</div>,
       sortingFn: "text",
       minSize: 30,
     },
@@ -82,7 +97,7 @@ export function getColumns({
             Email
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       cell: ({ row }) => <div>{row.getValue("email")}</div>,
       sortingFn: "alphanumeric",
@@ -98,7 +113,7 @@ export function getColumns({
             Criado em
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       sortingFn: "datetime",
       cell: ({ cell }) =>
@@ -121,7 +136,7 @@ export function getColumns({
               <Button
                 aria-label="Open menu"
                 variant="ghost"
-                className="flex size-8 p-0 data-[state=open]:bg-muted"
+                className="data-[state=open]:bg-muted flex size-8 p-0"
               >
                 <Ellipsis className="size-4" aria-hidden="true" />
               </Button>

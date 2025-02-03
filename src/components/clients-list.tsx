@@ -258,6 +258,14 @@ export function ClientsList() {
                   </TabsList>
                   <TabsContent value="subjetivo">
                     <div className="grid gap-2">
+                      <Label htmlFor="motivo">Motivo da consulta</Label>
+                      <Textarea
+                        id="motivo"
+                        placeholder="Digite o motivo da consulta"
+                        className="min-h-[150px]"
+                      />
+                    </div>
+                    <div className="grid gap-2">
                       <Label htmlFor="subjetivo">Informações Subjetivas</Label>
                       <Textarea
                         id="subjetivo"

@@ -19,6 +19,9 @@ export default function Page() {
             <Label htmlFor="paciente">Nome do Paciente</Label>
             <Input id="paciente" placeholder="Digite o nome do paciente" />
           </div>
+          <p>alergias</p>
+              <p>comorbidades</p>
+              <p>medicamentos</p>
           <Tabs defaultValue="subjetivo" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="subjetivo">Subjetivo</TabsTrigger>
@@ -26,7 +29,16 @@ export default function Page() {
               <TabsTrigger value="avaliacao">Avaliação</TabsTrigger>
               <TabsTrigger value="plano">Plano</TabsTrigger>
             </TabsList>
+            
             <TabsContent value="subjetivo">
+              <div className="grid gap-2 mb-4">
+                <Label htmlFor="motivo">Motivo da consulta</Label>
+                <Textarea
+                  id="motivo"
+                  placeholder="Digite o motivo da consulta"
+                  className="min-h-[150px]"
+                />
+              </div>
               <div className="grid gap-2">
                 <Label htmlFor="subjetivo">Informações Subjetivas</Label>
                 <Textarea

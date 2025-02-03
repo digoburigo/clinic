@@ -36,27 +36,8 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
-
-// Define the Appointment type
-export type Appointment = {
-  id: string;
-  patientName: string;
-  date: string;
-  status: "scheduled" | "completed" | "cancelled";
-  type: string;
-};
-
-// Sample data
-const sampleData: Appointment[] = [
-  {
-    id: "1",
-    patientName: "John Doe",
-    date: "2024-03-20T10:00:00",
-    status: "scheduled",
-    type: "Consulta Regular",
-  },
-  // Add more sample appointments as needed
-];
+import { api } from "~/trpc/react";
+import type { Appointment } from "@zenstackhq/runtime/models";
 
 export const columns: ColumnDef<Appointment>[] = [
   {
@@ -165,17 +146,95 @@ export const columns: ColumnDef<Appointment>[] = [
   },
 ];
 
-export function AppointmentsList({ patientId }: { patientId: string }) {
+export function PatientAppointmentsList({ patientId }: { patientId: string }) {
+  const [patient] = api.patient.findUnique.useSuspenseQuery({
+    where: {
+      id: patientId,
+    },
+    include: {
+      appointments: true,
+      vaccinations: {
+        include: {
+          vaccinationsValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+      allergies: {
+        include: {
+          allergiesValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+      medications: {
+        include: {
+          medicationsValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+      comorbidities: {
+        include: {
+          comorbiditiesValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+      examResults: {
+        include: {
+          examResultsValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+      surgeries: {
+        include: {
+          surgeriesValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+      healthPlans: {
+        include: {
+          healthPlansValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [data, setData] = React.useState<Appointment[]>(sampleData);
 
   const table = useReactTable({
-    data,
+    data: (patient as any)?.appointments,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

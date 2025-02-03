@@ -39,9 +39,9 @@ export function OrganizationSwitcher({
       organizationId: organization.id,
     });
     await utils.invalidate();
-    if (typeof window !== "undefined") {
-      window.location.reload();
-    }
+    // if (typeof window !== "undefined") {
+    //   window.location.reload();
+    // }
   }
 
   return (

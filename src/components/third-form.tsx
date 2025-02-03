@@ -64,7 +64,7 @@ export function ThirdStepForm() {
           name="ocupacao"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Ocupação</FormLabel>
+              <FormLabel>Ocupação principal</FormLabel>
               <FormControl>
                 <Input placeholder="Digite sua ocupação" {...field} />
               </FormControl>

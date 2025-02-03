@@ -44,7 +44,6 @@ export default async function Page() {
             searchableColumnCount={1}
             filterableColumnCount={2}
             cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
-            shrinkZero
           />
         }
       >

@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { useMemo } from "react";
 
 type BreadcrumbItem = {
@@ -13,6 +13,21 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
   "/": [{ title: "Painel de informações", link: "/" }],
   "/patients": [
     { title: "Pacientes", link: "/patients" },
+  ],
+  "/patients/:id": [
+    { title: "Pacientes", link: "/patients" },
+    { title: "Detalhes", link: "" },
+  ],
+  "/patients/:id/appointments": [
+    { title: "Pacientes", link: "/patients" },
+    { title: "Detalhes", link: "/patients/:id" },
+    { title: "Consultas", link: "" },
+  ],
+  "/patients/:id/appointments/new": [
+    { title: "Pacientes", link: "/patients" },
+    { title: "Detalhes", link: "/patients/:id" },
+    { title: "Consultas", link: "" },
+    { title: "Nova Consulta", link: "/patients/:id/appointments/new" },
   ],
   "/patients/new": [
     { title: "Pacientes", link: "/patients" },
@@ -35,14 +50,33 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
 
 export function useBreadcrumbs() {
   const pathname = usePathname();
-
+  const params = useParams();
+  
   const breadcrumbs = useMemo(() => {
-    // Check if we have a custom mapping for this exact path
+    // First try to match dynamic routes
+    for (const [route, breadcrumbItems] of Object.entries(routeMapping)) {
+      // Replace :id with actual param value to check for dynamic route match
+      const dynamicRoute = Object.entries(params).reduce((path, [key, value]) => {
+        return path.replace(`:${key}`, value as string);
+      }, route);
+      
+      if (pathname === dynamicRoute) {
+        // Replace dynamic params in the links as well
+        return breadcrumbItems.map(item => ({
+          ...item,
+          link: Object.entries(params).reduce((link, [key, value]) => {
+            return link.replace(`:${key}`, value as string);
+          }, item.link)
+        }));
+      }
+    }
+
+    // If no dynamic match found, check for exact static route match
     if (routeMapping[pathname]) {
       return routeMapping[pathname];
     }
 
-    // If no exact match, fall back to generating breadcrumbs from the path
+    // Fall back to generating breadcrumbs from the path
     const segments = pathname.split("/").filter(Boolean);
     return segments.map((segment, index) => {
       const path = `/${segments.slice(0, index + 1).join("/")}`;
@@ -51,7 +85,7 @@ export function useBreadcrumbs() {
         link: path,
       };
     });
-  }, [pathname]);
+  }, [pathname, params]);
 
   return breadcrumbs;
 }

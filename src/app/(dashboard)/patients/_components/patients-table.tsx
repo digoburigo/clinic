@@ -5,9 +5,8 @@ import { api } from "~/trpc/react";
 
 import type { Patient } from "@zenstackhq/runtime/models";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useState } from "react";
 import { DataTableRowAction } from "~/types";
-import { useState } from "react";
 import { getColumns } from "./patients-table-columns";
 import {
   useReactTable,

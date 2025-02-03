@@ -146,7 +146,7 @@ CREATE TABLE "patient" (
     "maritalStatus" TEXT NOT NULL,
     "bloodType" TEXT NOT NULL,
     "genderIdentity" TEXT NOT NULL,
-    "vaccination" TEXT NOT NULL,
+    "vaccinations" TEXT NOT NULL,
     "allergies" TEXT,
     "medications" TEXT,
     "examResults" TEXT,

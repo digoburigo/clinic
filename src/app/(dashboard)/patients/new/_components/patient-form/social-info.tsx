@@ -52,7 +52,7 @@ export function SocialInfoForm() {
           name="occupation" 
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel required>Ocupação</FormLabel>
+              <FormLabel required>Ocupação principal</FormLabel>
               <FormControl>
                 <Input placeholder="Ex.: Enfermeiro, Professor, etc." {...field} />
               </FormControl>

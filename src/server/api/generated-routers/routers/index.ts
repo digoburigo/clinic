@@ -19,8 +19,8 @@ import createMemberRouter from "./Member.router";
 import createInvitationRouter from "./Invitation.router";
 import createAppointmentRouter from "./Appointment.router";
 import createPatientRouter from "./Patient.router";
-import createVaccinationRouter from "./Vaccination.router";
-import createVaccinationValuesRouter from "./VaccinationValues.router";
+import createVaccinationsRouter from "./Vaccinations.router";
+import createVaccinationsValuesRouter from "./VaccinationsValues.router";
 import createAllergiesRouter from "./Allergies.router";
 import createAllergiesValuesRouter from "./AllergiesValues.router";
 import createMedicationsRouter from "./Medications.router";
@@ -31,6 +31,8 @@ import createComorbiditiesRouter from "./Comorbidities.router";
 import createComorbiditiesValuesRouter from "./ComorbiditiesValues.router";
 import createSurgeriesRouter from "./Surgeries.router";
 import createSurgeriesValuesRouter from "./SurgeriesValues.router";
+import createHealthPlansRouter from "./HealthPlans.router";
+import createHealthPlansValuesRouter from "./HealthPlansValues.router";
 
 export function db(ctx: any) {
     if (!ctx.prisma) {
@@ -52,8 +54,8 @@ export function createRouter() {
         invitation: createInvitationRouter(),
         appointment: createAppointmentRouter(),
         patient: createPatientRouter(),
-        vaccination: createVaccinationRouter(),
-        vaccinationValues: createVaccinationValuesRouter(),
+        vaccinations: createVaccinationsRouter(),
+        vaccinationsValues: createVaccinationsValuesRouter(),
         allergies: createAllergiesRouter(),
         allergiesValues: createAllergiesValuesRouter(),
         medications: createMedicationsRouter(),
@@ -64,6 +66,8 @@ export function createRouter() {
         comorbiditiesValues: createComorbiditiesValuesRouter(),
         surgeries: createSurgeriesRouter(),
         surgeriesValues: createSurgeriesValuesRouter(),
+        healthPlans: createHealthPlansRouter(),
+        healthPlansValues: createHealthPlansValuesRouter(),
     }
     );
 }
