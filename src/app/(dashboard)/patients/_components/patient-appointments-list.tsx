@@ -38,46 +38,68 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { api } from "~/trpc/react";
 import type { Appointment } from "@zenstackhq/runtime/models";
+import { formatDate } from "~/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Appointment>[] = [
   {
-    accessorKey: "patientName",
+    accessorKey: "id",
     header: ({ column }) => {
+      return <div>Identificador único</div>;
+    },
+    size: 10,
+    cell: ({ row }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Paciente
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="w-fit">
+          <Button variant="link" size="sm">
+            <Link
+              href={`/patients/${row.original.patientId}/appointments/${row.original.id}`}
+            >
+              {row.original.id}
+            </Link>
+          </Button>
+        </div>
       );
     },
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("patientName")}</div>
-    ),
   },
   {
-    accessorKey: "date",
+    accessorKey: "motive",
     header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Data
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
+      return <div>Motivo</div>;
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue("date"));
+      return (
+        <div className="max-w-[100px] truncate">
+          {row.getValue("motive")}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => {
+      return <div>Data de criação</div>;
+    },
+    cell: ({ row }) => {
       return (
         <div>
-          {date.toLocaleDateString("pt-BR", {
+          {formatDate(row.getValue("createdAt") as Date, {
             day: "2-digit",
             month: "2-digit",
-            year: "numeric",
+            year: "2-digit",
+            hour12: false,
             hour: "2-digit",
             minute: "2-digit",
           })}
@@ -85,39 +107,45 @@ export const columns: ColumnDef<Appointment>[] = [
       );
     },
   },
+
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "updatedAt",
+    header: ({ column }) => {
+      return <div>Última atualização</div>;
+    },
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
       return (
-        <div
-          className={`capitalize ${
-            status === "scheduled"
-              ? "text-blue-600"
-              : status === "completed"
-                ? "text-green-600"
-                : "text-red-600"
-          }`}
-        >
-          {status === "scheduled"
-            ? "Agendada"
-            : status === "completed"
-              ? "Realizada"
-              : "Cancelada"}
+        <div>
+          {formatDate(row.getValue("updatedAt") as Date, {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+            hour12: false,
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </div>
       );
     },
   },
-  {
-    accessorKey: "type",
-    header: "Tipo",
-    cell: ({ row }) => <div>{row.getValue("type")}</div>,
-  },
+
   {
     id: "actions",
     cell: ({ row }) => {
-      const appointment = row.original;
+      const utils = api.useUtils();
+      const deleteAppointment = api.appointment.delete.useMutation({
+        onSuccess: async () => {
+          toast.success("Consulta excluída com sucesso");
+          await utils.patient.findUnique.invalidate({
+            where: {
+              id: row.original.patientId,
+            },
+          });
+        },
+        onError: (error) => {
+          toast.error("Erro ao excluir consulta");
+        },
+      });
 
       return (
         <DropdownMenu>
@@ -128,17 +156,41 @@ export const columns: ColumnDef<Appointment>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Ações</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link href={`/patients/m5gr84i9/appointments/${appointment.id}`}>
-                Ver detalhes
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Editar consulta</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
-              Cancelar consulta
-            </DropdownMenuItem>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  Excluir consulta
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Tem certeza que deseja excluir esta consulta?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={() => {
+                      deleteAppointment.mutate({
+                        where: {  
+                          id: row.original.id,
+                        },
+                      });
+                    }}
+                  >
+                    {deleteAppointment.isPending ? "Excluindo..." : "Excluir"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

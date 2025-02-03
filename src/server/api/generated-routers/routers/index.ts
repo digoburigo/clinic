@@ -9,7 +9,6 @@ import type { AnyTRPCRouter as AnyRouter } from "@trpc/server";
 import type { PrismaClient } from "@zenstackhq/runtime/models";
 import { createTRPCRouter } from "../../trpc";
 import createPostRouter from "./Post.router";
-import createCidRouter from "./Cid.router";
 import createUserRouter from "./User.router";
 import createSessionRouter from "./Session.router";
 import createAccountRouter from "./Account.router";
@@ -17,6 +16,8 @@ import createVerificationRouter from "./Verification.router";
 import createOrganizationRouter from "./Organization.router";
 import createMemberRouter from "./Member.router";
 import createInvitationRouter from "./Invitation.router";
+import createCidRouter from "./Cid.router";
+import createAppointmentCidRouter from "./AppointmentCid.router";
 import createAppointmentRouter from "./Appointment.router";
 import createPatientRouter from "./Patient.router";
 import createVaccinationsRouter from "./Vaccinations.router";
@@ -44,7 +45,6 @@ export function db(ctx: any) {
 export function createRouter() {
     return createTRPCRouter({
         post: createPostRouter(),
-        cid: createCidRouter(),
         user: createUserRouter(),
         session: createSessionRouter(),
         account: createAccountRouter(),
@@ -52,6 +52,8 @@ export function createRouter() {
         organization: createOrganizationRouter(),
         member: createMemberRouter(),
         invitation: createInvitationRouter(),
+        cid: createCidRouter(),
+        appointmentCid: createAppointmentCidRouter(),
         appointment: createAppointmentRouter(),
         patient: createPatientRouter(),
         vaccinations: createVaccinationsRouter(),

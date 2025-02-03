@@ -33,6 +33,7 @@ type Auth {
   @@auth
 }
 
+// EXAMPLE OF A BUSINESS RULE
 model Post {
   id        String      @id @default(nanoid())
   title     String
@@ -67,18 +68,6 @@ model Post {
   @@map("post")
 }
 
-model Cid {
-  id        String      @id @default(nanoid())
-  code       String
-  description       String
-
-  @@unique([code])
-
-  @@allow('read', true)
-
-  @@map("cid")
-}
-
 model User {
   id            String       @id @default(nanoid())
   name          String
@@ -100,6 +89,8 @@ model User {
 
   patientsOwner Patient[] @relation("patientsOwner")
   patientUser Patient[] @relation("patientUser")
+
+  appointments Appointment[]
 
   @@allow('create,read', true)
   
@@ -173,6 +164,17 @@ model Organization {
   posts Post[]
   patients Patient[]
 
+  appointments Appointment[]
+  appointmentCids AppointmentCid[]
+  vaccinations Vaccinations[]
+  allergies Allergies[]
+  medications Medications[]
+  examResults ExamResults[]
+  comorbidities Comorbidities[]
+  surgeries Surgeries[]
+  healthPlans HealthPlans[]
+
+
   @@unique([slug])
 
   @@allow('create,read', true)
@@ -220,14 +222,81 @@ model Invitation {
   @@allow('read', auth().userId == inviterId && auth().organizationId == organizationId)
 }
 
+// --------------------- BUSINESS RULES ---------------------
+
+model Cid {
+  id        String      @id @default(nanoid())
+  code       String
+  description       String
+
+  appointmentCid AppointmentCid[]
+
+  @@unique([code])
+
+  @@index([code])
+
+  @@allow('read,create,delete', true)
+
+  @@map("cid")
+}
+
+model AppointmentCid {
+  id String @id @default(nanoid())
+
+  appointmentId String
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  cidId String
+  cid Cid @relation(fields: [cidId], references: [id], onDelete: Cascade)
+
+  organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Access rules
+  @@deny('all', auth() == null)
+  @@deny('all', auth().organizationId != organizationId)
+  @@allow('create', auth().userId == appointment.ownerId)
+  @@allow('all', auth().userId == appointment.ownerId || auth().organizationRole == 'owner' || auth().organizationRole == 'admin')
+  @@allow('read', organizationId != null)
+
+  @@unique([appointmentId, cidId])
+
+  @@map("appointment_cid")
+}
+
+
 model Appointment {
   id String @id @default(nanoid())
+
   patientId String
   patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  vaccinations Vaccinations[]
+  motive String
+  subjective String
+  objective String
+  evaluation String
+  plan String
+
+  cids AppointmentCid[]
+  allergies Allergies[]
+  medications Medications[]
+  comorbidities Comorbidities[]
+
+  ownerId String @default(auth().userId) @allow('update', false)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Access rules
+  @@deny('all', auth() == null)
+  @@deny('all', auth().organizationId != organizationId)
+  @@allow('create', auth().userId == ownerId)
+  @@allow('all', auth().userId == ownerId || auth().organizationRole == 'owner' || auth().organizationRole == 'admin')
+  @@allow('read', organizationId != null)
 
   @@map("appointment")
 }
@@ -311,8 +380,8 @@ model Vaccinations {
   vaccinationsValuesId String
   vaccinationsValues VaccinationsValues @relation(fields: [vaccinationsValuesId], references: [id], onDelete: Cascade)
 
-  appointmentId String?
-  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users
   @@deny('all', auth() == null)
@@ -345,11 +414,17 @@ model Allergies {
   id String @id @default(nanoid())
   createdAt   DateTime @default(now())
 
-  patientId String
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId String?
+  patient Patient? @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   allergiesValuesId String
   allergiesValues AllergiesValues @relation(fields: [allergiesValuesId], references: [id], onDelete: Cascade)
+
+  appointmentId String?
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users
   @@deny('all', auth() == null)
@@ -383,11 +458,17 @@ model Medications {
   id String @id @default(nanoid())
   createdAt   DateTime @default(now())
 
-  patientId String
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId String?
+  patient Patient? @relation(fields: [patientId], references: [id], onDelete: Cascade)
   
   medicationsValuesId String
   medicationsValues MedicationsValues @relation(fields: [medicationsValuesId], references: [id], onDelete: Cascade)
+
+  appointmentId String?
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users
   @@deny('all', auth() == null)
@@ -426,6 +507,9 @@ model ExamResults {
   examResultsValuesId String
   examResultsValues ExamResultsValues @relation(fields: [examResultsValuesId], references: [id], onDelete: Cascade)
 
+    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   // deny anonymous users
   @@deny('all', auth() == null)
 
@@ -457,11 +541,17 @@ model Comorbidities {
   id String @id @default(nanoid())
   createdAt   DateTime @default(now())
 
-  patientId String
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId String?
+  patient Patient? @relation(fields: [patientId], references: [id], onDelete: Cascade)
   
   comorbiditiesValuesId String
   comorbiditiesValues ComorbiditiesValues @relation(fields: [comorbiditiesValuesId], references: [id], onDelete: Cascade)
+
+  appointmentId String?
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users
   @@deny('all', auth() == null)
@@ -500,6 +590,9 @@ model Surgeries {
   surgeriesValuesId String
   surgeriesValues SurgeriesValues @relation(fields: [surgeriesValuesId], references: [id], onDelete: Cascade)
 
+    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   // deny anonymous users
   @@deny('all', auth() == null)
 
@@ -536,6 +629,9 @@ model HealthPlans {
   
   healthPlansValuesId String
   healthPlansValues HealthPlansValues @relation(fields: [healthPlansValuesId], references: [id], onDelete: Cascade)
+
+    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users
   @@deny('all', auth() == null)

@@ -14,6 +14,7 @@ const adapter = new PrismaLibSQL(libsql);
 const createPrismaClient = () =>
   new PrismaClient({
     adapter: process.env.NODE_ENV === "production" ? adapter : null,
+    // adapter: adapter,
     // when seeding to turso, we need to use the adapter
     log:
       env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],

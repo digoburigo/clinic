@@ -10,7 +10,7 @@ pnpm db:migrate:dev
 jogar alterações ao banco de dados do turso
 tem que ter o turso instalado e autenticado
 ```bash
-turso db shell doc-db < ./prisma/migrations/{nome_da_migration}/migration.sql
+turso db shell <database-name> < ./prisma/migrations/{nome_da_migration}/migration.sql
 ```
 
 rodar os seeds

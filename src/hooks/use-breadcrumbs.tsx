@@ -29,6 +29,12 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
     { title: "Consultas", link: "" },
     { title: "Nova Consulta", link: "/patients/:id/appointments/new" },
   ],
+  "/patients/:id/appointments/:appointmentId": [
+    { title: "Pacientes", link: "/patients" },
+    { title: "Detalhes", link: "/patients/:id" },
+    { title: "Consultas", link: "/patients/:id" },
+    { title: "Detalhes", link: "" },
+  ],
   "/patients/new": [
     { title: "Pacientes", link: "/patients" },
     { title: "Adicionar Paciente", link: "/patients/new" },

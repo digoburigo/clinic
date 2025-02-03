@@ -178,9 +178,9 @@ async function main() {
     }),
   ]);
 
-  await db.patient.create({
+  const thePatient = await db.patient.create({
     data: {
-      name: faker.person.fullName().replace(/'/g, "''"),
+      name: "O PACIENTE OFICIAL",
       email: "patient@test.com",
       cpf: faker.string.numeric(11),
       cellphone: faker.phone.number().replace(/'/g, "''"),
@@ -231,6 +231,31 @@ async function main() {
             healthPlansValuesId: healthPlan2.id,
           },
         ],
+      },
+    },
+  });
+
+  const cid1 = await db.cid.create({
+    data: {
+      code: "XXX",
+      description: "Fake CID",
+    },
+  });
+
+  await db.appointment.create({
+    data: {
+      patientId: thePatient.id,
+      organizationId: organization1?.id as string,
+      plan: "Plano 1",
+      motive: "Motivo 1",
+      subjective: "Subjetivo 1",
+      objective: "Objetivo 1",
+      evaluation: "Avaliação 1",
+      ownerId: ownerUser.user.id,
+      cids: {
+        create: {
+          cidId: cid1.id,
+        },
       },
     },
   });

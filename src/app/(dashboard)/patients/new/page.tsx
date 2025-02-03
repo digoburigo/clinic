@@ -4,7 +4,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import StepperDemo from "~/components/custom-stepper";
 import type { Metadata } from "next";
 import PatientForm from "./_components/new-patient-form";
 
