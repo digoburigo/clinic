@@ -17,9 +17,9 @@ type AllFields = z.infer<typeof subjectiveSchema> &
 export function ReviewInfo() {
   const { getValues } = useFormContext<AllFields>();
 
-  const { subjective, motive, objective, evaluation, cid, plan } = getValues();
+  const { subjective, motive, objective, evaluation, cids, plan } = getValues();
 
-  const cids = cid.map((c) => c.label);
+  const cidsLabels = cids.map((c) => c.label);
 
   return (
     <div className="space-y-6">
@@ -79,7 +79,7 @@ export function ReviewInfo() {
             <div className="flex flex-col gap-2">
               <Label className="text-muted-foreground font-bold">CIDs</Label>
               <UL className="mt-0">
-                {cids.map((cid) => (
+                {cidsLabels.map((cid) => (
                   <LI key={cid}>{cid}</LI>
                 ))}
               </UL>

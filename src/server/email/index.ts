@@ -17,7 +17,7 @@ export async function sendEmail({ emailTemplate, to, subject }: Props) {
 
   if (process.env.NODE_ENV === "production") {
     await resend.emails.send({
-      from: "Melomar Clínica <admin@updates.melomarclinicamedica.com.br>",
+      from: `Melomar Clínica <admin@${process.env.RESEND_DOMAIN}>`,
       to,
       subject,
       html,

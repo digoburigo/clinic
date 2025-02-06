@@ -24,6 +24,17 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export function PatientsTable() {
   const [rowAction, setRowAction] =
@@ -43,7 +54,7 @@ export function PatientsTable() {
     // skip: pagination.pageIndex * pagination.pageSize,
     orderBy: [
       {
-        createdAt: "desc",  
+        createdAt: "desc",
       },
     ],
   });
@@ -58,6 +69,26 @@ export function PatientsTable() {
       desc: true,
     },
   ]);
+
+  const utils = api.useUtils();
+  const { mutate: deletePatient, isPending: isDeleting } =
+    api.patient.delete.useMutation({
+      onMutate: () => {
+        toast.loading("Excluindo paciente...", { id: "delete-patient" });
+      },
+      onSettled: () => {
+        toast.dismiss("delete-patient");
+      },
+      onSuccess: () => {
+        toast.success("Paciente excluído com sucesso");
+        void utils.patient.findMany.invalidate();
+        void utils.patient.count.invalidate();
+        setRowAction(null);
+      },
+      onError: (error) => {
+        toast.error(`Erro ao excluir paciente: ${error.message}`);
+      },
+    });
 
   const table = useReactTable({
     data: patients,
@@ -94,15 +125,47 @@ export function PatientsTable() {
           className="max-w-sm"
         />
 
-        <Button asChild className="dark:bg-white dark:text-black" >
+        <Button asChild className="dark:bg-white dark:text-black">
           <Link href="/patients/new">
-            <PlusIcon className="w-4 h-4" />
+            <PlusIcon className="h-4 w-4" />
             Novo paciente
           </Link>
         </Button>
       </div>
 
       <DataTable table={table} />
+
+      <AlertDialog
+        open={rowAction?.type === "delete"}
+        onOpenChange={() => setRowAction(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o
+              paciente {rowAction?.row.original.name} e todos os dados associados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              onClick={() => {
+                if (rowAction?.row.original.id) {
+                  deletePatient({
+                    where: {
+                      id: rowAction.row.original.id,
+                    },
+                  });
+                }
+              }}
+            >
+              {isDeleting ? "Excluindo..." : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
