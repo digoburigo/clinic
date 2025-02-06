@@ -74,7 +74,6 @@ export type PatientEntity = Prisma.PatientGetPayload<
 >;
 
 function formatPatient(patient: PatientEntity) {
-  console.log(`patient:`, patient);
   return {
     ...patient,
     vaccinations:

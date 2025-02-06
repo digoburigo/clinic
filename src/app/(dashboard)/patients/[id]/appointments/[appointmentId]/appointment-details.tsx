@@ -64,7 +64,6 @@ export type AppointmentEntity = Prisma.AppointmentGetPayload<
 >;
 
 function formatAppointment(appointment: AppointmentEntity) {
-  console.log(`appointment:`, appointment);
   return {
     ...appointment,
     cids:
@@ -158,13 +157,10 @@ export function AppointmentDetails({
   const [tab, setTab] = useState<AppointmentTabs>("subjective");
   const [formHasChanged, setFormHasChanged] = useState(false);
 
-  console.log(`appointment:`, appointment);
-  const a = formatAppointment(appointment);
-  console.log(`a:`, a);
   const form = useForm({
     mode: "onBlur",
     resolver: zodResolver(schemas[tab]),
-    defaultValues: a,
+    defaultValues: formatAppointment(appointment),
   });
 
   form.watch(() => {
@@ -214,7 +210,6 @@ export function AppointmentDetails({
 
   async function onSubmit(values: z.infer<(typeof schemas)[typeof tab]>) {
     const v = form.getValues();
-    console.log(`v:`, v)
 
     await updateAppointmentAsync({
       where: {

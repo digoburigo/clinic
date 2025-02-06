@@ -13,12 +13,6 @@ import { useSession } from "~/server/auth";
 import { BarChartExample } from "~/components/bar-chart";
 import { TrendingUp } from "lucide-react";
 
-import { CidMultiSelect } from "~/components/cid-multi-select";
-import { Button } from "~/components/ui/button";
-import { authClient } from "~/lib/auth-client";
-import { InviteButton } from "./invite-button";
-import { headers } from "next/headers";
-
 export const metadata: Metadata = {
   title: "Painel de informações",
   description: "Painel de informações do sistema de gerenciamento de pacientes.",
@@ -170,7 +164,6 @@ export default async function Page() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <InviteButton />
             </CardContent>
           </Card>
         </div>
