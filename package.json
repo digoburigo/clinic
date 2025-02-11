@@ -75,7 +75,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@radix-ui/react-use-controllable-state": "^1.1.0",
     "@react-email/components": "0.0.33",
-    "@stepperize/react": "^5.0.1",
+    "@stepperize/react": "^5.1.0",
     "@t3-oss/env-nextjs": "^0.12.0",
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-table": "^8.20.6",
