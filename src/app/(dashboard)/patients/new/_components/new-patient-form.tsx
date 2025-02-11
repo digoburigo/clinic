@@ -8,7 +8,7 @@ import { useWindowSize } from "@uidotdev/usehooks";
 
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
-import { defineStepper } from "~/components/ui/stepper2";
+import { defineStepper } from "~/components/ui/stepper";
 import { PersonalInfoForm, personalInfoSchema } from "./patient-form/personal-info";
 import { AddressInfoForm, addressInfoSchema } from "./patient-form/address-info";
 import { SocialInfoForm, socialInfoSchema } from "./patient-form/social-info";

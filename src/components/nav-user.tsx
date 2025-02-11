@@ -5,6 +5,9 @@ import {
   Bell,
   ChevronsUpDown,
   LogOut,
+  Sun,
+  Moon,
+  LaptopMinimal,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -14,7 +17,11 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import {
@@ -26,6 +33,9 @@ import {
 import { authClient } from "~/lib/auth-client";
 import { Button } from "~/components/ui/button";
 import { useRouter } from "next/navigation";
+import ToggleThemeSwitch from "./ui/toggle-theme-switch";
+import { useTheme } from "next-themes";
+import { cn } from "~/lib/utils";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -34,14 +44,14 @@ export function NavUser() {
   const { data: session } = authClient.useSession();
 
   async function onSignOut() {
-   await authClient.signOut({
+    await authClient.signOut({
       fetchOptions: {
         onSuccess: async () => {
           router.push("/login"); // redirect to login page
         },
       },
     });
-  };
+  }
 
   return (
     <SidebarMenu>
@@ -109,12 +119,13 @@ export function NavUser() {
                 <Bell />
                 Notificações
               </DropdownMenuItem>
+              <ThemeSubMenu />
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Button
                 variant="ghost"
-                className="w-full flex justify-start"
+                className="flex w-full justify-start"
                 onClick={onSignOut}
               >
                 <LogOut />
@@ -125,5 +136,42 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+  );
+}
+
+function ThemeSubMenu() {
+  const { setTheme, theme } = useTheme();
+
+  return (
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger>
+        <span>Tema</span>
+      </DropdownMenuSubTrigger>
+      <DropdownMenuPortal>
+        <DropdownMenuSubContent>
+          <DropdownMenuItem
+            onClick={() => setTheme("light")}
+            className={cn(theme === "light" && "bg-sidebar-accent")}
+          >
+            <Sun />
+            <span>Claro</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => setTheme("dark")}
+            className={cn(theme === "dark" && "bg-sidebar-accent")}
+          >
+            <Moon />
+            <span>Escuro</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => setTheme("system")}
+            className={cn(theme === "system" && "bg-sidebar-accent")}
+          >
+            <LaptopMinimal />
+            <span>Sistema</span>
+          </DropdownMenuItem>
+        </DropdownMenuSubContent>
+      </DropdownMenuPortal>
+    </DropdownMenuSub>
   );
 }

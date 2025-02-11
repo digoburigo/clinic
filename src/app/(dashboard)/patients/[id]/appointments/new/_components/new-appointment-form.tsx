@@ -7,7 +7,7 @@ import { z } from "zod";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
-import { defineStepper } from "~/components/ui/stepper2";
+import { defineStepper } from "~/components/ui/stepper";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { ClientOnly } from "~/lib/client-only";
 import { api } from "~/trpc/react";

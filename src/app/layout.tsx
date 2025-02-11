@@ -6,6 +6,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { Toaster } from "~/components/ui/sonner";
 import { cn } from "~/lib/utils";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { ThemeProvider } from "~/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Clínica Médica",
@@ -53,7 +54,16 @@ export default function RootLayout({
         )}
       >
         <TRPCReactProvider>
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <NuqsAdapter>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </NuqsAdapter>
         </TRPCReactProvider>
         <Toaster richColors />
       </body>
