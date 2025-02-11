@@ -6,7 +6,7 @@ import { FormControl } from "~/components/ui/form";
 import { FormLabel } from "~/components/ui/form";
 import { FormField } from "~/components/ui/form";
 import { FormItem } from "~/components/ui/form";
-import MultipleSelector, { type Option } from "~/components/ui/multiple-select";
+import MultipleSelector, { type Option } from "~/components/ui/multiple-selector";
 
 import { api } from "~/trpc/react";
 import type { MedicalInfoForm } from "./types";

@@ -9,7 +9,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { api } from "~/trpc/react";
 import { useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
-import MultipleSelector from "~/components/ui/multiple-select";
+import MultipleSelector from "~/components/ui/multiple-selector";
 import { InlineCode } from "~/components/ui/typography";
 
 const optionSchema = z.object({

@@ -41,13 +41,13 @@ export type ChartContainerProps = React.ComponentProps<"div"> & {
   >["children"];
 };
 
-const ChartContainer = ({
+function ChartContainer({
   id,
   className,
   children,
   config,
   ...props
-}: ChartContainerProps) => {
+}: ChartContainerProps) {
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
@@ -70,7 +70,6 @@ const ChartContainer = ({
     </ChartContext.Provider>
   );
 };
-ChartContainer.displayName = "Chart";
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
@@ -118,7 +117,7 @@ export type ChartTooltipProps = React.ComponentProps<
     labelKey?: string;
   };
 
-const ChartTooltipContent = ({
+function ChartTooltipContent({
   active,
   payload,
   className,
@@ -133,7 +132,7 @@ const ChartTooltipContent = ({
   nameKey,
   labelKey,
   ref,
-}: ChartTooltipProps) => {
+}: ChartTooltipProps) {
   const { config } = useChart();
 
   const tooltipLabel = React.useMemo(() => {
@@ -256,7 +255,6 @@ const ChartTooltipContent = ({
     </div>
   );
 };
-ChartTooltipContent.displayName = "ChartTooltip";
 
 const ChartLegend = RechartsPrimitive.Legend;
 
@@ -266,14 +264,14 @@ export type ChartLegendProps = React.ComponentProps<"div"> &
     nameKey?: string;
   };
 
-const ChartLegendContent = ({
+function ChartLegendContent({
   className,
   hideIcon = false,
   payload,
   verticalAlign = "bottom",
   nameKey,
   ref,
-}: ChartLegendProps) => {
+}: ChartLegendProps) {
   const { config } = useChart();
 
   if (!payload?.length) {
@@ -317,7 +315,6 @@ const ChartLegendContent = ({
     </div>
   );
 };
-ChartLegendContent.displayName = "ChartLegend";
 
 // Helper to extract item config from a payload.
 function getPayloadConfigFromPayload(

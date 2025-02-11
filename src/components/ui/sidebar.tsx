@@ -53,7 +53,7 @@ function useSidebar() {
   return context
 }
 
-const SidebarProvider = ({
+function SidebarProvider({
   defaultOpen = true,
   open: openProp,
   onOpenChange: setOpenProp,
@@ -65,7 +65,7 @@ const SidebarProvider = ({
   defaultOpen?: boolean
   open?: boolean
   onOpenChange?: (open: boolean) => void
-}) => {
+}) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
 
@@ -152,8 +152,6 @@ const SidebarProvider = ({
     </SidebarContext.Provider>
   )
 }
-
-SidebarProvider.displayName = "SidebarProvider"
 
 function Sidebar({
   side = "left",
