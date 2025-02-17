@@ -15,7 +15,7 @@ async function main() {
     db.patient.deleteMany(),
     db.vaccinationsValues.deleteMany(),
     db.healthPlansValues.deleteMany(),
-    db.defaultObjectInformation.deleteMany(),
+    db.defaultObjectiveInformation.deleteMany(),
   ]);
 
   const [superAdminUser, adminUser, memberUser, ownerUser, patientUser] =
@@ -73,7 +73,7 @@ async function main() {
   ]);
 
   await Promise.all([
-    db.defaultObjectInformation.create({
+    db.defaultObjectiveInformation.create({
       data: {
         organizationId: organization1?.id as string,
         text: `
