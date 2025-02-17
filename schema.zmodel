@@ -158,6 +158,8 @@ model Organization {
   updatedAt   DateTime @updatedAt
   metadata    String?
 
+  defaultObjectiveInformation DefaultObjectiveInformation?
+
   members     Member[]
   invitations Invitation[]
 
@@ -173,7 +175,6 @@ model Organization {
   comorbidities Comorbidities[]
   surgeries Surgeries[]
   healthPlans HealthPlans[]
-
 
   @@unique([slug])
 
@@ -659,4 +660,19 @@ model HealthPlansValues {
 
   @@map("health_plans_values")
 }
+
+model DefaultObjectiveInformation {
+  id String @id @default(nanoid())
+  text String?
+
+  organizationId String? @default(auth().organizationId) @allow('update', false)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("default_objective_information")
+
+  @@unique([organizationId])
+
+  @@allow('read', auth().organizationId == organizationId)
+}
+
 

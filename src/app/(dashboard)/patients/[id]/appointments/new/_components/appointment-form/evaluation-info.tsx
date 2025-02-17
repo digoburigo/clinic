@@ -1,16 +1,19 @@
+import { useDebounce } from "@uidotdev/usehooks";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
-import { FormDescription, FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
-import { Textarea } from "~/components/ui/textarea";
-import { api } from "~/trpc/react";
-import { useState } from "react";
-import { useDebounce } from "@uidotdev/usehooks";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 import MultipleSelector from "~/components/ui/multiple-selector";
+import { Textarea } from "~/components/ui/textarea";
 import { InlineCode } from "~/components/ui/typography";
+import { api } from "~/trpc/react";
 
 const optionSchema = z.object({
   id: z.string().optional(),
@@ -65,7 +68,7 @@ export function EvaluationForm() {
         name="evaluation"
         render={({ field, fieldState }) => (
           <FormItem>
-            <FormLabel required>Informações Objetivas</FormLabel>
+            <FormLabel required>Informações da Avaliação</FormLabel>
             <FormControl>
               <Textarea
                 {...field}

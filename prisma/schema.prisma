@@ -102,26 +102,27 @@ model Verification {
 }
 
 model Organization {
-  id              String           @id() @default(nanoid())
-  name            String
-  slug            String?
-  logo            String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt()
-  metadata        String?
-  members         Member[]
-  invitations     Invitation[]
-  posts           Post[]
-  patients        Patient[]
-  appointments    Appointment[]
-  appointmentCids AppointmentCid[]
-  vaccinations    Vaccinations[]
-  allergies       Allergies[]
-  medications     Medications[]
-  examResults     ExamResults[]
-  comorbidities   Comorbidities[]
-  surgeries       Surgeries[]
-  healthPlans     HealthPlans[]
+  id                          String                       @id() @default(nanoid())
+  name                        String
+  slug                        String?
+  logo                        String?
+  createdAt                   DateTime                     @default(now())
+  updatedAt                   DateTime                     @updatedAt()
+  metadata                    String?
+  defaultObjectiveInformation DefaultObjectiveInformation?
+  members                     Member[]
+  invitations                 Invitation[]
+  posts                       Post[]
+  patients                    Patient[]
+  appointments                Appointment[]
+  appointmentCids             AppointmentCid[]
+  vaccinations                Vaccinations[]
+  allergies                   Allergies[]
+  medications                 Medications[]
+  examResults                 ExamResults[]
+  comorbidities               Comorbidities[]
+  surgeries                   Surgeries[]
+  healthPlans                 HealthPlans[]
 
   @@unique([slug])
   @@map("organization")
@@ -411,4 +412,14 @@ model HealthPlansValues {
   healthPlans HealthPlans[]
 
   @@map("health_plans_values")
+}
+
+model DefaultObjectiveInformation {
+  id             String        @id() @default(nanoid())
+  text           String?
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId])
+  @@map("default_objective_information")
 }

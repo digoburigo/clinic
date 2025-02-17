@@ -1,5 +1,5 @@
-import { auth } from "~/server/auth";
 import { faker } from "@faker-js/faker";
+import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 
 async function main() {
@@ -15,6 +15,7 @@ async function main() {
     db.patient.deleteMany(),
     db.vaccinationsValues.deleteMany(),
     db.healthPlansValues.deleteMany(),
+    db.defaultObjectInformation.deleteMany(),
   ]);
 
   const [superAdminUser, adminUser, memberUser, ownerUser, patientUser] =
@@ -72,6 +73,23 @@ async function main() {
   ]);
 
   await Promise.all([
+    db.defaultObjectInformation.create({
+      data: {
+        organizationId: organization1?.id as string,
+        text: `
+                BEG, LOC, MUC, AAA
+                Via área pérvia orofaringe sem particularidade
+                Oroscopia: Amigdalas presente sem hiperemia e sem hipertrofias, sem exsudatos, sem lesões aparentes.
+                Otoscopia: Membranas bilaterais presentes sem abaulamento, sem perfurações, cone luminoso presente, conduto bilateral sem hiperemia e sem lesões aparentes.
+                AP: MV+ Bilateral SRA
+                AC: BNF RR 2T SSA sem arritmias 
+                PA:
+                Neurológico sem particularidade, pupilas isofotorreagente, ECG 15
+                ABD: Plano, Globoso, Em avental, Pouco globoso em aventar, sem cicatrizes, RHA+, Indolor a palpação, sem sinais de pritonismo
+                MMII: Sem edemas, Com edemas +/++++, com caçifo +1/+4, Pulsos palpáveis, amplos e simétricos, sem deformidades, extremidades quentes, TEC < 3s
+              `,
+      },
+    }),
     db.user.update({
       where: {
         id: superAdminUser.user.id,

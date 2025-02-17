@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { AppointmentsList } from "~/components/appointments-list";
+import { Suspense } from "react";
+import { DataTableSkeleton } from "~/components/ui/data-table/data-table-skeleton";
+import { api, HydrateClient } from "~/trpc/server";
+import { AppointmentsTable } from "./_components/appointments-table";
+import { withPatientName } from "./utils/queries";
 
 export const metadata: Metadata = {
   title: "Consultas",
@@ -7,5 +11,22 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <AppointmentsList patientId="m5gr84i9" />;
+  void api.appointment.findMany.prefetch(withPatientName);
+
+  return (
+    <HydrateClient>
+      <Suspense
+        fallback={
+          <DataTableSkeleton
+            columnCount={6}
+            searchableColumnCount={1}
+            filterableColumnCount={2}
+            cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
+          />
+        }
+      >
+        <AppointmentsTable />
+      </Suspense>
+    </HydrateClient>
+  );
 }

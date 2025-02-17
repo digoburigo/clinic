@@ -1,5 +1,8 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Fragment } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,9 +12,6 @@ import {
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
 import { useBreadcrumbs } from "~/hooks/use-breadcrumbs";
-import { ChevronRight } from "lucide-react";
-import { Fragment } from "react";
-import Link from "next/link";
 
 export function Breadcrumbs() {
   const items = useBreadcrumbs();
@@ -21,7 +21,7 @@ export function Breadcrumbs() {
     <Breadcrumb>
       <BreadcrumbList>
         {items.map((item, index) => (
-          <Fragment key={item.title}>
+          <Fragment key={`${item.title}-${index}`}>
             {index !== items.length - 1 && (
               <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink asChild>

@@ -1,5 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, CheckCircle2, LoaderCircle } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import {
@@ -10,14 +17,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import { authClient } from "~/lib/auth-client";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -26,8 +25,8 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { LoaderCircle } from "lucide-react";
-import { toast } from "sonner";
+import { Input } from "~/components/ui/input";
+import { authClient } from "~/lib/auth-client";
 
 const ForgotPasswordFormSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
@@ -126,7 +125,7 @@ export function ForgotPasswordForm(props: { email?: string }) {
             Relembrou a senha?{" "}
             <Link
               href="/login"
-              className="underline-offset-4 hover:underline hover:text-primary"
+              className="hover:text-primary underline-offset-4 hover:underline"
             >
               Entrar
             </Link>

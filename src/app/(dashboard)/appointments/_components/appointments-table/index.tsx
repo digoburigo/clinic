@@ -1,23 +1,18 @@
 "use client";
 "use no memo";
 
-import { api } from "~/trpc/react";
-
-import type { Patient } from "@zenstackhq/runtime/models";
-
 import {
+  ColumnFiltersState,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
-  type ColumnFiltersState,
-  type PaginationState,
+  VisibilityState,
 } from "@tanstack/react-table";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import * as React from "react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -33,96 +28,76 @@ import {
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { Input } from "~/components/ui/input";
+import { api } from "~/trpc/react";
 import { DataTableRowAction } from "~/types";
-import { getColumns } from "./patients-table-columns";
+import { AppointmentWithPatient } from "~/types/db-entities";
+import { withPatientName } from "../../utils/queries";
+import { getColumns } from "./appointments-table-columns";
 
-export function PatientsTable() {
+const fallbackData: AppointmentWithPatient[] = [];
+
+export function AppointmentsTable() {
+  const [appointments] =
+    api.appointment.findMany.useSuspenseQuery<AppointmentWithPatient[]>(
+      withPatientName,
+    );
+
   const [rowAction, setRowAction] =
-    useState<DataTableRowAction<Patient> | null>(null);
+    useState<DataTableRowAction<AppointmentWithPatient> | null>(null);
 
   const columns = useMemo(() => getColumns({ setRowAction }), [setRowAction]);
 
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-
-  const [patients] = api.patient.findMany.useSuspenseQuery({
-    // take: pagination.pageSize,
-    // skip: pagination.pageIndex * pagination.pageSize,
-    orderBy: [
-      {
-        createdAt: "desc",
-      },
-    ],
-  });
-
-  const [patientCount] = api.patient.count.useSuspenseQuery();
-
-  const rowCount = patientCount;
-
-  const [sorting, setSorting] = React.useState<SortingState>([
-    {
-      id: "createdAt",
-      desc: true,
+  const table = useReactTable<AppointmentWithPatient>({
+    data: appointments ?? fallbackData,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
     },
-  ]);
+  });
 
   const utils = api.useUtils();
-  const { mutate: deletePatient, isPending: isDeleting } =
-    api.patient.delete.useMutation({
+  const { mutate: deleteAppointment, isPending: isDeleting } =
+    api.appointment.delete.useMutation({
       onMutate: () => {
-        toast.loading("Excluindo paciente...", { id: "delete-patient" });
+        toast.loading("Excluindo consulta...", { id: "delete-appointment" });
       },
       onSettled: () => {
-        toast.dismiss("delete-patient");
+        toast.dismiss("delete-appointment");
       },
       onSuccess: async () => {
         await Promise.all([
-          utils.patient.findMany.invalidate(),
-          utils.patient.count.invalidate(),
+          utils.appointment.findMany.invalidate(withPatientName),
+          utils.appointment.count.invalidate(),
         ]);
-        toast.success("Paciente excluído com sucesso");
+        toast.success("Consulta excluída com sucesso");
         setRowAction(null);
       },
       onError: (error) => {
-        toast.error(`Erro ao excluir paciente: ${error.message}`);
+        toast.error(`Erro ao excluir consulta: ${error.message}`);
       },
     });
-
-  const table = useReactTable({
-    data: patients,
-    columns,
-    rowCount,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-    },
-    // state: {
-    //   pagination,
-    //   columnFilters,
-    // },
-    // manualPagination: true,
-    // onPaginationChange: setPagination,
-    // manualFiltering: true,
-    // onColumnFiltersChange: setColumnFilters,
-    debugTable: true,
-  });
 
   return (
     <>
       <div className="flex justify-between gap-4">
         <Input
-          placeholder="Procurar por nome"
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          placeholder="Procurar por paciente"
+          value={(table.getColumn("patient")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn("patient")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -130,7 +105,7 @@ export function PatientsTable() {
         <Button asChild className="dark:bg-white dark:text-black">
           <Link href="/patients/new">
             <PlusIcon className="h-4 w-4" />
-            Novo paciente
+            Nova consulta
           </Link>
         </Button>
       </div>
@@ -145,8 +120,8 @@ export function PatientsTable() {
           <AlertDialogHeader>
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-              paciente {rowAction?.row.original.name} e todos os dados
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente a
+              consulta (ID {rowAction?.row.original.id}) e todos os dados
               associados.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -156,7 +131,7 @@ export function PatientsTable() {
               disabled={isDeleting}
               onClick={() => {
                 if (rowAction?.row.original.id) {
-                  deletePatient({
+                  deleteAppointment({
                     where: {
                       id: rowAction.row.original.id,
                     },

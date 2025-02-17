@@ -1,15 +1,15 @@
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
-import { Separator } from "~/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
-import { Card, CardContent, CardTitle, CardHeader } from "~/components/ui/card";
-import { subjectiveSchema } from "./subject-info";
+import { Separator } from "~/components/ui/separator";
+import { LI, UL } from "~/components/ui/typography";
 import { evaluationSchema } from "./evaluation-info";
 import { objectiveSchema } from "./objective-info";
 import { planSchema } from "./plan-info";
-import { LI, UL } from "~/components/ui/typography";
+import { subjectiveSchema } from "./subject-info";
 
-type AllFields = z.infer<typeof subjectiveSchema> &
+export type AllFields = z.infer<typeof subjectiveSchema> &
   z.infer<typeof objectiveSchema> &
   z.infer<typeof evaluationSchema> &
   z.infer<typeof planSchema>;

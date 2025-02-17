@@ -34,6 +34,7 @@ import createSurgeriesRouter from "./Surgeries.router";
 import createSurgeriesValuesRouter from "./SurgeriesValues.router";
 import createHealthPlansRouter from "./HealthPlans.router";
 import createHealthPlansValuesRouter from "./HealthPlansValues.router";
+import createDefaultObjectiveInformationRouter from "./DefaultObjectiveInformation.router";
 
 export function db(ctx: any) {
     if (!ctx.prisma) {
@@ -70,6 +71,7 @@ export function createRouter() {
         surgeriesValues: createSurgeriesValuesRouter(),
         healthPlans: createHealthPlansRouter(),
         healthPlansValues: createHealthPlansValuesRouter(),
+        defaultObjectiveInformation: createDefaultObjectiveInformationRouter(),
     }
     );
 }

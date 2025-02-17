@@ -1,5 +1,4 @@
 import { ForgotPasswordForm } from "./forgot-password-form";
-import type { NextPage } from "next";
 
 type SearchParams = Promise<{ email?: string }>;
 

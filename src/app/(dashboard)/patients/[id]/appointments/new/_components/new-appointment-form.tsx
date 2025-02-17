@@ -1,34 +1,32 @@
 "use client";
 
-import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocalStorage, useWindowSize } from "@uidotdev/usehooks";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
-import { useWindowSize } from "@uidotdev/usehooks";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
 import { defineStepper } from "~/components/ui/stepper";
-import { useLocalStorage } from "@uidotdev/usehooks";
+import { authClient } from "~/lib/auth-client";
 import { ClientOnly } from "~/lib/client-only";
 import { api } from "~/trpc/react";
-import { toast } from "sonner";
-import { useParams, useRouter } from "next/navigation";
-import {
-  SubjectiveForm,
-  subjectiveSchema,
-} from "./appointment-form/subject-info";
-import {
-  ObjectiveForm,
-  objectiveSchema,
-} from "./appointment-form/objective-info";
+import { AppointmentMedical } from "./appointment-form/appointment-medical";
 import {
   EvaluationForm,
   evaluationSchema,
 } from "./appointment-form/evaluation-info";
-import { ReviewInfo } from "./appointment-form/review-info";
+import {
+  ObjectiveForm,
+  objectiveSchema,
+} from "./appointment-form/objective-info";
 import { PlanForm, planSchema } from "./appointment-form/plan-info";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { AppointmentMedical } from "./appointment-form/appointment-medical";
+import { ReviewInfo, type AllFields } from "./appointment-form/review-info";
+import {
+  SubjectiveForm,
+  subjectiveSchema,
+} from "./appointment-form/subject-info";
 
 const {
   StepperProvider,
@@ -118,6 +116,19 @@ const FormStepperComponent = () => {
       },
     });
 
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const { data: defaultObjectiveInformation } =
+    api.defaultObjectiveInformation.findUnique.useQuery(
+      {
+        where: {
+          organizationId: activeOrganization?.id,
+        },
+      },
+      {
+        enabled: !!activeOrganization,
+      },
+    );
+
   const form = useForm({
     mode: "onBlur",
     disabled: isPending,
@@ -132,7 +143,11 @@ const FormStepperComponent = () => {
       medications: [],
       allergies: [],
       comorbidities: [],
+    },
+    values: {
       ...newAppointmentForm,
+      objective:
+        defaultObjectiveInformation?.text?.replace(/\\n/g, "\n") ?? undefined,
     },
   });
 
@@ -142,7 +157,7 @@ const FormStepperComponent = () => {
 
   const onSubmit = (values: z.infer<typeof methods.current.schema>) => {
     if (methods.isLast) {
-      const v = form.getValues();
+      const v = form.getValues() as AllFields;
 
       createAppointment({
         data: {
@@ -221,7 +236,7 @@ const FormStepperComponent = () => {
           review: ({ Component }) => <Component />,
         })}
         <StepperControls aria-disabled={isPending}>
-          {(!methods.isFirst) && (
+          {!methods.isFirst && (
             <Button
               variant="secondary"
               onClick={methods.prev}

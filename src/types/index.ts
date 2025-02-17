@@ -1,65 +1,68 @@
-import type { ColumnSort, Row } from "@tanstack/react-table"
-import type { Prisma } from "@prisma/client"
-import { type z } from "zod"
+import type { ColumnSort, Row } from "@tanstack/react-table";
+import type { Prisma } from "@prisma/client";
+import { type z } from "zod";
 
-import { type DataTableConfig } from "~/components/ui/data-table/config/operations"
-import { type filterSchema } from "~/components/ui/data-table/config/parsers"
+import { type DataTableConfig } from "~/components/ui/data-table/config/operations";
+import { type filterSchema } from "~/components/ui/data-table/config/parsers";
 
 export type Prettify<T> = {
-  [K in keyof T]: T[K]
-} & {}
+  [K in keyof T]: T[K];
+} & {};
 
-export type StringKeyOf<TData> = Extract<keyof TData, string>
+export type StringKeyOf<TData> = Extract<keyof TData, string>;
 
 export interface SearchParams {
-  [key: string]: string | string[] | undefined
+  [key: string]: string | string[] | undefined;
 }
 
 export interface Option {
-  label: string
-  value: string
-  icon?: React.ComponentType<{ className?: string }>
-  count?: number
+  label: string;
+  value: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  count?: number;
 }
 
 export interface ExtendedColumnSort<TData> extends Omit<ColumnSort, "id"> {
-  id: StringKeyOf<TData>
+  id: StringKeyOf<TData>;
 }
 
-export type ExtendedSortingState<TData> = ExtendedColumnSort<TData>[]
+export type ExtendedSortingState<TData> = ExtendedColumnSort<TData>[];
 
-export type ColumnType = DataTableConfig["columnTypes"][number]
+export type ColumnType = DataTableConfig["columnTypes"][number];
 
-export type FilterOperator = DataTableConfig["globalOperators"][number]
+export type FilterOperator = DataTableConfig["globalOperators"][number];
 
-export type JoinOperator = DataTableConfig["joinOperators"][number]["value"]
+export type JoinOperator = DataTableConfig["joinOperators"][number]["value"];
 
 export interface DataTableFilterField<TData> {
-  id: StringKeyOf<TData>
-  label: string
-  placeholder?: string
-  options?: Option[]
+  id: StringKeyOf<TData>;
+  label: string;
+  placeholder?: string;
+  options?: Option[];
 }
 
 export interface DataTableAdvancedFilterField<TData>
   extends DataTableFilterField<TData> {
-  type: ColumnType
+  type: ColumnType;
 }
 
 export type Filter<TData> = Prettify<
   Omit<z.infer<typeof filterSchema>, "id"> & {
-    id: StringKeyOf<TData>
+    id: StringKeyOf<TData>;
   }
->
+>;
 
 export interface DataTableRowAction<TData> {
-  row: Row<TData>
-  type: "update" | "delete"
+  row: Row<TData>;
+  type: "update" | "delete";
 }
 
 export interface PatientQueryBuilderOpts {
-  where?: Prisma.PatientWhereInput
-  orderBy?: Prisma.PatientOrderByWithRelationInput[]
-  distinct?: boolean
-  nullish?: boolean
+  where?: Prisma.PatientWhereInput;
+  orderBy?: Prisma.PatientOrderByWithRelationInput[];
+  distinct?: boolean;
+  nullish?: boolean;
 }
+
+// PRISMA MODELS
+

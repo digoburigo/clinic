@@ -1,11 +1,23 @@
 "use client";
 
-import { api } from "~/trpc/react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { isEqual } from "lodash-es";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form } from "~/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { api } from "~/trpc/react";
+import { PatientEntity } from "~/types/db-entities";
+import {
+  AddressInfoForm,
+  addressInfoSchema,
+} from "../new/_components/patient-form/address-info";
+import { MedicalInfoForm } from "../new/_components/patient-form/medical-info";
+import { medicalInfoSchema } from "../new/_components/patient-form/medical-info/types";
 import {
   PersonalInfoForm,
   personalInfoSchema,
@@ -14,64 +26,8 @@ import {
   SocialInfoForm,
   socialInfoSchema,
 } from "../new/_components/patient-form/social-info";
-import { medicalInfoSchema } from "../new/_components/patient-form/medical-info/types";
-import {
-  AddressInfoForm,
-  addressInfoSchema,
-} from "../new/_components/patient-form/address-info";
-import { useState } from "react";
-import { z } from "zod";
-import { Prisma } from "@prisma/client";
-import { MedicalInfoForm } from "../new/_components/patient-form/medical-info";
-import { isEqual } from "lodash-es";
-import { Button } from "~/components/ui/button";
-import { toast } from "sonner";
 
 type PatientTabs = "medical" | "personal" | "address" | "social";
-
-const patientEntityInclude = {
-  include: {
-    vaccinations: {
-      include: {
-        vaccinationsValues: true,
-      },
-    },
-    allergies: {
-      include: {
-        allergiesValues: true,
-      },
-    },
-    medications: {
-      include: {
-        medicationsValues: true,
-      },
-    },
-    comorbidities: {
-      include: {
-        comorbiditiesValues: true,
-      },
-    },
-    surgeries: {
-      include: {
-        surgeriesValues: true,
-      },
-    },
-    healthPlans: {
-      include: {
-        healthPlansValues: true,
-      },
-    },
-    examResults: {
-      include: {
-        examResultsValues: true,
-      },
-    },
-  },
-} satisfies Prisma.PatientDefaultArgs;
-
-export type PatientEntity = Prisma.PatientGetPayload<
-  typeof patientEntityInclude
->;
 
 function formatPatient(patient: PatientEntity) {
   return {
@@ -223,9 +179,7 @@ export function PatientDetails({ patientId }: { patientId: string }) {
 
   const apiUtils = api.useUtils();
 
-  const {
-    mutateAsync: updatePatientAsync,
-  } = api.patient.update.useMutation({
+  const { mutateAsync: updatePatientAsync } = api.patient.update.useMutation({
     onMutate: () => {
       toast.loading("Atualizando paciente...", {
         id: "patient-update-loading",
@@ -239,23 +193,19 @@ export function PatientDetails({ patientId }: { patientId: string }) {
     },
   });
 
-
-  const {
-    mutate: updatePatient,
-    isPending,
-  } = api.patient.update.useMutation({
+  const { mutate: updatePatient, isPending } = api.patient.update.useMutation({
     onMutate: () => {
       toast.loading("Atualizando paciente...", {
         id: "patient-update-loading",
       });
     },
-    onSuccess: () => {
-      toast.success("Paciente atualizado com sucesso");
-      apiUtils.patient.findUnique.invalidate({
+    onSuccess: async () => {
+      await apiUtils.patient.findUnique.invalidate({
         where: {
           id: patientId,
         },
       });
+      toast.success("Paciente atualizado com sucesso");
     },
     onError: (err) => {
       toast.error("Erro ao atualizar paciente");
