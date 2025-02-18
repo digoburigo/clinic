@@ -11,9 +11,7 @@ export const medicalInfoSchema = z.object({
   vaccinations: z.array(optionSchema).min(1, {
     message: "Vacinação é obrigatória",
   }),
-  healthPlans: z.array(optionSchema).min(1, {
-    message: "Plano de saúde é obrigatório",
-  }),
+  healthPlans: z.array(optionSchema).optional(),
   allergies: z.array(optionSchema).optional(),
   medications: z.array(optionSchema).optional(),
   examResults: z.array(optionSchema).optional(),

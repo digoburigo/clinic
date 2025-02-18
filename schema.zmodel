@@ -508,7 +508,10 @@ model ExamResults {
   examResultsValuesId String
   examResultsValues ExamResultsValues @relation(fields: [examResultsValuesId], references: [id], onDelete: Cascade)
 
-    organizationId String? @default(auth().organizationId) @allow('update', false)
+  result String?
+  date DateTime?
+
+  organizationId String? @default(auth().organizationId) @allow('update', false)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users

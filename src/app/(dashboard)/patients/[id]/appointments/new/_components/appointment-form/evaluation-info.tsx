@@ -68,7 +68,7 @@ export function EvaluationForm() {
         name="evaluation"
         render={({ field, fieldState }) => (
           <FormItem>
-            <FormLabel required>Informações da Avaliação</FormLabel>
+            <FormLabel required>Avaliação</FormLabel>
             <FormControl>
               <Textarea
                 {...field}

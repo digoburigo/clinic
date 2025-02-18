@@ -7,6 +7,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { Form } from "~/components/ui/form";
 import { defineStepper } from "~/components/ui/stepper";
 import { authClient } from "~/lib/auth-client";
@@ -68,8 +75,18 @@ const {
   },
 );
 
-export default function NewAppointmentForm() {
+export default function NewAppointmentForm({
+  patientId,
+}: {
+  patientId: string;
+}) {
   const { width } = useWindowSize();
+
+  const [patient] = api.patient.findUnique.useSuspenseQuery({
+    where: {
+      id: patientId,
+    },
+  });
 
   return (
     <StepperProvider
@@ -77,13 +94,13 @@ export default function NewAppointmentForm() {
       labelOrientation={width && width < 1080 ? "horizontal" : "vertical"}
     >
       <ClientOnly>
-        <FormStepperComponent />
+        <FormStepperComponent patient={patient} />
       </ClientOnly>
     </StepperProvider>
   );
 }
 
-const FormStepperComponent = () => {
+const FormStepperComponent = ({ patient }: { patient: Patient }) => {
   const router = useRouter();
   const params = useParams();
   const [newAppointmentForm, saveNewAppointmentForm] = useLocalStorage(
@@ -151,6 +168,8 @@ const FormStepperComponent = () => {
     },
   });
 
+  const motive = form.watch("motive");
+
   form.watch(() => {
     saveNewAppointmentForm(form.getValues());
   });
@@ -204,67 +223,81 @@ const FormStepperComponent = () => {
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
-        aria-disabled={isPending}
-      >
-        <AppointmentMedical />
-
-        <StepperNavigation aria-disabled={isPending}>
-          {methods.all.map((step) => (
-            <StepperStep
-              key={step.id}
-              of={step.id}
-              type={step.id === methods.current.id ? "submit" : "button"}
-              onClick={async () => {
-                const valid = await form.trigger();
-                if (!valid) return;
-                methods.goTo(step.id);
-              }}
-            >
-              <StepperTitle>{step.title}</StepperTitle>
-            </StepperStep>
-          ))}
-        </StepperNavigation>
-        {methods.switch({
-          subjective: ({ Component }) => <Component />,
-          objective: ({ Component }) => <Component />,
-          evaluation: ({ Component }) => <Component />,
-          plan: ({ Component }) => <Component />,
-          review: ({ Component }) => <Component />,
-        })}
-        <StepperControls aria-disabled={isPending}>
-          {!methods.isFirst && (
-            <Button
-              variant="secondary"
-              onClick={methods.prev}
-              disabled={methods.isFirst || isPending}
-            >
-              Anterior
-            </Button>
-          )}
-          <Button
-            type="button"
-            disabled={isPending}
-            onClick={() => {
-              if (methods.isLast) {
-                form.handleSubmit(onSubmit)();
-                return;
-              }
-
-              methods.beforeNext(async () => {
-                const valid = await form.trigger();
-                if (!valid) return false;
-                return true;
-              });
-            }}
+    <Card>
+      <CardHeader>
+        <CardTitle className="relative">
+          Nova consulta para {patient.name}
+          {motive ? (
+            <CardDescription className="absolute top-4 left-0 font-medium">
+              Motivo: {motive}
+            </CardDescription>
+          ) : null}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+            aria-disabled={isPending}
           >
-            {methods.isLast ? "Adicionar" : "Próximo"}
-          </Button>
-        </StepperControls>
-      </form>
-    </Form>
+            <AppointmentMedical />
+
+            <StepperNavigation aria-disabled={isPending}>
+              {methods.all.map((step) => (
+                <StepperStep
+                  key={step.id}
+                  of={step.id}
+                  type={step.id === methods.current.id ? "submit" : "button"}
+                  onClick={async () => {
+                    const valid = await form.trigger();
+                    if (!valid) return;
+                    methods.goTo(step.id);
+                  }}
+                >
+                  <StepperTitle>{step.title}</StepperTitle>
+                </StepperStep>
+              ))}
+            </StepperNavigation>
+            {methods.switch({
+              subjective: ({ Component }) => <Component />,
+              objective: ({ Component }) => <Component />,
+              evaluation: ({ Component }) => <Component />,
+              plan: ({ Component }) => <Component />,
+              review: ({ Component }) => <Component />,
+            })}
+            <StepperControls aria-disabled={isPending}>
+              {!methods.isFirst && (
+                <Button
+                  variant="secondary"
+                  onClick={methods.prev}
+                  disabled={methods.isFirst || isPending}
+                >
+                  Anterior
+                </Button>
+              )}
+              <Button
+                type="button"
+                disabled={isPending}
+                onClick={() => {
+                  if (methods.isLast) {
+                    form.handleSubmit(onSubmit)();
+                    return;
+                  }
+
+                  methods.beforeNext(async () => {
+                    const valid = await form.trigger();
+                    if (!valid) return false;
+                    return true;
+                  });
+                }}
+              >
+                {methods.isLast ? "Adicionar" : "Próximo"}
+              </Button>
+            </StepperControls>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 };

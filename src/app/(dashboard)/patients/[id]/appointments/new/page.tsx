@@ -1,15 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { api } from "~/trpc/server";
 import NewAppointmentForm from "./_components/new-appointment-form";
 
-export default function Page() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Nova consulta</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <NewAppointmentForm />
-      </CardContent>
-    </Card>
-  );
+export default async function Page({
+  params,
+}: {
+  params: { id: string; appointmentId: string };
+}) {
+  const p = await params;
+
+  void api.patient.findUnique.prefetch({
+    where: {
+      id: p.id,
+    },
+  });
+
+  return <NewAppointmentForm patientId={p.id} />;
 }

@@ -11,7 +11,7 @@ import { Textarea } from "~/components/ui/textarea";
 
 export const objectiveSchema = z.object({
   objective: z.string().nonempty({
-    message: "Informações objetivas é obrigatório.",
+    message: "Objetivo é obrigatório.",
   }),
 });
 
@@ -27,11 +27,11 @@ export function ObjectiveForm() {
         name="objective"
         render={({ field, fieldState }) => (
           <FormItem>
-            <FormLabel required>Informações Objetivas</FormLabel>
+            <FormLabel required>Objetivo</FormLabel>
             <FormControl>
               <Textarea
                 {...field}
-                placeholder="Digite as informações objetivas do paciente"
+                placeholder="Digite o objetivo da consulta"
                 className="min-h-[150px]"
               />
             </FormControl>

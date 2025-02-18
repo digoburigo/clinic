@@ -1,10 +1,12 @@
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
-import { FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
 
 export const planSchema = z.object({
@@ -23,7 +25,7 @@ export function PlanForm() {
         render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel htmlFor={field.name} required>
-              Informações do Plano
+              Plano
             </FormLabel>
             <FormControl>
               <Textarea

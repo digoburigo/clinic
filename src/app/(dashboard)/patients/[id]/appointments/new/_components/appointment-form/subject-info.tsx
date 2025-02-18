@@ -1,18 +1,20 @@
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
-import { FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
 
 export const subjectiveSchema = z.object({
   motive: z.string().min(1, {
-    message: "Motivo deve conter pelo menos 8 caracteres.",
+    message: "Motivo é obrigatório.",
   }),
-  subjective: z.string().nonempty({
-    message: "Informações subjetivas devem ser preenchidas.",
+  subjective: z.string().min(1, {
+    message: "Subjetivo é obrigatório.",
   }),
 });
 
@@ -28,11 +30,11 @@ export function SubjectiveForm() {
         name="motive"
         render={({ field }) => (
           <FormItem>
-            <FormLabel required>Motivo da consulta</FormLabel>
+            <FormLabel required>Motivo</FormLabel>
             <FormControl>
               <Textarea
                 {...field}
-                placeholder="Digite o motivo da consulta"
+                placeholder="Informe o motivo da consulta para esse paciente"
                 className="min-h-[150px]"
               />
             </FormControl>
@@ -46,7 +48,7 @@ export function SubjectiveForm() {
         name="subjective"
         render={({ field }) => (
           <FormItem>
-            <FormLabel required>Informações subjetivas</FormLabel>
+            <FormLabel required>Subjetivo</FormLabel>
             <FormControl>
               <Textarea
                 {...field}
