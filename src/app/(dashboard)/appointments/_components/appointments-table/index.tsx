@@ -121,7 +121,7 @@ export function AppointmentsTable() {
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Isso excluirá permanentemente a
-              consulta (ID {rowAction?.row.original.id}) e todos os dados
+              consulta (ID <strong>{rowAction?.row.original.id}</strong>) e todos os dados
               associados.
             </AlertDialogDescription>
           </AlertDialogHeader>

@@ -146,7 +146,7 @@ export function PatientsTable() {
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-              paciente {rowAction?.row.original.name} e todos os dados
+              paciente <strong>{rowAction?.row.original.name}</strong> e todos os dados
               associados.
             </AlertDialogDescription>
           </AlertDialogHeader>
