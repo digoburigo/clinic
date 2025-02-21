@@ -1,0 +1,9 @@
+---
+description: Best practices for managing server state with React Query
+globs: **/**.{ts,tsx}
+---
+ - Use React Query for efficient server state management and data fetching.
+- Implement strategic query keys and caching to optimize performance.
+- Utilize the mutation API for handling side effects and optimistic UI updates.
+- Implement comprehensive error handling and loading states for improved UX.
+- Leverage React Query devtools for debugging and optimizing your queries.

@@ -1,0 +1,9 @@
+---
+description: Best practices for using Prisma ORM
+globs: **/**.{zmodel,prisma,ts,tsx}
+---
+ - Centralize Prisma Client usage to prevent multiple instances and improve performance.
+- Implement robust error handling and logging for all Prisma operations.
+- Utilize Prisma's type-safe query API to reduce runtime errors and enhance maintainability.
+- Leverage relation fields and nested writes for efficient data modeling and querying.
+- Implement a disciplined migration strategy and version control for your Prisma schema.

@@ -1,0 +1,10 @@
+---
+description: Best practices for React development
+globs: \*_/_.{ts,tsx,js,jsx}
+---
+- Use functional components and hooks over class components for better readability and reusability.
+- Implement React.memo and useMemo for performance optimization where necessary.
+- Adhere strictly to React hooks rules to prevent common errors.
+- Utilize React.lazy and Suspense for code-splitting and lazy loading of components.
+- Implement error boundaries to manage and display errors effectively.
+- Be aware that this is a NextJS project and utilize React in the best way within the meta framework.

@@ -1,0 +1,9 @@
+---
+description: Best practices for using Radix UI components
+globs: **/**.{ts,tsx}
+---
+ - Use Radix UI components to ensure consistent and accessible UI elements.
+- Customize components using Radix UI's provided APIs rather than altering the core.
+- Implement accessibility features like ARIA attributes and keyboard navigation.
+- Use Radix UI's primitive components to build custom, accessible UI elements.
+- Follow Radix UI's guidelines for theming and styling to maintain design consistency.

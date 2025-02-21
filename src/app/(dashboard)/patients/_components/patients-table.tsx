@@ -127,7 +127,7 @@ export function PatientsTable() {
           className="max-w-sm"
         />
 
-        <Button asChild className="dark:bg-white dark:text-black">
+        <Button asChild>
           <Link href="/patients/new">
             <PlusIcon className="h-4 w-4" />
             Novo paciente
@@ -146,8 +146,8 @@ export function PatientsTable() {
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-              paciente <strong>{rowAction?.row.original.name}</strong> e todos os dados
-              associados.
+              paciente <strong>{rowAction?.row.original.name}</strong> e todos
+              os dados associados.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
