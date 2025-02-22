@@ -99,7 +99,7 @@ export function PatientsTable() {
         }
         toast.dismiss("delete-patient");
       },
-      onSuccess: async () => {
+      onSuccess: async (data) => {
         await Promise.all([
           queryClient.invalidateQueries({
             queryKey: trpc.patient.findMany.queryKey(),
@@ -108,7 +108,7 @@ export function PatientsTable() {
             queryKey: trpc.patient.count.queryKey(),
           }),
         ]);
-        toast.success("Paciente excluído com sucesso");
+        toast.success(`Paciente ${data?.name} excluído com sucesso`);
         setRowAction(null);
       },
       onError: (error) => {

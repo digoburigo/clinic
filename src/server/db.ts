@@ -15,8 +15,8 @@ const createPrismaClient = () =>
   new PrismaClient({
     // when seeding to turso, we need to use the adapter
     // adapter: adapter,
-    // adapter: process.env.NODE_ENV === "production" ? adapter : null,
-    adapter: null,
+    // adapter: null,
+    adapter: process.env.NODE_ENV === "production" ? adapter : null,
     log:
       env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });

@@ -13,6 +13,7 @@ import { UserMenu } from "~/components/user/user-menu";
 import { useSession } from "~/server/auth";
 import { db } from "~/server/db";
 import { PatientAreaNav } from "./_components/patient-area-nav";
+import { relatePatientUser } from "./_db/relate-patient-user";
 
 export const metadata: Metadata = {
   title: "Área do paciente",
@@ -50,12 +51,16 @@ export default async function Page() {
     },
   });
 
-  // if (!patient?.userId) {
-  //   await api._patient.relateToUser({
-  //     userId: authSession.user.id,
-  //     organizationId: authSession.session.activeOrganizationId as string,
-  //   });
-  // }
+  try {
+    if (!patient?.userId) {
+      await relatePatientUser(
+        authSession.user.id,
+        authSession.session.activeOrganizationId as string,
+      );
+    }
+  } catch (error) {
+    redirect("/patient-login");
+  }
 
   return (
     <div className="mx-auto max-w-(--breakpoint-2xl)">
