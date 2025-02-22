@@ -1,3 +1,4 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -13,35 +14,40 @@ import {
 import MultipleSelector, {
   type Option,
 } from "~/components/ui/multiple-selector";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import type { MedicalInfoForm } from "./types";
+
 export function MedicationsField() {
+  const trpc = useTRPC();
   const { control, setValue } = useFormContext<MedicalInfoForm>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
-  const { data, isFetching } = api.medicationsValues.findMany.useQuery(
-    {
-      where: {
-        value: {
-          contains: debouncedSearch,
+  const { data, isFetching } = useQuery(
+    trpc.medicationsValues.findMany.queryOptions(
+      {
+        where: {
+          value: {
+            contains: debouncedSearch,
+          },
         },
       },
-    },
-    {
-      enabled: debouncedSearch.length > 2,
-    },
+      {
+        enabled: debouncedSearch.length > 2,
+      },
+    ),
   );
 
-  const { mutateAsync: createMedication } =
-    api.medicationsValues.create.useMutation({
+  const { mutateAsync: createMedication } = useMutation(
+    trpc.medicationsValues.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success("Medicamento criado com sucesso!");
       },
       onError: (error) => {
         toast.error("Erro ao criar medicamento. Tente novamente.");
       },
-    });
+    }),
+  );
 
   const formattedOptions =
     data?.map((item) => ({

@@ -25,8 +25,10 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { formatDate } from "~/lib/utils";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { DataTableRowAction } from "~/types";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
@@ -37,6 +39,7 @@ interface GetColumnsProps {
 export function getColumns({
   setRowAction,
 }: GetColumnsProps): ColumnDef<Appointment>[] {
+  const trpc = useTRPC();
   return [
     // {
     //   accessorKey: "id",
@@ -115,20 +118,24 @@ export function getColumns({
     {
       id: "actions",
       cell: ({ row }) => {
-        const utils = api.useUtils();
-        const deleteAppointment = api.appointment.delete.useMutation({
-          onSuccess: async () => {
-            toast.success("Consulta excluída com sucesso");
-            await utils.patient.findUnique.invalidate({
-              where: {
-                id: row.original.patientId,
-              },
-            });
-          },
-          onError: (error) => {
-            toast.error("Erro ao excluir consulta");
-          },
-        });
+        const queryClient = useQueryClient();
+        const deleteAppointment = useMutation(
+          trpc.appointment.delete.mutationOptions({
+            onSuccess: async () => {
+              toast.success("Consulta excluída com sucesso");
+              await queryClient.invalidateQueries({
+                queryKey: trpc.appointment.findMany.queryKey({
+                  where: {
+                    patientId: row.original.patientId,
+                  },
+                }),
+              });
+            },
+            onError: (error) => {
+              toast.error("Erro ao excluir consulta");
+            },
+          }),
+        );
 
         return (
           <DropdownMenu>

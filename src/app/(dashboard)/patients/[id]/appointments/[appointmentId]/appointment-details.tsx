@@ -1,25 +1,20 @@
 "use client";
 
-import { api } from "~/trpc/react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Form } from "~/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { isEqual } from "lodash-es";
-import { Button } from "~/components/ui/button";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {
-  SubjectiveForm,
-  subjectiveSchema,
-} from "../new/_components/appointment-form/subject-info";
-import {
-  PlanForm,
-  planSchema,
-} from "../new/_components/appointment-form/plan-info";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Form } from "~/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { useTRPC } from "~/trpc/react";
+import { AllergiesField } from "../../../new/_components/patient-form/medical-info/allergies-field";
+import { ComorbiditiesField } from "../../../new/_components/patient-form/medical-info/comorbidities-field";
+import { MedicationsField } from "../../../new/_components/patient-form/medical-info/medications-field";
 import {
   EvaluationForm,
   evaluationSchema,
@@ -28,9 +23,20 @@ import {
   ObjectiveForm,
   objectiveSchema,
 } from "../new/_components/appointment-form/objective-info";
-import { AllergiesField } from "../../../new/_components/patient-form/medical-info/allergies-field";
-import { MedicationsField } from "../../../new/_components/patient-form/medical-info/medications-field";
-import { ComorbiditiesField } from "../../../new/_components/patient-form/medical-info/comorbidities-field";
+import {
+  PlanForm,
+  planSchema,
+} from "../new/_components/appointment-form/plan-info";
+import {
+  SubjectiveForm,
+  subjectiveSchema,
+} from "../new/_components/appointment-form/subject-info";
+
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 
 type AppointmentTabs = "subjective" | "objective" | "evaluation" | "plan";
 
@@ -97,8 +103,9 @@ export function AppointmentDetails({
   appointmentId: string;
   patientId: string;
 }) {
-  const [appointment] =
-    api.appointment.findUnique.useSuspenseQuery<AppointmentEntity>({
+  const trpc = useTRPC();
+  const { data: appointment } = useSuspenseQuery(
+    trpc.appointment.findUnique.queryOptions<AppointmentEntity>({
       where: {
         id: appointmentId,
       },
@@ -145,7 +152,8 @@ export function AppointmentDetails({
           },
         },
       },
-    });
+    }),
+  );
 
   const [schemas] = useState<Record<AppointmentTabs, z.ZodSchema>>(() => ({
     subjective: subjectiveSchema,
@@ -168,10 +176,9 @@ export function AppointmentDetails({
     setFormHasChanged(!formIsEqual);
   });
 
-  const apiUtils = api.useUtils();
-
-  const { mutateAsync: updateAppointmentAsync } =
-    api.appointment.update.useMutation({
+  const queryClient = useQueryClient();
+  const { mutateAsync: updateAppointmentAsync } = useMutation(
+    trpc.appointment.update.mutationOptions({
       onMutate: () => {
         toast.loading("Atualizando consulta...", {
           id: "appointment-update-loading",
@@ -183,10 +190,11 @@ export function AppointmentDetails({
       onSettled: () => {
         toast.dismiss("appointment-update-loading");
       },
-    });
+    }),
+  );
 
-  const { mutate: updateAppointment, isPending } =
-    api.appointment.update.useMutation({
+  const { mutate: updateAppointment, isPending } = useMutation(
+    trpc.appointment.update.mutationOptions({
       onMutate: () => {
         toast.loading("Atualizando consulta...", {
           id: "appointment-update-loading",
@@ -194,10 +202,12 @@ export function AppointmentDetails({
       },
       onSuccess: () => {
         toast.success("Consulta atualizada com sucesso");
-        apiUtils.appointment.findUnique.invalidate({
-          where: {
-            id: appointmentId,
-          },
+        queryClient.invalidateQueries({
+          queryKey: trpc.appointment.findUnique.queryKey({
+            where: {
+              id: appointmentId,
+            },
+          }),
         });
       },
       onError: (err) => {
@@ -206,7 +216,8 @@ export function AppointmentDetails({
       onSettled: () => {
         toast.dismiss("appointment-update-loading");
       },
-    });
+    }),
+  );
 
   async function onSubmit(values: z.infer<(typeof schemas)[typeof tab]>) {
     const v = form.getValues();

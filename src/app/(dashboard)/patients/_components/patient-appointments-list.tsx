@@ -20,18 +20,21 @@ import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { DataTable } from "~/components/ui/data-table";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { DataTableRowAction } from "~/types";
 import { PatientWithAppointments } from "~/types/db-entities";
 import { getColumns } from "./patient-appointments-list-columns";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 const fallbackData: PatientWithAppointments[] = [];
 
 export function PatientAppointmentsList({ patientId }: { patientId: string }) {
+  const trpc = useTRPC();
   const router = useRouter();
 
-  const [patient] =
-    api.patient.findUnique.useSuspenseQuery<PatientWithAppointments>({
+  const { data: patient } = useSuspenseQuery(
+    trpc.patient.findUnique.queryOptions<PatientWithAppointments>({
       where: {
         id: patientId,
       },
@@ -108,7 +111,8 @@ export function PatientAppointmentsList({ patientId }: { patientId: string }) {
           },
         },
       },
-    });
+    }),
+  );
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

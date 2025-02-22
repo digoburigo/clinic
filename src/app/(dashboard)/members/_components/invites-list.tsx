@@ -1,11 +1,17 @@
 "use client";
 
-import { api } from "~/trpc/react";
 import { DataTable } from "~/components/ui/data-table";
+import { useTRPC } from "~/trpc/react";
 
 import type { Invitation } from "@zenstackhq/runtime/models";
 
-import { ColumnDef, useReactTable, getCoreRowModel } from "@tanstack/react-table";
+import {
+  ColumnDef,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+import { useQuery } from "@tanstack/react-query";
 
 export const columns: ColumnDef<Invitation>[] = [
   {
@@ -22,18 +28,24 @@ export const columns: ColumnDef<Invitation>[] = [
   },
 ];
 
-export function InvitesList({ organizationId }: { organizationId: string | null | undefined }) {
-  const { data: invitations, isPending } = api.invitation.findMany.useQuery(
-    {
-      include: {
-        user: true,
+export function InvitesList({
+  organizationId,
+}: {
+  organizationId: string | null | undefined;
+}) {
+  const trpc = useTRPC();
+  const { data: invitations, isPending } = useQuery(
+    trpc.invitation.findMany.queryOptions(
+      {
+        include: {
+          user: true,
+        },
       },
-    },
-    {
-      enabled: !!organizationId,
-    },
+      {
+        enabled: !!organizationId,
+      },
+    ),
   );
-
 
   const table = useReactTable<Invitation>({
     data: invitations ?? [],
@@ -41,11 +53,9 @@ export function InvitesList({ organizationId }: { organizationId: string | null 
     getCoreRowModel: getCoreRowModel(),
   });
 
-
   if (isPending) return <div>Loading...</div>;
 
   if (!invitations) return <div>Nenhum convite encontrado</div>;
 
- 
   return <DataTable table={table} emptyMessage="Nenhum convite encontrado" />;
 }

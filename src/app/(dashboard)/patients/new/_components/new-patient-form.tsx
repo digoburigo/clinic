@@ -1,28 +1,33 @@
 "use client";
 
-import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useWindowSize } from "@uidotdev/usehooks";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useWindowSize } from "@uidotdev/usehooks";
 
+import { useLocalStorage } from "@uidotdev/usehooks";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
 import { defineStepper } from "~/components/ui/stepper";
-import { PersonalInfoForm, personalInfoSchema } from "./patient-form/personal-info";
-import { AddressInfoForm, addressInfoSchema } from "./patient-form/address-info";
-import { SocialInfoForm, socialInfoSchema } from "./patient-form/social-info";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import { ClientOnly } from "~/lib/client-only";
-import { ReviewInfo } from "./patient-form/review-info";
-import { medicalInfoSchema } from "./patient-form/medical-info/types";
+import { useTRPC } from "~/trpc/react";
+import {
+  AddressInfoForm,
+  addressInfoSchema,
+} from "./patient-form/address-info";
 import { MedicalInfoForm } from "./patient-form/medical-info";
-import { api } from "~/trpc/react";
-import { toast } from "sonner";
+import { medicalInfoSchema } from "./patient-form/medical-info/types";
+import {
+  PersonalInfoForm,
+  personalInfoSchema,
+} from "./patient-form/personal-info";
+import { ReviewInfo } from "./patient-form/review-info";
+import { SocialInfoForm, socialInfoSchema } from "./patient-form/social-info";
 
-import { PatientCreateScalarSchema } from "@zenstackhq/runtime/zod/models";
 import { useRouter } from "next/navigation";
-import type { Patient } from "@zenstackhq/runtime/models";
+
+import { useMutation } from "@tanstack/react-query";
 
 const {
   StepperProvider,
@@ -80,6 +85,7 @@ export default function PatientForm() {
 }
 
 const FormStepperComponent = () => {
+  const trpc = useTRPC();
   const router = useRouter();
   const [newPatientForm, saveNewPatientForm] = useLocalStorage(
     "new-patient-form",
@@ -88,25 +94,29 @@ const FormStepperComponent = () => {
 
   const methods = useStepper();
 
-  const { mutate: createPatient, isPending } = api.patient.create.useMutation({
-    onMutate: () => {
-      toast.loading("Criando paciente...", { id: "patient-creation-loading" });
-    },
-    onSuccess: (data) => {
-      form.reset();
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("new-patient-form");
-      }
-      toast.success("Paciente criado com sucesso");
-      router.push(`/patients/${data?.id}`);
-    },
-    onError: () => {
-      toast.error("Erro ao criar paciente");
-    },
-    onSettled: () => {
-      toast.dismiss("patient-creation-loading");
-    },
-  });
+  const { mutate: createPatient, isPending } = useMutation(
+    trpc.patient.create.mutationOptions({
+      onMutate: () => {
+        toast.loading("Criando paciente...", {
+          id: "patient-creation-loading",
+        });
+      },
+      onSuccess: (data) => {
+        form.reset();
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("new-patient-form");
+        }
+        toast.success("Paciente criado com sucesso");
+        router.push(`/patients/${data?.id}`);
+      },
+      onError: () => {
+        toast.error("Erro ao criar paciente");
+      },
+      onSettled: () => {
+        toast.dismiss("patient-creation-loading");
+      },
+    }),
+  );
 
   const form = useForm({
     mode: "onBlur",

@@ -10,7 +10,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form } from "~/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { PatientEntity } from "~/types/db-entities";
 import {
   AddressInfoForm,
@@ -26,6 +26,12 @@ import {
   SocialInfoForm,
   socialInfoSchema,
 } from "../new/_components/patient-form/social-info";
+
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 
 type PatientTabs = "medical" | "personal" | "address" | "social";
 
@@ -78,83 +84,86 @@ function formatPatient(patient: PatientEntity) {
 }
 
 export function PatientDetails({ patientId }: { patientId: string }) {
-  const [patient] = api.patient.findUnique.useSuspenseQuery<PatientEntity>({
-    where: {
-      id: patientId,
-    },
-    include: {
-      vaccinations: {
-        include: {
-          vaccinationsValues: {
-            select: {
-              id: true,
-              value: true,
+  const trpc = useTRPC();
+  const { data: patient } = useSuspenseQuery(
+    trpc.patient.findUnique.queryOptions<PatientEntity>({
+      where: {
+        id: patientId,
+      },
+      include: {
+        vaccinations: {
+          include: {
+            vaccinationsValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+        allergies: {
+          include: {
+            allergiesValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+        medications: {
+          include: {
+            medicationsValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+        comorbidities: {
+          include: {
+            comorbiditiesValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+        examResults: {
+          include: {
+            examResultsValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+        surgeries: {
+          include: {
+            surgeriesValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+        healthPlans: {
+          include: {
+            healthPlansValues: {
+              select: {
+                id: true,
+                value: true,
+              },
             },
           },
         },
       },
-      allergies: {
-        include: {
-          allergiesValues: {
-            select: {
-              id: true,
-              value: true,
-            },
-          },
-        },
-      },
-      medications: {
-        include: {
-          medicationsValues: {
-            select: {
-              id: true,
-              value: true,
-            },
-          },
-        },
-      },
-      comorbidities: {
-        include: {
-          comorbiditiesValues: {
-            select: {
-              id: true,
-              value: true,
-            },
-          },
-        },
-      },
-      examResults: {
-        include: {
-          examResultsValues: {
-            select: {
-              id: true,
-              value: true,
-            },
-          },
-        },
-      },
-      surgeries: {
-        include: {
-          surgeriesValues: {
-            select: {
-              id: true,
-              value: true,
-            },
-          },
-        },
-      },
-      healthPlans: {
-        include: {
-          healthPlansValues: {
-            select: {
-              id: true,
-              value: true,
-            },
-          },
-        },
-      },
-    },
-  });
+    }),
+  );
 
   const [schemas] = useState<Record<PatientTabs, z.ZodSchema>>(() => ({
     personal: personalInfoSchema,
@@ -177,43 +186,49 @@ export function PatientDetails({ patientId }: { patientId: string }) {
     setFormHasChanged(!formIsEqual);
   });
 
-  const apiUtils = api.useUtils();
+  const queryClient = useQueryClient();
 
-  const { mutateAsync: updatePatientAsync } = api.patient.update.useMutation({
-    onMutate: () => {
-      toast.loading("Atualizando paciente...", {
-        id: "patient-update-loading",
-      });
-    },
-    onError: (err) => {
-      toast.error("Erro ao atualizar paciente");
-    },
-    onSettled: () => {
-      toast.dismiss("patient-update-loading");
-    },
-  });
+  const { mutateAsync: updatePatientAsync } = useMutation(
+    trpc.patient.update.mutationOptions({
+      onMutate: () => {
+        toast.loading("Atualizando paciente...", {
+          id: "patient-update-loading",
+        });
+      },
+      onError: (err) => {
+        toast.error("Erro ao atualizar paciente");
+      },
+      onSettled: () => {
+        toast.dismiss("patient-update-loading");
+      },
+    }),
+  );
 
-  const { mutate: updatePatient, isPending } = api.patient.update.useMutation({
-    onMutate: () => {
-      toast.loading("Atualizando paciente...", {
-        id: "patient-update-loading",
-      });
-    },
-    onSuccess: async () => {
-      await apiUtils.patient.findUnique.invalidate({
-        where: {
-          id: patientId,
-        },
-      });
-      toast.success("Paciente atualizado com sucesso");
-    },
-    onError: (err) => {
-      toast.error("Erro ao atualizar paciente");
-    },
-    onSettled: () => {
-      toast.dismiss("patient-update-loading");
-    },
-  });
+  const { mutate: updatePatient, isPending } = useMutation(
+    trpc.patient.update.mutationOptions({
+      onMutate: () => {
+        toast.loading("Atualizando paciente...", {
+          id: "patient-update-loading",
+        });
+      },
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: trpc.patient.findUnique.queryKey({
+            where: {
+              id: patientId,
+            },
+          }),
+        });
+        toast.success("Paciente atualizado com sucesso");
+      },
+      onError: (err) => {
+        toast.error("Erro ao atualizar paciente");
+      },
+      onSettled: () => {
+        toast.dismiss("patient-update-loading");
+      },
+    }),
+  );
 
   async function onSubmit(values: z.infer<(typeof schemas)[typeof tab]>) {
     const v = form.getValues();

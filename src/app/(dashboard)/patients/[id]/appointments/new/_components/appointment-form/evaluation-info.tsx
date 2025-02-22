@@ -13,7 +13,9 @@ import {
 import MultipleSelector from "~/components/ui/multiple-selector";
 import { Textarea } from "~/components/ui/textarea";
 import { InlineCode } from "~/components/ui/typography";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
+
+import { useQuery } from "@tanstack/react-query";
 
 const optionSchema = z.object({
   id: z.string().optional(),
@@ -34,24 +36,27 @@ export const evaluationSchema = z.object({
 export type EvaluationForm = z.infer<typeof evaluationSchema>;
 
 export function EvaluationForm() {
+  const trpc = useTRPC();
   const { control, setValue } = useFormContext<EvaluationForm>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data, isFetching } = api.cid.findMany.useQuery(
-    {
-      take: 20,
-      where: {
-        OR: [
-          { code: { contains: debouncedSearch } },
-          { description: { contains: debouncedSearch } },
-        ],
+  const { data, isFetching } = useQuery(
+    trpc.cid.findMany.queryOptions(
+      {
+        take: 20,
+        where: {
+          OR: [
+            { code: { contains: debouncedSearch } },
+            { description: { contains: debouncedSearch } },
+          ],
+        },
       },
-    },
-    {
-      enabled: debouncedSearch.length > 1,
-    },
+      {
+        enabled: debouncedSearch.length > 1,
+      },
+    ),
   );
 
   const formattedOptions =

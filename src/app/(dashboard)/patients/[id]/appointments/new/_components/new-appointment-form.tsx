@@ -18,7 +18,7 @@ import {
 import { Form } from "~/components/ui/form";
 import { defineStepper } from "~/components/ui/stepper";
 import { ClientOnly } from "~/lib/client-only";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { PatientEntityNewAppointment } from "~/types/db-entities";
 import { AppointmentMedical } from "./appointment-form/appointment-medical";
 import {
@@ -35,6 +35,8 @@ import {
   SubjectiveForm,
   subjectiveSchema,
 } from "./appointment-form/subject-info";
+
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 function formatPatientNewAppointment(patient: PatientEntityNewAppointment) {
   return {
@@ -105,10 +107,11 @@ export default function NewAppointmentForm({
 }: {
   patientId: string;
 }) {
+  const trpc = useTRPC();
   const { width } = useWindowSize();
 
-  const [patient] =
-    api.patient.findUnique.useSuspenseQuery<PatientEntityNewAppointment>({
+  const { data: patient } = useSuspenseQuery(
+    trpc.patient.findUnique.queryOptions<PatientEntityNewAppointment>({
       where: {
         id: patientId,
       },
@@ -144,7 +147,8 @@ export default function NewAppointmentForm({
           },
         },
       },
-    });
+    }),
+  );
 
   return (
     <StepperProvider
@@ -163,6 +167,7 @@ const FormStepperComponent = ({
 }: {
   patient: PatientEntityNewAppointment;
 }) => {
+  const trpc = useTRPC();
   const router = useRouter();
   const params = useParams();
   const [newAppointmentForm, saveNewAppointmentForm] = useLocalStorage(
@@ -172,8 +177,8 @@ const FormStepperComponent = ({
 
   const methods = useStepper();
 
-  const { mutate: createAppointment, isPending } =
-    api.appointment.create.useMutation({
+  const { mutate: createAppointment, isPending } = useMutation(
+    trpc.appointment.create.mutationOptions({
       onMutate: () => {
         toast.loading("Criando consulta...", {
           id: "appointment-creation-loading",
@@ -193,10 +198,12 @@ const FormStepperComponent = ({
       onSettled: () => {
         toast.dismiss("appointment-creation-loading");
       },
-    });
+    }),
+  );
 
-  const { data: defaultObjectiveInformation } =
-    api.defaultObjectiveInformation.findFirst.useQuery();
+  const { data: defaultObjectiveInformation } = useQuery(
+    trpc.defaultObjectiveInformation.findFirst.queryOptions(),
+  );
 
   console.log(` patient:`, patient);
 

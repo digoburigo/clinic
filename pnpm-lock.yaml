@@ -137,9 +137,6 @@ importers:
       '@trpc/client':
         specifier: 11.0.0-rc.800
         version: 11.0.0-rc.800(@trpc/server@11.0.0-rc.800(typescript@5.7.3))(typescript@5.7.3)
-      '@trpc/react-query':
-        specifier: 11.0.0-rc.800
-        version: 11.0.0-rc.800(@tanstack/react-query@5.66.9(react@19.0.0))(@trpc/client@11.0.0-rc.800(@trpc/server@11.0.0-rc.800(typescript@5.7.3))(typescript@5.7.3))(@trpc/server@11.0.0-rc.800(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3)
       '@trpc/server':
         specifier: 11.0.0-rc.800
         version: 11.0.0-rc.800(typescript@5.7.3)
@@ -2268,16 +2265,6 @@ packages:
     resolution: {integrity: sha512-ER9W2zdEnvSI9jeXeQ5Rz8OnDN5wkscAITWpsLUPCqaVCpL5yT/zCb8gayshSTx9kuyk7iWn43nD41cTYjKQ5Q==}
     peerDependencies:
       '@trpc/server': 11.0.0-rc.800+892471d1b
-      typescript: '>=5.7.2'
-
-  '@trpc/react-query@11.0.0-rc.800':
-    resolution: {integrity: sha512-C++nyxjSaZAl5zZqvVZqSHTrh/1NnTkZtq2j/8L5pIyjE3Xt+geq6R9CFt4CpkYhyEub60JEVdGfhxHGuPjqVw==}
-    peerDependencies:
-      '@tanstack/react-query': ^5.62.8
-      '@trpc/client': 11.0.0-rc.800+892471d1b
-      '@trpc/server': 11.0.0-rc.800+892471d1b
-      react: '>=18.2.0'
-      react-dom: '>=18.2.0'
       typescript: '>=5.7.2'
 
   '@trpc/server@11.0.0-rc.800':
@@ -6786,15 +6773,6 @@ snapshots:
   '@trpc/client@11.0.0-rc.800(@trpc/server@11.0.0-rc.800(typescript@5.7.3))(typescript@5.7.3)':
     dependencies:
       '@trpc/server': 11.0.0-rc.800(typescript@5.7.3)
-      typescript: 5.7.3
-
-  '@trpc/react-query@11.0.0-rc.800(@tanstack/react-query@5.66.9(react@19.0.0))(@trpc/client@11.0.0-rc.800(@trpc/server@11.0.0-rc.800(typescript@5.7.3))(typescript@5.7.3))(@trpc/server@11.0.0-rc.800(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3)':
-    dependencies:
-      '@tanstack/react-query': 5.66.9(react@19.0.0)
-      '@trpc/client': 11.0.0-rc.800(@trpc/server@11.0.0-rc.800(typescript@5.7.3))(typescript@5.7.3)
-      '@trpc/server': 11.0.0-rc.800(typescript@5.7.3)
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
       typescript: 5.7.3
 
   '@trpc/server@11.0.0-rc.800(typescript@5.7.3)':

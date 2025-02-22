@@ -13,26 +13,31 @@ import {
 import MultipleSelector, {
   type Option,
 } from "~/components/ui/multiple-selector";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import type { MedicalInfoForm } from "./types";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 export function AllergiesField() {
+  const trpc = useTRPC();
   const { control, setValue } = useFormContext<MedicalInfoForm>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data, isFetching } = api.allergiesValues.findMany.useQuery(
-    {
-      where: {
-        value: {
-          contains: debouncedSearch,
+  const { data, isFetching } = useQuery(
+    trpc.allergiesValues.findMany.queryOptions(
+      {
+        where: {
+          value: {
+            contains: debouncedSearch,
+          },
         },
       },
-    },
-    {
-      enabled: debouncedSearch.length > 2,
-    },
+      {
+        enabled: debouncedSearch.length > 2,
+      },
+    ),
   );
 
   const formattedOptions =
@@ -42,15 +47,15 @@ export function AllergiesField() {
       value: item.value,
     })) ?? [];
 
-  const { mutateAsync: createAllergy } = api.allergiesValues.create.useMutation(
-    {
+  const { mutateAsync: createAllergy } = useMutation(
+    trpc.allergiesValues.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success("Alergia criada com sucesso!");
       },
       onError: (error) => {
         toast.error("Erro ao criar alergia. Tente novamente.");
       },
-    },
+    }),
   );
 
   return (

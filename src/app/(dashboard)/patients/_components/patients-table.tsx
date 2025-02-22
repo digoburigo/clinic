@@ -2,7 +2,7 @@
 "use no memo";
 
 import { useRouter } from "next/navigation";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 
 import type { Patient } from "@zenstackhq/runtime/models";
 
@@ -37,7 +37,14 @@ import { Input } from "~/components/ui/input";
 import { DataTableRowAction } from "~/types";
 import { getColumns } from "./patients-table-columns";
 
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+
 export function PatientsTable() {
+  const trpc = useTRPC();
   const router = useRouter();
   const [rowAction, setRowAction] =
     useState<DataTableRowAction<Patient> | null>(null);
@@ -51,17 +58,21 @@ export function PatientsTable() {
     pageSize: 10,
   });
 
-  const [patients] = api.patient.findMany.useSuspenseQuery({
-    // take: pagination.pageSize,
-    // skip: pagination.pageIndex * pagination.pageSize,
-    orderBy: [
-      {
-        createdAt: "desc",
-      },
-    ],
-  });
+  const { data: patients } = useSuspenseQuery(
+    trpc.patient.findMany.queryOptions({
+      // take: pagination.pageSize,
+      // skip: pagination.pageIndex * pagination.pageSize,
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+    }),
+  );
 
-  const [patientCount] = api.patient.count.useSuspenseQuery();
+  const { data: patientCount } = useSuspenseQuery(
+    trpc.patient.count.queryOptions(),
+  );
 
   const rowCount = patientCount;
 
@@ -72,9 +83,10 @@ export function PatientsTable() {
     },
   ]);
 
-  const utils = api.useUtils();
-  const { mutate: deletePatient, isPending: isDeleting } =
-    api.patient.delete.useMutation({
+  const queryClient = useQueryClient();
+
+  const { mutate: deletePatient, isPending: isDeleting } = useMutation(
+    trpc.patient.delete.mutationOptions({
       onMutate: () => {
         const loadingTimeout = setTimeout(() => {
           toast.loading("Excluindo paciente...", { id: "delete-patient" });
@@ -89,8 +101,12 @@ export function PatientsTable() {
       },
       onSuccess: async () => {
         await Promise.all([
-          utils.patient.findMany.invalidate(),
-          utils.patient.count.invalidate(),
+          queryClient.invalidateQueries({
+            queryKey: trpc.patient.findMany.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.patient.count.queryKey(),
+          }),
         ]);
         toast.success("Paciente excluído com sucesso");
         setRowAction(null);
@@ -98,7 +114,8 @@ export function PatientsTable() {
       onError: (error) => {
         toast.error(`Erro ao excluir paciente: ${error.message}`);
       },
-    });
+    }),
+  );
 
   const table = useReactTable({
     data: patients,

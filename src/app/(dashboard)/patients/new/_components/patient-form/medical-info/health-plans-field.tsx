@@ -13,37 +13,43 @@ import {
 import MultipleSelector, {
   type Option,
 } from "~/components/ui/multiple-selector";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import type { MedicalInfoForm } from "./types";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 export function HealthPlansField() {
+  const trpc = useTRPC();
   const { control, setValue } = useFormContext<MedicalInfoForm>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data, isFetching } = api.healthPlansValues.findMany.useQuery(
-    {
-      where: {
-        value: {
-          contains: debouncedSearch,
+  const { data, isFetching } = useQuery(
+    trpc.healthPlansValues.findMany.queryOptions(
+      {
+        where: {
+          value: {
+            contains: debouncedSearch,
+          },
         },
       },
-    },
-    {
-      enabled: debouncedSearch.length > 2,
-    },
+      {
+        enabled: debouncedSearch.length > 2,
+      },
+    ),
   );
 
-  const { mutateAsync: createHealthPlan } =
-    api.healthPlansValues.create.useMutation({
+  const { mutateAsync: createHealthPlan } = useMutation(
+    trpc.healthPlansValues.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success("Plano de saúde criado com sucesso!");
       },
       onError: (error) => {
         toast.error("Erro ao criar medicamento. Tente novamente.");
       },
-    });
+    }),
+  );
 
   const formattedOptions =
     data?.map((item) => ({
