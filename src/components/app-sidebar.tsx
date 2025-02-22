@@ -2,6 +2,7 @@
 
 import { Organization } from "@prisma/client";
 import { NavMain } from "~/components/nav-main";
+import { Separator } from "~/components/ui/separator";
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +23,7 @@ export function AppSidebar({
   const { data: organizations, isPending } = authClient.useListOrganizations();
 
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar {...props}>
       <SidebarHeader>
         {isPending ? (
           <SidebarMenu>
@@ -37,11 +38,13 @@ export function AppSidebar({
             organizations={organizations as Organization[]}
           />
         )}
+        <Separator />
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
       </SidebarContent>
       <SidebarFooter>
+        <Separator />
         <NavUser />
       </SidebarFooter>
     </Sidebar>

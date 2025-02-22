@@ -390,8 +390,6 @@ model Vaccinations {
   // allow read and create access to all users
   @@allow('create,read,update,delete', true)
 
-  @@unique([patientId, vaccinationsValuesId])
-
   @@map("vaccinations")
 }
 
@@ -424,7 +422,7 @@ model Allergies {
   appointmentId String?
   appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
-    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organizationId String? @default(auth().organizationId) @allow('update', false)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users
@@ -432,8 +430,6 @@ model Allergies {
 
   // allow read and create access to all users
   @@allow('create,read,update,delete', true)
-
-  @@unique([patientId, allergiesValuesId])
 
   @@map("allergies")
 }
@@ -468,7 +464,7 @@ model Medications {
   appointmentId String?
   appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
-    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organizationId String? @default(auth().organizationId) @allow('update', false)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users
@@ -476,8 +472,6 @@ model Medications {
 
   // allow read and create access to all users
   @@allow('create,read,update,delete', true)
-
-  @@unique([patientId, medicationsValuesId])
 
   @@map("medications")
 }
@@ -520,8 +514,6 @@ model ExamResults {
   // allow read and create access to all users
   @@allow('create,read,update,delete', true)
 
-  @@unique([patientId, examResultsValuesId])
-
   @@map("exam_results")
 }   
 
@@ -563,8 +555,6 @@ model Comorbidities {
   // allow read and create access to all users
   @@allow('create,read,update,delete', true)
 
-  @@unique([patientId, comorbiditiesValuesId])
-
   @@map("comorbidities")
 }
 
@@ -603,8 +593,6 @@ model Surgeries {
   // allow read and create access to all users
   @@allow('create,read,update,delete', true)
 
-  @@unique([patientId, surgeriesValuesId])
-
   @@map("surgeries")
 }
 
@@ -634,7 +622,7 @@ model HealthPlans {
   healthPlansValuesId String
   healthPlansValues HealthPlansValues @relation(fields: [healthPlansValuesId], references: [id], onDelete: Cascade)
 
-    organizationId String? @default(auth().organizationId) @allow('update', false)
+  organizationId String? @default(auth().organizationId) @allow('update', false)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   // deny anonymous users
@@ -642,8 +630,6 @@ model HealthPlans {
 
   // allow read and create access to all users
   @@allow('create,read,update,delete', true)
-
-  @@unique([patientId, healthPlansValuesId])
 
   @@map("health_plans")
 }

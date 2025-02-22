@@ -16,7 +16,6 @@ import {
   type ColumnFiltersState,
   type PaginationState,
 } from "@tanstack/react-table";
-import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { useMemo, useState } from "react";
@@ -158,10 +157,7 @@ export function PatientsTable() {
         />
 
         <Button asChild>
-          <Link href="/patients/new">
-            <PlusIcon className="h-4 w-4" />
-            Novo paciente
-          </Link>
+          <Link href="/patients/new">Novo paciente</Link>
         </Button>
       </div>
 

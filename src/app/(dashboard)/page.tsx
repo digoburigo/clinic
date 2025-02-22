@@ -2,7 +2,6 @@ import { TrendingUp } from "lucide-react";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { BarChartExample } from "~/components/bar-chart";
-import SolarChatSquare2BoldDuotone from "~/components/svgs/solar-chat-square-2-bold-duotone";
 import {
   Card,
   CardContent,
@@ -165,9 +164,7 @@ export default async function Page() {
                 Você realizou 22 consultas novas esse mês.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <SolarChatSquare2BoldDuotone className="text-primary size-12" />
-            </CardContent>
+            <CardContent></CardContent>
           </Card>
         </div>
       </TabsContent>

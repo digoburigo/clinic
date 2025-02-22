@@ -257,7 +257,6 @@ model Vaccinations {
   organizationId       String?
   organization         Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@unique([patientId, vaccinationsValuesId])
   @@map("vaccinations")
 }
 
@@ -282,7 +281,6 @@ model Allergies {
   organizationId    String?
   organization      Organization?   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@unique([patientId, allergiesValuesId])
   @@map("allergies")
 }
 
@@ -307,7 +305,6 @@ model Medications {
   organizationId      String?
   organization        Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@unique([patientId, medicationsValuesId])
   @@map("medications")
 }
 
@@ -332,7 +329,6 @@ model ExamResults {
   organizationId      String?
   organization        Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@unique([patientId, examResultsValuesId])
   @@map("exam_results")
 }
 
@@ -357,7 +353,6 @@ model Comorbidities {
   organizationId        String?
   organization          Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@unique([patientId, comorbiditiesValuesId])
   @@map("comorbidities")
 }
 
@@ -380,7 +375,6 @@ model Surgeries {
   organizationId    String?
   organization      Organization?   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@unique([patientId, surgeriesValuesId])
   @@map("surgeries")
 }
 
@@ -403,7 +397,6 @@ model HealthPlans {
   organizationId      String?
   organization        Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@unique([patientId, healthPlansValuesId])
   @@map("health_plans")
 }
 

@@ -11,7 +11,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -117,10 +116,7 @@ export function AppointmentsTable() {
         />
 
         <Button asChild className="dark:bg-white dark:text-black">
-          <Link href="/patients/new">
-            <PlusIcon className="h-4 w-4" />
-            Nova consulta
-          </Link>
+          <Link href="/appointments/new">Nova consulta</Link>
         </Button>
       </div>
 
