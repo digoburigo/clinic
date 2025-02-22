@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { DataTableSkeleton } from "~/components/ui/data-table/data-table-skeleton";
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient, prefetch, trpc } from "~/trpc/server";
 import { AppointmentsTable } from "./_components/appointments-table";
 import { withPatientName } from "./utils/queries";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  void api.appointment.findMany.prefetch(withPatientName);
+  prefetch(trpc.appointment.findMany.queryOptions(withPatientName));
 
   return (
     <HydrateClient>

@@ -80,6 +80,7 @@
     "@trpc/client": "11.0.0-rc.800",
     "@trpc/react-query": "11.0.0-rc.800",
     "@trpc/server": "11.0.0-rc.800",
+    "@trpc/tanstack-react-query": "11.0.0-rc.800",
     "@uidotdev/usehooks": "^2.4.1",
     "@zenstackhq/runtime": "2.11.6",
     "@zenstackhq/server": "2.11.6",

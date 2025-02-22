@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
 import { AdminUsers } from "~/components/admin-users";
-import { useSession } from "~/server/auth";
+import { auth } from "~/server/auth";
 
 import { Metadata } from "next";
 
+import { headers } from "next/headers";
+import Link from "next/link";
 import { UserMenu } from "~/components/user/user-menu";
 import { cn } from "~/lib/utils";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Área administrativa",
@@ -14,7 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
-  const session = await useSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session) {
     return redirect("/login");
@@ -29,14 +32,10 @@ export default async function AdminPage() {
       <div className="border-b">
         <div className="flex h-16 items-center px-4">
           <div className="mx-6">
-            <nav
-              className={cn(
-                "flex items-center space-x-4 lg:space-x-6",
-              )}
-            >
+            <nav className={cn("flex items-center space-x-4 lg:space-x-6")}>
               <Link
                 href="/admin"
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className="hover:text-primary text-sm font-medium transition-colors"
               >
                 Área administrativa
               </Link>
