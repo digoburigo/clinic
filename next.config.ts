@@ -1,12 +1,13 @@
 import { type NextConfig } from "next";
-import "./src/env.js";
+import "./src/env";
 
 const config: NextConfig = {
+  reactStrictMode: true,
   typescript: {
-    ignoreBuildErrors: true
+    ignoreBuildErrors: true,
   },
   eslint: {
-    ignoreDuringBuilds: true
+    ignoreDuringBuilds: true,
   },
   experimental: {
     reactCompiler: true,

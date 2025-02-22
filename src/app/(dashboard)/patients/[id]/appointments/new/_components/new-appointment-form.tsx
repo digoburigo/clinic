@@ -205,8 +205,6 @@ const FormStepperComponent = ({
     trpc.defaultObjectiveInformation.findFirst.queryOptions(),
   );
 
-  console.log(` patient:`, patient);
-
   const formatedPatient = useMemo(
     () => formatPatientNewAppointment(patient),
     [patient],

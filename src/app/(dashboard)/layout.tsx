@@ -1,45 +1,40 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "~/components/app-sidebar";
 import { Breadcrumbs } from "~/components/breadcrumbs";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb";
 import { Separator } from "~/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "~/components/ui/sidebar";
-import { useSession } from "~/server/auth";
-import { api } from "~/trpc/server";
+import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const authSession = await useSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!authSession?.user) {
+  if (!session?.user) {
     return redirect("/login");
   }
 
-  if (!authSession?.user?.emailVerified) {
+  if (!session?.user?.emailVerified) {
     return redirect("/verify-email");
   }
 
-  if (authSession?.user?.role === "admin") {
+  if (session?.user?.role === "admin") {
     return redirect("/admin");
   }
 
-  const member = await api.member.findFirst({
+  const member = await db.member.findFirst({
     where: {
-      userId: authSession.user.id,
+      userId: session.user.id,
     },
   });
 
@@ -47,13 +42,13 @@ export default async function Layout({
     return redirect("/patient-area");
   }
 
-  if (!authSession?.session.activeOrganizationId) {
+  if (!session?.session.activeOrganizationId) {
     return redirect("/home");
   }
 
   return (
     <SidebarProvider>
-      <AppSidebar memberRole={member?.role} />
+      <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">

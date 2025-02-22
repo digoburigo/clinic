@@ -25,7 +25,22 @@ import { DataTableRowAction } from "~/types";
 import { PatientWithAppointments } from "~/types/db-entities";
 import { getColumns } from "./patient-appointments-list-columns";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 
 const fallbackData: PatientWithAppointments[] = [];
 
@@ -114,6 +129,25 @@ export function PatientAppointmentsList({ patientId }: { patientId: string }) {
     }),
   );
 
+  const queryClient = useQueryClient();
+  const deleteAppointment = useMutation(
+    trpc.appointment.delete.mutationOptions({
+      onSuccess: async () => {
+        toast.success("Consulta excluída com sucesso");
+        await queryClient.invalidateQueries({
+          queryKey: trpc.appointment.findMany.queryKey({
+            where: {
+              patientId,
+            },
+          }),
+        });
+      },
+      onError: (error) => {
+        toast.error("Erro ao excluir consulta");
+      },
+    }),
+  );
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -164,6 +198,39 @@ export function PatientAppointmentsList({ patientId }: { patientId: string }) {
         <div className="w-full">
           <div className="rounded-md border">
             <DataTable table={table} emptyMessage="Nenhuma consulta" />
+
+            <AlertDialog
+              open={rowAction?.type === "delete"}
+              onOpenChange={() => setRowAction(null)}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Tem certeza que deseja excluir esta consulta?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive"
+                    onClick={() => {
+                      if (rowAction?.row.original.id) {
+                        deleteAppointment.mutate({
+                          where: {
+                            id: rowAction.row.original.id,
+                          },
+                        });
+                      }
+                    }}
+                  >
+                    {deleteAppointment.isPending ? "Excluindo..." : "Excluir"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
             <Button

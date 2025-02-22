@@ -15,38 +15,38 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendEmail({ emailTemplate, to, subject }: Props) {
   const html = await render(emailTemplate);
 
-  if (process.env.NODE_ENV === "production") {
-    await resend.emails.send({
-      from: `Melomar Clínica <admin@${process.env.RESEND_DOMAIN}>`,
-      to,
-      subject,
-      html,
-    });
-  } else {
-    const smtpOptions: SMTPTransport.Options = {
-      // remove "service"
-      service: "Gmail",
-      host: process.env.SMTP_HOST || "smtp.mailtrap.io",
-      port: parseInt(process.env.SMTP_PORT || "2525"),
-      // secure: true,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER || "user",
-        pass: process.env.SMTP_PASSWORD || "password",
-      },
-    };
+  // if (process.env.NODE_ENV === "production") {
+  //   await resend.emails.send({
+  //     from: `Melomar Clínica <admin@${process.env.RESEND_DOMAIN}>`,
+  //     to,
+  //     subject,
+  //     html,
+  //   });
+  // } else {
+  const smtpOptions: SMTPTransport.Options = {
+    // remove "service"
+    service: "Gmail",
+    host: process.env.SMTP_HOST || "smtp.mailtrap.io",
+    port: parseInt(process.env.SMTP_PORT || "2525"),
+    // secure: true,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER || "user",
+      pass: process.env.SMTP_PASSWORD || "password",
+    },
+  };
 
-    const transporter = nodemailer.createTransport({
-      ...smtpOptions,
-    });
+  const transporter = nodemailer.createTransport({
+    ...smtpOptions,
+  });
 
-    const options = {
-      from: process.env.SMTP_FROM_EMAIL,
-      to,
-      subject,
-      html,
-    };
+  const options = {
+    from: process.env.SMTP_FROM_EMAIL,
+    to,
+    subject,
+    html,
+  };
 
-    await transporter.sendMail(options);
-  }
+  await transporter.sendMail(options);
+  // }
 }

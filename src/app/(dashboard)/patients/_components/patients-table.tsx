@@ -140,7 +140,6 @@ export function PatientsTable() {
     debugTable: true,
     meta: {
       onRowClick: (row: Patient) => {
-        console.log(` row:`, row);
         router.push(`/patients/${row.id}`);
       },
     },
@@ -184,6 +183,7 @@ export function PatientsTable() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
+              variant="destructive"
               disabled={isDeleting}
               onClick={() => {
                 if (rowAction?.row.original.id) {
