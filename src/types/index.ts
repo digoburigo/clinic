@@ -1,5 +1,5 @@
-import type { ColumnSort, Row } from "@tanstack/react-table";
 import type { Prisma } from "@prisma/client";
+import type { ColumnSort, Row } from "@tanstack/react-table";
 import { type z } from "zod";
 
 import { type DataTableConfig } from "~/components/ui/data-table/config/operations";
@@ -57,6 +57,10 @@ export interface DataTableRowAction<TData> {
   type: "update" | "delete";
 }
 
+export interface DataTableMeta<TData> {
+  onRowClick?: (row: TData) => void;
+}
+
 export interface PatientQueryBuilderOpts {
   where?: Prisma.PatientWhereInput;
   orderBy?: Prisma.PatientOrderByWithRelationInput[];
@@ -65,4 +69,3 @@ export interface PatientQueryBuilderOpts {
 }
 
 // PRISMA MODELS
-

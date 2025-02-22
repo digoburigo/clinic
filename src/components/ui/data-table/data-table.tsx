@@ -1,10 +1,10 @@
 "use client";
 "use no memo";
 
-import * as React from "react";
 import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
+import * as React from "react";
+import type { DataTableMeta } from "~/types";
 
-import { cn } from "~/lib/utils";
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { cn } from "~/lib/utils";
 import { getCommonPinningStyles } from "./config/utils";
 import { DataTablePagination } from "./data-table-pagination";
 
@@ -21,7 +22,7 @@ interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
    * The table instance returned from useDataTable hook with pagination, sorting, filtering, etc.
    * @type TanstackTable<TData>
    */
-  table: TanstackTable<TData>;
+  table: TanstackTable<TData> & { options: { meta?: DataTableMeta<TData> } };
 
   /**
    * The floating bar to render at the bottom of the table on row selection.
@@ -77,6 +78,8 @@ export function DataTable<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={() => table.options.meta?.onRowClick?.(row.original)}
+                  className="hover:bg-muted/50 cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

@@ -12,6 +12,38 @@ export default async function Page({
     where: {
       id: p.id,
     },
+    include: {
+      allergies: {
+        include: {
+          allergiesValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+      medications: {
+        include: {
+          medicationsValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+      comorbidities: {
+        include: {
+          comorbiditiesValues: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   return <NewAppointmentForm patientId={p.id} />;

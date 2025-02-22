@@ -1,0 +1,9 @@
+---
+description: Best practices for Node.js development
+globs: **/*.{ts,js}
+---
+- Use async/await for handling asynchronous operations
+- Implement proper error handling and logging
+- Use environment variables for configuration
+- Implement proper security measures (e.g., input validation, authentication)
+- Optimize performance by using streams for large data processing

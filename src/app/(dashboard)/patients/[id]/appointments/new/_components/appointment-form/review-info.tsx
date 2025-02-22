@@ -1,3 +1,8 @@
+import {
+  Allergies,
+  Comorbidities,
+  Medications,
+} from "@zenstackhq/runtime/models";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -12,7 +17,11 @@ import { subjectiveSchema } from "./subject-info";
 export type AllFields = z.infer<typeof subjectiveSchema> &
   z.infer<typeof objectiveSchema> &
   z.infer<typeof evaluationSchema> &
-  z.infer<typeof planSchema>;
+  z.infer<typeof planSchema> & {
+    medications: Medications[];
+    allergies: Allergies[];
+    comorbidities: Comorbidities[];
+  };
 
 export function ReviewInfo() {
   const { getValues } = useFormContext<AllFields>();

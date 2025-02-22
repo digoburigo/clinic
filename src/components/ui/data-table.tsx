@@ -3,6 +3,7 @@
 
 import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
 
+import type { HTMLAttributes } from "react";
 import {
   Table,
   TableBody,
@@ -11,16 +12,16 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { DataTablePagination } from "./data-table-pagination";
-import type { HTMLAttributes } from "react";
 import { cn } from "~/lib/utils";
+import { DataTableMeta } from "~/types";
+import { DataTablePagination } from "./data-table-pagination";
 
 interface DataTableProps<TData> extends HTMLAttributes<HTMLDivElement> {
   /**
    * The table instance returned from useDataTable hook with pagination, sorting, filtering, etc.
    * @type TanstackTable<TData>
    */
-  table: TanstackTable<TData>;
+  table: TanstackTable<TData> & { options: { meta?: DataTableMeta<TData> } };
   emptyMessage?: string;
 }
 
@@ -63,9 +64,23 @@ export function DataTable<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={(e) => {
+                    // Check if click originated from actions column
+                    const isActionsCell =
+                      (e.target as HTMLElement).getAttribute("data-slot") ===
+                        "dropdown-menu-item" ||
+                      (e.target as HTMLElement)
+                        .closest("td")
+                        ?.getAttribute("data-column") === "select";
+
+                    if (!isActionsCell) {
+                      table.options.meta?.onRowClick?.(row.original);
+                    }
+                  }}
+                  className="hover:bg-primary/10 cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} data-column={cell.column.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),

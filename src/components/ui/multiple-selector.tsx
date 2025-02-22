@@ -209,6 +209,7 @@ function MultipleSelector({
   const dropdownRef = React.useRef<HTMLDivElement>(null); // Added this
 
   const [selected, setSelected] = React.useState<Option[]>(value || []);
+  console.log(` selected:`, selected);
   const [options, setOptions] = React.useState<GroupOption>(
     transToGroupOption(arrayDefaultOptions, groupBy),
   );
@@ -478,6 +479,7 @@ function MultipleSelector({
                 className={cn(
                   "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
                   "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
+                  option.external && "bg-primary/20",
                   badgeClassName,
                 )}
                 variant={"outline"}

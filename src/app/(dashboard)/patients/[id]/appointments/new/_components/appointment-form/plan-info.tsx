@@ -10,7 +10,7 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 
 export const planSchema = z.object({
-  plan: z.string().optional(),
+  plan: z.string(),
 });
 export type PlanForm = z.infer<typeof planSchema>;
 

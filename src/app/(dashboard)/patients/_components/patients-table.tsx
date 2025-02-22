@@ -1,6 +1,7 @@
 "use client";
 "use no memo";
 
+import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 
 import type { Patient } from "@zenstackhq/runtime/models";
@@ -37,6 +38,7 @@ import { DataTableRowAction } from "~/types";
 import { getColumns } from "./patients-table-columns";
 
 export function PatientsTable() {
+  const router = useRouter();
   const [rowAction, setRowAction] =
     useState<DataTableRowAction<Patient> | null>(null);
 
@@ -74,9 +76,15 @@ export function PatientsTable() {
   const { mutate: deletePatient, isPending: isDeleting } =
     api.patient.delete.useMutation({
       onMutate: () => {
-        toast.loading("Excluindo paciente...", { id: "delete-patient" });
+        const loadingTimeout = setTimeout(() => {
+          toast.loading("Excluindo paciente...", { id: "delete-patient" });
+        }, 300);
+        return loadingTimeout;
       },
-      onSettled: () => {
+      onSettled: (_, __, ___, context) => {
+        if (context) {
+          clearTimeout(context);
+        }
         toast.dismiss("delete-patient");
       },
       onSuccess: async () => {
@@ -113,6 +121,12 @@ export function PatientsTable() {
     // manualFiltering: true,
     // onColumnFiltersChange: setColumnFilters,
     debugTable: true,
+    meta: {
+      onRowClick: (row: Patient) => {
+        console.log(` row:`, row);
+        router.push(`/patients/${row.id}`);
+      },
+    },
   });
 
   return (

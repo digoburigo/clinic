@@ -2,8 +2,11 @@
 description: Best practices for form management with React Hook Form
 globs: **/**.{ts,tsx}
 ---
- - Use React Hook Form for efficient form state management and validation.
+- Use React Hook Form for efficient form state management and validation.
+- Use controlled components for better performance and easier state management.
 - Implement form validation using Zod for improved type safety and error handling.
-- Utilize both controlled and uncontrolled inputs as needed for performance.
 - Implement clear error handling and user feedback for form validation issues.
 - Leverage React Hook Form's performance optimizations like lazy registration.
+- Implement proper validation using React Hook Form's built-in validation with Zod.
+- Utilize the `useForm` hook's `watch` function for real-time form state updates.
+- Use the `useFormContext` hook for sharing form state across nested components.

@@ -15,6 +15,7 @@ import Link from "next/link";
 import * as React from "react";
 
 import type { Appointment } from "@zenstackhq/runtime/models";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -27,6 +28,8 @@ import { getColumns } from "./patient-appointments-list-columns";
 const fallbackData: PatientWithAppointments[] = [];
 
 export function PatientAppointmentsList({ patientId }: { patientId: string }) {
+  const router = useRouter();
+
   const [patient] =
     api.patient.findUnique.useSuspenseQuery<PatientWithAppointments>({
       where: {
@@ -133,6 +136,11 @@ export function PatientAppointmentsList({ patientId }: { patientId: string }) {
       sorting,
       columnFilters,
       columnVisibility,
+    },
+    meta: {
+      onRowClick: (row: Appointment) => {
+        router.push(`/patients/${patientId}/appointments/${row.id}`);
+      },
     },
   });
 

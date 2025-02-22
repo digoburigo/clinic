@@ -1,15 +1,20 @@
+import { useDebounce } from "@uidotdev/usehooks";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { FormDescription, FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
-import MultipleSelector, { type Option } from "~/components/ui/multiple-selector";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import MultipleSelector, {
+  type Option,
+} from "~/components/ui/multiple-selector";
 import { api } from "~/trpc/react";
 import type { MedicalInfoForm } from "./types";
-import { useDebounce } from "@uidotdev/usehooks";
 
 export function HealthPlansField() {
   const { control, setValue } = useFormContext<MedicalInfoForm>();
@@ -53,12 +58,11 @@ export function HealthPlansField() {
       name="healthPlans"
       render={({ field, fieldState }) => (
         <FormItem>
-          <FormLabel required>Planos de saúde</FormLabel>
+          <FormLabel>Planos de saúde</FormLabel>
           <FormControl>
             <MultipleSelector
               {...field}
               isFetching={isFetching}
-
               options={formattedOptions}
               onSearchSync={(value) => {
                 setSearch(value);

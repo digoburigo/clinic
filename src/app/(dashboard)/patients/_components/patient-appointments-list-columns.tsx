@@ -3,7 +3,6 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import Link from "next/link";
 
 import type { Appointment } from "@zenstackhq/runtime/models";
 import { toast } from "sonner";
@@ -39,26 +38,26 @@ export function getColumns({
   setRowAction,
 }: GetColumnsProps): ColumnDef<Appointment>[] {
   return [
-    {
-      accessorKey: "id",
-      header: ({ column }) => {
-        return <div>Identificador único</div>;
-      },
-      size: 10,
-      cell: ({ row }) => {
-        return (
-          <div className="w-fit">
-            <Button variant="link" size="sm">
-              <Link
-                href={`/patients/${row.original.patientId}/appointments/${row.original.id}`}
-              >
-                {row.original.id}
-              </Link>
-            </Button>
-          </div>
-        );
-      },
-    },
+    // {
+    //   accessorKey: "id",
+    //   header: ({ column }) => {
+    //     return <div>Identificador único</div>;
+    //   },
+    //   size: 10,
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="w-fit">
+    //         <Button variant="link" size="sm">
+    //           <Link
+    //             href={`/patients/${row.original.patientId}/appointments/${row.original.id}`}
+    //           >
+    //             {row.original.id}
+    //           </Link>
+    //         </Button>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       accessorKey: "motive",
       header: ({ column }) => {

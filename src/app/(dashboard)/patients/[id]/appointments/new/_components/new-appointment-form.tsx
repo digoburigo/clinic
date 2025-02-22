@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocalStorage, useWindowSize } from "@uidotdev/usehooks";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -16,9 +17,9 @@ import {
 } from "~/components/ui/card";
 import { Form } from "~/components/ui/form";
 import { defineStepper } from "~/components/ui/stepper";
-import { authClient } from "~/lib/auth-client";
 import { ClientOnly } from "~/lib/client-only";
 import { api } from "~/trpc/react";
+import { PatientEntityNewAppointment } from "~/types/db-entities";
 import { AppointmentMedical } from "./appointment-form/appointment-medical";
 import {
   EvaluationForm,
@@ -34,6 +35,30 @@ import {
   SubjectiveForm,
   subjectiveSchema,
 } from "./appointment-form/subject-info";
+
+function formatPatientNewAppointment(patient: PatientEntityNewAppointment) {
+  return {
+    ...patient,
+    allergies:
+      patient?.allergies?.map((allergy) => ({
+        ...allergy.allergiesValues,
+        label: allergy.allergiesValues.value,
+        external: true,
+      })) || [],
+    medications:
+      patient?.medications?.map((medication) => ({
+        ...medication.medicationsValues,
+        label: medication.medicationsValues.value,
+        external: true,
+      })) || [],
+    comorbidities:
+      patient?.comorbidities?.map((comorbidity) => ({
+        ...comorbidity.comorbiditiesValues,
+        label: comorbidity.comorbiditiesValues.value,
+        external: true,
+      })) || [],
+  };
+}
 
 const {
   StepperProvider,
@@ -82,11 +107,44 @@ export default function NewAppointmentForm({
 }) {
   const { width } = useWindowSize();
 
-  const [patient] = api.patient.findUnique.useSuspenseQuery({
-    where: {
-      id: patientId,
-    },
-  });
+  const [patient] =
+    api.patient.findUnique.useSuspenseQuery<PatientEntityNewAppointment>({
+      where: {
+        id: patientId,
+      },
+      include: {
+        allergies: {
+          include: {
+            allergiesValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+        medications: {
+          include: {
+            medicationsValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+        comorbidities: {
+          include: {
+            comorbiditiesValues: {
+              select: {
+                id: true,
+                value: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
   return (
     <StepperProvider
@@ -100,7 +158,11 @@ export default function NewAppointmentForm({
   );
 }
 
-const FormStepperComponent = ({ patient }: { patient: Patient }) => {
+const FormStepperComponent = ({
+  patient,
+}: {
+  patient: PatientEntityNewAppointment;
+}) => {
   const router = useRouter();
   const params = useParams();
   const [newAppointmentForm, saveNewAppointmentForm] = useLocalStorage(
@@ -133,18 +195,15 @@ const FormStepperComponent = ({ patient }: { patient: Patient }) => {
       },
     });
 
-  const { data: activeOrganization } = authClient.useActiveOrganization();
   const { data: defaultObjectiveInformation } =
-    api.defaultObjectiveInformation.findUnique.useQuery(
-      {
-        where: {
-          organizationId: activeOrganization?.id,
-        },
-      },
-      {
-        enabled: !!activeOrganization,
-      },
-    );
+    api.defaultObjectiveInformation.findFirst.useQuery();
+
+  console.log(` patient:`, patient);
+
+  const formatedPatient = useMemo(
+    () => formatPatientNewAppointment(patient),
+    [patient],
+  );
 
   const form = useForm({
     mode: "onBlur",
@@ -163,8 +222,10 @@ const FormStepperComponent = ({ patient }: { patient: Patient }) => {
     },
     values: {
       ...newAppointmentForm,
-      objective:
-        defaultObjectiveInformation?.text?.replace(/\\n/g, "\n") ?? undefined,
+      objective: defaultObjectiveInformation?.text?.replace(/\\n/g, "\n") ?? "",
+      medications: formatedPatient.medications,
+      allergies: formatedPatient.allergies,
+      comorbidities: formatedPatient.comorbidities,
     },
   });
 
@@ -188,32 +249,29 @@ const FormStepperComponent = ({ patient }: { patient: Patient }) => {
           patientId: params.id as string,
           cids: {
             createMany: {
-              data: v.cids.map((c: { id: string }) => ({
+              data: v.cids.map((c) => ({
                 cidId: c.id,
               })),
             },
           },
           medications: {
             createMany: {
-              data: v.medications.map((m: { id: string }) => ({
+              data: v.medications.map((m) => ({
                 medicationsValuesId: m.id,
-                patientId: params.id as string,
               })),
             },
           },
           allergies: {
             createMany: {
-              data: v.allergies.map((a: { id: string }) => ({
+              data: v.allergies.map((a) => ({
                 allergiesValuesId: a.id,
-                patientId: params.id as string,
               })),
             },
           },
           comorbidities: {
             createMany: {
-              data: v.comorbidities.map((c: { id: string }) => ({
+              data: v.comorbidities.map((c) => ({
                 comorbiditiesValuesId: c.id,
-                patientId: params.id as string,
               })),
             },
           },

@@ -2,8 +2,11 @@
 description: Best practices for styling with Tailwind CSS v4
 globs: **/**.{ts,tsx,css}
 ---
- - Use Tailwind CSS v4 for utility-first styling to speed up development.
-- Implement responsive design using Tailwind's responsive utilities.
+- Use Tailwind CSS v4 for utility-first styling to speed up development.
+- Implement responsive design using Tailwind's responsive utilities and modifiers.
 - Customize your theme with Tailwind's configuration for consistent branding.
 - Ensure accessibility by using Tailwind's focus states and screen reader support.
 - Respect the WCAG 2.1 AAA Standards.
+- Use utility classes directly in JSX for faster development.
+- Create custom components for reusable UI patterns.
+- For conditional clsses use the `cn` function to merge the tailwindcss classes in the proper way.

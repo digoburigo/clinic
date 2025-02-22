@@ -1,0 +1,9 @@
+---
+description: Best practices for using Shadcn UI components
+globs: **/*.{ts,tsx}
+---
+- Use Shadcn UI components as building blocks for your UI
+- Customize components using the provided props and className
+- Implement dark mode support using the built-in dark mode classes
+- Ensure accessibility by following the component's accessibility guidelines
+- Use the provided TypeScript types for type-safe component usage
