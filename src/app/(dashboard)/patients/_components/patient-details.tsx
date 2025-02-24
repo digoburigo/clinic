@@ -67,6 +67,8 @@ function formatPatient(patient: PatientEntity) {
         ...examResult.examResultsValues,
         label: examResult.examResultsValues.value,
         exists: true,
+        result: examResult.result,
+        date: examResult.date,
       })) || [],
     surgeries:
       patient?.surgeries?.map((surgery) => ({

@@ -1,15 +1,22 @@
-import { useFormContext } from "react-hook-form";
-import { z } from "zod";
-import { FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
-import { SelectContent, SelectItem } from "~/components/ui/select";
-import { Input } from "~/components/ui/input";
-import { Select, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { withMask } from "use-mask-input";
 import { useQuery } from "@tanstack/react-query";
+import { useFormContext } from "react-hook-form";
+import { withMask } from "use-mask-input";
+import { z } from "zod";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 export const addressInfoSchema = z.object({
   zipcode: z.string().min(8, {
@@ -76,16 +83,18 @@ export function AddressInfoForm() {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <FormField
         control={control}
         name="zipcode"
         render={({ field }) => (
           <FormItem>
             <FormLabel required>CEP</FormLabel>
-            <FormControl ref={withMask("99999-999", {
-              jitMasking: true,
-            })}>
+            <FormControl
+              ref={withMask("99999-999", {
+                jitMasking: true,
+              })}
+            >
               <Input
                 placeholder="Ex.: 00000-000"
                 {...field}

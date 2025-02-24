@@ -1,14 +1,14 @@
-import { VaccinationsField } from "./vaccinations-field";
 import { AllergiesField } from "./allergies-field";
-import { MedicationsField } from "./medications-field";
-import { ExamResultsField } from "./exam-results-field";
 import { ComorbiditiesField } from "./comorbidities-field";
-import { SurgeriesField } from "./surgeries-field";
+import { ExamResultsField } from "./exam-results-field";
 import { HealthPlansField } from "./health-plans-field";
+import { MedicationsField } from "./medications-field";
+import { SurgeriesField } from "./surgeries-field";
+import { VaccinationsField } from "./vaccinations-field";
 
 export function MedicalInfoForm() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <VaccinationsField />
 
       <HealthPlansField />

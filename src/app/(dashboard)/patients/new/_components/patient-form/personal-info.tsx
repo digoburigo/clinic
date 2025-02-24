@@ -1,14 +1,21 @@
 import { useFormContext } from "react-hook-form";
-import { z } from "zod";
-import { FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
-import { SelectContent, SelectItem } from "~/components/ui/select";
-import { Input } from "~/components/ui/input";
-import { Select, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { withMask } from "use-mask-input";
+import { z } from "zod";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 const SexEnum = z.enum(["male", "female"], {
   errorMap: () => {
@@ -75,7 +82,7 @@ export function PersonalInfoForm() {
   const { control } = useFormContext<PersonalInfoForm>();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <FormField
         control={control}
         name="name"
@@ -87,9 +94,7 @@ export function PersonalInfoForm() {
             <FormControl>
               <Input id={field.name} placeholder="João da Silva" {...field} />
             </FormControl>
-            {fieldState.error && (
-              <FormMessage>{fieldState.error.message}</FormMessage>
-            )}
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -107,9 +112,7 @@ export function PersonalInfoForm() {
             >
               <Input placeholder="Digite seu CPF" {...field} type="tel" />
             </FormControl>
-            {fieldState.error && (
-              <FormMessage>{fieldState.error.message}</FormMessage>
-            )}
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -127,9 +130,7 @@ export function PersonalInfoForm() {
             >
               <Input {...field} type="tel" />
             </FormControl>
-            {fieldState.error && (
-              <FormMessage>{fieldState.error.message}</FormMessage>
-            )}
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -143,9 +144,7 @@ export function PersonalInfoForm() {
             <FormControl>
               <Input placeholder="Digite seu melhor Email" {...field} />
             </FormControl>
-            {fieldState.error && (
-              <FormMessage>{fieldState.error.message}</FormMessage>
-            )}
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -167,9 +166,7 @@ export function PersonalInfoForm() {
                 <SelectItem value="female">Feminino</SelectItem>
               </SelectContent>
             </Select>
-            {fieldState.error && (
-              <FormMessage>{fieldState.error.message}</FormMessage>
-            )}
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -183,9 +180,7 @@ export function PersonalInfoForm() {
             <FormControl>
               <Input placeholder="" {...field} />
             </FormControl>
-            {fieldState.error && (
-              <FormMessage>{fieldState.error.message}</FormMessage>
-            )}
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -199,9 +194,7 @@ export function PersonalInfoForm() {
             <FormControl>
               <Input placeholder="Digite sua nacionalidade" {...field} />
             </FormControl>
-            {fieldState.error && (
-              <FormMessage>{fieldState.error.message}</FormMessage>
-            )}
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -226,9 +219,7 @@ export function PersonalInfoForm() {
                 <SelectItem value="indigenous">Indígena</SelectItem>
               </SelectContent>
             </Select>
-            {fieldState.error && (
-              <FormMessage>{fieldState.error.message}</FormMessage>
-            )}
+            <FormMessage />
           </FormItem>
         )}
       />

@@ -13,6 +13,7 @@ import {
   CommandList,
 } from "~/components/ui/command";
 import { cn } from "~/lib/utils";
+import { Button } from "./button";
 
 export interface Option {
   id?: string;
@@ -458,9 +459,9 @@ function MultipleSelector({
     >
       <div
         className={cn(
-          "border-input ring-offset-background focus-within:ring-ring min-h-10 rounded-md border text-base focus-within:ring-2 focus-within:ring-offset-2 md:text-sm",
+          "border-input ring-offset-background focus-within:ring-ring ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 aria-invalid:outline-destructive/60 dark:aria-invalid:outline-destructive dark:aria-invalid:ring-destructive/40 aria-invalid:ring-destructive/20 aria-invalid:border-destructive/60 dark:aria-invalid:border-destructive min-h-9 rounded-md border text-base transition-[color,box-shadow] focus-within:ring-2 focus-within:ring-offset-2 focus-visible:ring-4 focus-visible:outline-1 aria-invalid:focus-visible:ring-[3px] aria-invalid:focus-visible:outline-none md:text-sm dark:aria-invalid:focus-visible:ring-4",
           {
-            "px-3 py-2": selected.length !== 0,
+            "px-3 py-1.5": selected.length !== 0,
             "cursor-text": !disabled && selected.length !== 0,
           },
           className,
@@ -537,14 +538,16 @@ function MultipleSelector({
               "placeholder:text-muted-foreground flex-1 bg-transparent outline-none",
               {
                 "w-full": hidePlaceholderWhenSelected,
-                "px-3 py-2": selected.length === 0,
+                "px-3 py-1.5": selected.length === 0,
                 "ml-1": selected.length !== 0,
               },
               inputProps?.className,
             )}
           />
-          <button
+          <Button
             type="button"
+            variant={"ghost"}
+            size={"icon"}
             onClick={() => {
               setSelected(selected.filter((s) => s.fixed));
               onChange?.(selected.filter((s) => s.fixed));
@@ -558,8 +561,8 @@ function MultipleSelector({
                 "hidden",
             )}
           >
-            <X />
-          </button>
+            <X className="text-muted-foreground hover:text-foreground" />
+          </Button>
         </div>
       </div>
       <div className="relative">

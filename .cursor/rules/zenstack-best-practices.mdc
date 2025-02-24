@@ -1,6 +1,6 @@
 ---
 description: Best practices for using ZenStack in your application
-globs: **/*.{ts,tsx,zmodel}
+globs: **/*.{zmodel}
 ---
 - Use ZenStack's access policy system to implement fine-grained authorization.
 - Regularly run `zenstack generate` to keep your Prisma schema and ZenStack models in sync.
