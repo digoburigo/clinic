@@ -327,6 +327,8 @@ model ExamResults {
   patient             Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
   examResultsValuesId String
   examResultsValues   ExamResultsValues @relation(fields: [examResultsValuesId], references: [id], onDelete: Cascade)
+  result              String?
+  date                DateTime?
   organizationId      String?
   organization        Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
