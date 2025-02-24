@@ -2,12 +2,13 @@
 
 import { ChevronsUpDown, Plus } from "lucide-react";
 
+import { Organization } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
@@ -19,9 +20,6 @@ import {
 } from "~/components/ui/sidebar";
 import { Skeleton } from "~/components/ui/skeleton";
 import { authClient } from "~/lib/auth-client";
-import { Organization } from "@prisma/client";
-import { api } from "~/trpc/react";
-import { useState } from "react";
 
 export function OrganizationSwitcher({
   organizations,
@@ -32,13 +30,14 @@ export function OrganizationSwitcher({
 
   const { data: activeOrganization, isPending } =
     authClient.useActiveOrganization();
-  const utils = api.useUtils();
+
+  const queryClient = useQueryClient();
 
   async function setActiveOrganization(organization: Organization) {
     await authClient.organization.setActive({
       organizationId: organization.id,
     });
-    await utils.invalidate();
+    await queryClient.invalidateQueries();
     // if (typeof window !== "undefined") {
     //   window.location.reload();
     // }
@@ -51,10 +50,10 @@ export function OrganizationSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="disabled:opacity-100 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground disabled:opacity-100"
               disabled={organizations.length <= 1}
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <Plus className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -77,7 +76,7 @@ export function OrganizationSwitcher({
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
+            <DropdownMenuLabel className="text-muted-foreground text-xs">
               Times
             </DropdownMenuLabel>
             {organizations?.map((organization, index) => (

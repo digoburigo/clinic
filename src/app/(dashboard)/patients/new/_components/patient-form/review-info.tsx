@@ -1,13 +1,14 @@
+import { format } from "date-fns";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Label } from "~/components/ui/label";
+import { Separator } from "~/components/ui/separator";
+import { textFormatter } from "~/lib/utils";
+import { addressInfoSchema } from "./address-info";
 import { medicalInfoSchema } from "./medical-info/types";
 import { personalInfoSchema } from "./personal-info";
-import { addressInfoSchema } from "./address-info";
 import { socialInfoSchema } from "./social-info";
-import { Separator } from "~/components/ui/separator";
-import { Label } from "~/components/ui/label";
-import { Card, CardContent, CardTitle, CardHeader } from "~/components/ui/card";
-import { textFormatter } from "~/lib/utils";
 
 type AllFields = z.infer<typeof medicalInfoSchema> &
   z.infer<typeof personalInfoSchema> &
@@ -96,14 +97,19 @@ export function ReviewInfo() {
     .map((vaccination) => vaccination.label)
     .join(" / ");
   const healthPlansString = healthPlans
-    .map((healthPlan) => healthPlan.label)
+    ?.map((healthPlan) => healthPlan.label)
     .join(" / ");
   const allergiesString = allergies?.map((allergy) => allergy.label).join(", ");
   const medicationsString = medications
     ?.map((medication) => medication.label)
     .join(" / ");
   const examResultsString = examResults
-    ?.map((examResult) => examResult.label)
+    ?.map((examResult) => {
+      const type = examResult.type?.at(0)?.label || "";
+      const result = examResult.result || "";
+      const date = examResult.date || "";
+      return `${type}: ${result} - ${format(date, "dd/MM/yyyy")}`;
+    })
     .join(" / ");
   const comorbiditiesString = comorbidities
     ?.map((comorbidity) => comorbidity.label)

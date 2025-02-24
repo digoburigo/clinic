@@ -1,44 +1,55 @@
+import { useDebounce } from "@uidotdev/usehooks";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { FormDescription, FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
-import MultipleSelector, { type Option } from "~/components/ui/multiple-selector";
-import { api } from "~/trpc/react";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import MultipleSelector, {
+  type Option,
+} from "~/components/ui/multiple-selector";
+import { useTRPC } from "~/trpc/react";
 import type { MedicalInfoForm } from "./types";
-import { useDebounce } from "@uidotdev/usehooks";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function ComorbiditiesField() {
+  const trpc = useTRPC();
   const { control, setValue } = useFormContext<MedicalInfoForm>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data, isFetching } = api.comorbiditiesValues.findMany.useQuery(
-    {
-      where: {
-        value: {
-          contains: debouncedSearch,
+  const { data, isFetching } = useQuery(
+    trpc.comorbiditiesValues.findMany.queryOptions(
+      {
+        where: {
+          value: {
+            contains: debouncedSearch,
+          },
         },
       },
-    },
-    {
-      enabled: debouncedSearch.length > 2,
-    },
+      {
+        enabled: debouncedSearch.length > 2,
+      },
+    ),
   );
 
-  const { mutateAsync: createComorbidity } =
-    api.comorbiditiesValues.create.useMutation({
+  const { mutateAsync: createComorbidity } = useMutation(
+    trpc.comorbiditiesValues.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success("Comorbidade criada com sucesso!");
       },
       onError: (error) => {
         toast.error("Erro ao criar comorbidade. Tente novamente.");
       },
-    }); 
+    }),
+  );
 
   const formattedOptions =
     data?.map((item) => ({
@@ -58,7 +69,6 @@ export function ComorbiditiesField() {
             <MultipleSelector
               {...field}
               isFetching={isFetching}
-
               options={formattedOptions}
               onSearchSync={(value) => {
                 setSearch(value);

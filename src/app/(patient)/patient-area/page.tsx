@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 
+import { redirect } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -9,10 +10,10 @@ import {
 } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { UserMenu } from "~/components/user/user-menu";
-import { PatientAreaNav } from "./_components/patient-area-nav";
 import { useSession } from "~/server/auth";
-import { redirect } from "next/navigation";
-import { api } from "~/trpc/server";
+import { db } from "~/server/db";
+import { PatientAreaNav } from "./_components/patient-area-nav";
+import { relatePatientUser } from "./_db/relate-patient-user";
 
 export const metadata: Metadata = {
   title: "Área do paciente",
@@ -26,7 +27,7 @@ export default async function Page() {
     return redirect("/patient-login");
   }
 
-  const member = await api.member.findFirst({
+  const member = await db.member.findFirst({
     where: {
       organizationId: authSession.session.activeOrganizationId as string,
       userId: authSession.user.id,
@@ -37,24 +38,28 @@ export default async function Page() {
     return redirect("/");
   }
 
-  const user = await api.user.findFirst({
+  const user = await db.user.findFirst({
     where: {
       id: authSession.user.id,
     },
   });
 
-  const patient = await api.patient.findFirst({
+  const patient = await db.patient.findFirst({
     where: {
       email: user?.email,
       organizationId: authSession.session.activeOrganizationId as string,
     },
   });
 
-  if (!patient?.userId) {
-    await api._patient.relateToUser({
-      userId: authSession.user.id,
-      organizationId: authSession.session.activeOrganizationId as string,
-    });
+  try {
+    if (!patient?.userId) {
+      await relatePatientUser(
+        authSession.user.id,
+        authSession.session.activeOrganizationId as string,
+      );
+    }
+  } catch (error) {
+    redirect("/patient-login");
   }
 
   return (
@@ -87,14 +92,14 @@ export default async function Page() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
+                    className="text-muted-foreground h-4 w-4"
                   >
                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                   </svg>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">$45,231.89</div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     +20.1% from last month
                   </p>
                 </CardContent>
@@ -112,7 +117,7 @@ export default async function Page() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
+                    className="text-muted-foreground h-4 w-4"
                   >
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
@@ -121,7 +126,7 @@ export default async function Page() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">+2350</div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     +180.1% from last month
                   </p>
                 </CardContent>
@@ -137,7 +142,7 @@ export default async function Page() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
+                    className="text-muted-foreground h-4 w-4"
                   >
                     <rect width="20" height="14" x="2" y="5" rx="2" />
                     <path d="M2 10h20" />
@@ -145,7 +150,7 @@ export default async function Page() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">+12,234</div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     +19% from last month
                   </p>
                 </CardContent>
@@ -163,14 +168,14 @@ export default async function Page() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
+                    className="text-muted-foreground h-4 w-4"
                   >
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                   </svg>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">+573</div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     +201 since last hour
                   </p>
                 </CardContent>
@@ -181,8 +186,7 @@ export default async function Page() {
                 <CardHeader>
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
-                <CardContent className="pl-2">
-                </CardContent>
+                <CardContent className="pl-2"></CardContent>
               </Card>
               <Card className="col-span-3">
                 <CardHeader>

@@ -1,5 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -9,11 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -22,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { authClient } from "~/lib/auth-client";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -30,9 +32,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Loader2 } from "lucide-react";
-import { api } from "~/trpc/react";
-import { useState } from "react";
+import { authClient } from "~/lib/auth-client";
+import { useTRPC } from "~/trpc/react";
 
 const SentInviteSchema = z.object({
   email: z.string().email({
@@ -41,13 +42,12 @@ const SentInviteSchema = z.object({
   role: z.enum(["member", "admin", "owner"]),
 });
 
-
 export function SentInvite({
   organizationId,
 }: {
   organizationId: string | null | undefined;
 }) {
-  const apiUtils = api.useUtils();
+  const trpc = useTRPC();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -58,6 +58,8 @@ export function SentInvite({
       role: "member",
     },
   });
+
+  const queryClient = useQueryClient();
 
   async function onSubmit(data: z.infer<typeof SentInviteSchema>) {
     if (!organizationId) return;
@@ -73,9 +75,11 @@ export function SentInvite({
         toast.error(invitation.error.message);
         return;
       }
-      
-      await apiUtils.invitation.findMany.invalidate();
-  
+
+      await queryClient.invalidateQueries({
+        queryKey: trpc.invitation.findMany.queryKey(),
+      });
+
       toast.success(
         "Convite enviado com sucesso. O usuário receberá um email. Aguarde a confirmação.",
       );

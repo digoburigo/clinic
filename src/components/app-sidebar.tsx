@@ -1,6 +1,8 @@
 "use client";
 
+import { Organization } from "@prisma/client";
 import { NavMain } from "~/components/nav-main";
+import { Separator } from "~/components/ui/separator";
 import {
   Sidebar,
   SidebarContent,
@@ -12,17 +14,16 @@ import {
 } from "~/components/ui/sidebar";
 import { Skeleton } from "~/components/ui/skeleton";
 import { authClient } from "~/lib/auth-client";
-import { Organization } from "@prisma/client";
-import { OrganizationSwitcher } from "./organization-switcher";
 import { NavUser } from "./nav-user";
-// import { AdminNav } from "./admin-nav";
+import { OrganizationSwitcher } from "./organization-switcher";
 
-
-export function AppSidebar({ memberRole, ...props }: React.ComponentProps<typeof Sidebar> & { memberRole?: string }) {
+export function AppSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { memberRole?: string }) {
   const { data: organizations, isPending } = authClient.useListOrganizations();
 
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar {...props}>
       <SidebarHeader>
         {isPending ? (
           <SidebarMenu>
@@ -37,12 +38,13 @@ export function AppSidebar({ memberRole, ...props }: React.ComponentProps<typeof
             organizations={organizations as Organization[]}
           />
         )}
+        <Separator />
       </SidebarHeader>
       <SidebarContent>
-        {/* {memberRole === "admin" ? <AdminNav /> : null} */}
         <NavMain />
       </SidebarContent>
       <SidebarFooter>
+        <Separator />
         <NavUser />
       </SidebarFooter>
     </Sidebar>

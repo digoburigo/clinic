@@ -1,28 +1,38 @@
 "use client";
 
-import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useWindowSize } from "@uidotdev/usehooks";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useWindowSize } from "@uidotdev/usehooks";
 
+import { useLocalStorage } from "@uidotdev/usehooks";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
 import { defineStepper } from "~/components/ui/stepper";
-import { PersonalInfoForm, personalInfoSchema } from "./patient-form/personal-info";
-import { AddressInfoForm, addressInfoSchema } from "./patient-form/address-info";
-import { SocialInfoForm, socialInfoSchema } from "./patient-form/social-info";
-import { useLocalStorage } from "@uidotdev/usehooks";
-import { ClientOnly } from "~/lib/client-only";
-import { ReviewInfo } from "./patient-form/review-info";
-import { medicalInfoSchema } from "./patient-form/medical-info/types";
+import { useTRPC } from "~/trpc/react";
+import {
+  AddressInfoForm,
+  addressInfoSchema,
+} from "./patient-form/address-info";
 import { MedicalInfoForm } from "./patient-form/medical-info";
-import { api } from "~/trpc/react";
-import { toast } from "sonner";
+import { medicalInfoSchema } from "./patient-form/medical-info/types";
+import {
+  PersonalInfoForm,
+  personalInfoSchema,
+} from "./patient-form/personal-info";
+import { ReviewInfo } from "./patient-form/review-info";
+import { SocialInfoForm, socialInfoSchema } from "./patient-form/social-info";
 
-import { PatientCreateScalarSchema } from "@zenstackhq/runtime/zod/models";
 import { useRouter } from "next/navigation";
-import type { Patient } from "@zenstackhq/runtime/models";
+
+import { useMutation } from "@tanstack/react-query";
+import { Prisma } from "@zenstackhq/runtime/models";
+
+export type AllPatientFields = z.infer<typeof medicalInfoSchema> &
+  z.infer<typeof addressInfoSchema> &
+  z.infer<typeof personalInfoSchema> &
+  z.infer<typeof socialInfoSchema>;
 
 const {
   StepperProvider,
@@ -72,47 +82,18 @@ export default function PatientForm() {
       variant={width && width < 1080 ? "vertical" : "horizontal"}
       labelOrientation={width && width < 1080 ? "horizontal" : "vertical"}
     >
-      <ClientOnly>
-        <FormStepperComponent />
-      </ClientOnly>
+      <FormStepperComponent />
     </StepperProvider>
   );
 }
 
 const FormStepperComponent = () => {
+  const trpc = useTRPC();
   const router = useRouter();
+
   const [newPatientForm, saveNewPatientForm] = useLocalStorage(
     "new-patient-form",
-    {},
-  );
-
-  const methods = useStepper();
-
-  const { mutate: createPatient, isPending } = api.patient.create.useMutation({
-    onMutate: () => {
-      toast.loading("Criando paciente...", { id: "patient-creation-loading" });
-    },
-    onSuccess: (data) => {
-      form.reset();
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("new-patient-form");
-      }
-      toast.success("Paciente criado com sucesso");
-      router.push(`/patients/${data?.id}`);
-    },
-    onError: () => {
-      toast.error("Erro ao criar paciente");
-    },
-    onSettled: () => {
-      toast.dismiss("patient-creation-loading");
-    },
-  });
-
-  const form = useForm({
-    mode: "onBlur",
-    disabled: isPending,
-    resolver: zodResolver(methods.current.schema),
-    defaultValues: {
+    {
       name: "",
       cpf: "",
       cellphone: "",
@@ -136,21 +117,86 @@ const FormStepperComponent = () => {
       vaccinations: [],
       allergies: [],
       medications: [],
-      examResults: [],
       comorbidities: [],
       surgeries: [],
       healthPlans: [],
-      ...newPatientForm,
+      examResults: [],
+    } as unknown as AllPatientFields,
+  );
+
+  const methods = useStepper();
+
+  const { mutate: createPatient, isPending } = useMutation(
+    trpc.patient.create.mutationOptions({
+      onMutate: () => {
+        toast.loading("Criando paciente...", {
+          id: "patient-creation-loading",
+        });
+      },
+      onSuccess: (data) => {
+        form.reset();
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("new-patient-form");
+        }
+        toast.success("Paciente criado com sucesso");
+        router.push(`/patients/${data?.id}`);
+      },
+      onError: () => {
+        toast.error("Erro ao criar paciente");
+      },
+      onSettled: () => {
+        toast.dismiss("patient-creation-loading");
+      },
+    }),
+  );
+
+  const form = useForm({
+    mode: "onBlur",
+    disabled: isPending,
+    resolver: zodResolver(methods.current.schema),
+    defaultValues: {
+      name: newPatientForm.name,
+      cpf: newPatientForm.cpf,
+      cellphone: newPatientForm.cellphone,
+      email: newPatientForm.email,
+      sex: newPatientForm.sex,
+      responsible: newPatientForm.responsible,
+      nationality: newPatientForm.nationality,
+      race: newPatientForm.race,
+      zipcode: newPatientForm.zipcode,
+      state: newPatientForm.state,
+      city: newPatientForm.city,
+      neighborhood: newPatientForm.neighborhood,
+      street: newPatientForm.street,
+      number: newPatientForm.number,
+      complement: newPatientForm.complement,
+      occupation: newPatientForm.occupation,
+      sexualOrientation: newPatientForm.sexualOrientation,
+      civilStatus: newPatientForm.civilStatus,
+      bloodType: newPatientForm.bloodType,
+      genderIdentity: newPatientForm.genderIdentity,
+      vaccinations: newPatientForm.vaccinations,
+      allergies: newPatientForm.allergies,
+      medications: newPatientForm.medications,
+      comorbidities: newPatientForm.comorbidities,
+      surgeries: newPatientForm.surgeries,
+      healthPlans: newPatientForm.healthPlans,
+      examResults: newPatientForm?.examResults?.length
+        ? newPatientForm.examResults?.map((exam) => ({
+            ...exam,
+            date: exam.date ? new Date(exam.date) : new Date(),
+          }))
+        : [],
     },
   });
 
   form.watch(() => {
-    saveNewPatientForm(form.getValues());
+    saveNewPatientForm(form.getValues() as AllPatientFields);
   });
 
   const onSubmit = (values: z.infer<typeof methods.current.schema>) => {
     if (methods.isLast) {
-      const v = form.getValues();
+      const v = form.getValues() as AllPatientFields;
 
       createPatient({
         data: {
@@ -176,51 +222,53 @@ const FormStepperComponent = () => {
           genderIdentity: v.genderIdentity,
           vaccinations: {
             createMany: {
-              data: v.vaccinations.map((v: { id: string }) => ({
+              data: v.vaccinations.map((v) => ({
                 vaccinationsValuesId: v.id,
-              })),
+              })) as Prisma.VaccinationsCreateManyPatientInput[],
             },
           },
           allergies: {
             createMany: {
-              data: v.allergies.map((a: { id: string }) => ({
+              data: v.allergies?.map((a) => ({
                 allergiesValuesId: a.id,
-              })),
+              })) as Prisma.AllergiesCreateManyPatientInput[],
             },
           },
           medications: {
             createMany: {
-              data: v.medications.map((m: { id: string }) => ({
+              data: v.medications?.map((m) => ({
                 medicationsValuesId: m.id,
-              })),
+              })) as Prisma.MedicationsCreateManyPatientInput[],
             },
           },
           examResults: {
             createMany: {
-              data: v.examResults.map((r: { id: string }) => ({
-                examResultsValuesId: r.id,
-              })),
+              data: v.examResults?.map((r) => ({
+                examResultsValuesId: r.type.at(0)?.id,
+                result: r.result,
+                date: r.date,
+              })) as Prisma.ExamResultsCreateManyPatientInput[],
             },
           },
           comorbidities: {
             createMany: {
-              data: v.comorbidities.map((c: { id: string }) => ({
+              data: v.comorbidities?.map((c) => ({
                 comorbiditiesValuesId: c.id,
-              })),
+              })) as Prisma.ComorbiditiesCreateManyPatientInput[],
             },
           },
           surgeries: {
             createMany: {
-              data: v.surgeries.map((s: { id: string }) => ({
+              data: v.surgeries?.map((s) => ({
                 surgeriesValuesId: s.id,
-              })),
+              })) as Prisma.SurgeriesCreateManyPatientInput[],
             },
           },
           healthPlans: {
             createMany: {
-              data: v.healthPlans.map((h: { id: string }) => ({
+              data: v.healthPlans?.map((h) => ({
                 healthPlansValuesId: h.id,
-              })),
+              })) as Prisma.HealthPlansCreateManyPatientInput[],
             },
           },
         },
@@ -262,7 +310,9 @@ const FormStepperComponent = () => {
           {!methods.isLast && (
             <Button
               variant="secondary"
-              onClick={methods.prev}
+              onClick={() => {
+                methods.prev();
+              }}
               disabled={methods.isFirst || isPending}
             >
               Anterior

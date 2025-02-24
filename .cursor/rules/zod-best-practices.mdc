@@ -1,0 +1,9 @@
+---
+description: Best practices for runtime type checking and validation with Zod
+globs: **/**.{ts,tsx}
+---
+ - Use Zod for runtime type checking and data validation to ensure data integrity.
+- Implement clear error handling and user feedback for validation errors.
+- Utilize Zod's advanced features like refinements and transformations for complex validation scenarios.
+- Integrate Zod with libraries like React Hook Form for seamless form validation.
+- Leverage Zod's inferred types for enhanced type safety and better TypeScript integration.

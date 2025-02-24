@@ -11,7 +11,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -28,19 +27,27 @@ import {
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { Input } from "~/components/ui/input";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { DataTableRowAction } from "~/types";
 import { AppointmentWithPatient } from "~/types/db-entities";
 import { withPatientName } from "../../utils/queries";
 import { getColumns } from "./appointments-table-columns";
 
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+
 const fallbackData: AppointmentWithPatient[] = [];
 
 export function AppointmentsTable() {
-  const [appointments] =
-    api.appointment.findMany.useSuspenseQuery<AppointmentWithPatient[]>(
+  const trpc = useTRPC();
+  const { data: appointments } = useSuspenseQuery(
+    trpc.appointment.findMany.queryOptions<AppointmentWithPatient[]>(
       withPatientName,
-    );
+    ),
+  );
 
   const [rowAction, setRowAction] =
     useState<DataTableRowAction<AppointmentWithPatient> | null>(null);
@@ -68,9 +75,9 @@ export function AppointmentsTable() {
     },
   });
 
-  const utils = api.useUtils();
-  const { mutate: deleteAppointment, isPending: isDeleting } =
-    api.appointment.delete.useMutation({
+  const queryClient = useQueryClient();
+  const { mutate: deleteAppointment, isPending: isDeleting } = useMutation(
+    trpc.appointment.delete.mutationOptions({
       onMutate: () => {
         toast.loading("Excluindo consulta...", { id: "delete-appointment" });
       },
@@ -79,16 +86,22 @@ export function AppointmentsTable() {
       },
       onSuccess: async () => {
         await Promise.all([
-          utils.appointment.findMany.invalidate(withPatientName),
-          utils.appointment.count.invalidate(),
+          queryClient.invalidateQueries({
+            queryKey: trpc.appointment.findMany.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.appointment.count.queryKey(),
+          }),
         ]);
+
         toast.success("Consulta excluída com sucesso");
         setRowAction(null);
       },
       onError: (error) => {
         toast.error(`Erro ao excluir consulta: ${error.message}`);
       },
-    });
+    }),
+  );
 
   return (
     <>
@@ -103,10 +116,7 @@ export function AppointmentsTable() {
         />
 
         <Button asChild className="dark:bg-white dark:text-black">
-          <Link href="/patients/new">
-            <PlusIcon className="h-4 w-4" />
-            Nova consulta
-          </Link>
+          <Link href="/appointments/new">Nova consulta</Link>
         </Button>
       </div>
 
@@ -121,8 +131,8 @@ export function AppointmentsTable() {
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Isso excluirá permanentemente a
-              consulta (ID {rowAction?.row.original.id}) e todos os dados
-              associados.
+              consulta (ID <strong>{rowAction?.row.original.id}</strong>) e
+              todos os dados associados.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

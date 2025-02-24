@@ -1,12 +1,17 @@
 import "~/styles/globals.css";
 
-import { GeistSans } from "geist/font/sans";
 import { Viewport, type Metadata } from "next";
-import { TRPCReactProvider } from "~/trpc/react";
-import { Toaster } from "~/components/ui/sonner";
-import { cn } from "~/lib/utils";
+import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ThemeProvider } from "~/components/theme-provider";
+import { Toaster } from "~/components/ui/sonner";
+import { cn } from "~/lib/utils";
+import { TRPCReactProvider } from "~/trpc/react";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Clínica Médica",
@@ -47,12 +52,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={cn(
-          "bg-background min-h-svh font-sans antialiased",
-          GeistSans.variable,
-        )}
-      >
+      <body className={cn(inter.variable)}>
         <TRPCReactProvider>
           <NuqsAdapter>
             <ThemeProvider

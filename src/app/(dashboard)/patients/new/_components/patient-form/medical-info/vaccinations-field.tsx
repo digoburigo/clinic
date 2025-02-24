@@ -1,51 +1,59 @@
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { FormDescription, FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
-import MultipleSelector, { type Option } from "~/components/ui/multiple-selector";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import MultipleSelector, {
+  type Option,
+} from "~/components/ui/multiple-selector";
 
-import { api } from "~/trpc/react";
-import type { MedicalInfoForm } from "./types";
 import { useDebounce } from "@uidotdev/usehooks";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useTRPC } from "~/trpc/react";
+import type { MedicalInfoForm } from "./types";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function VaccinationsField() {
+  const trpc = useTRPC();
   const { control, setValue } = useFormContext<MedicalInfoForm>();
 
   const [search, setSearch] = useState("");
 
   const debouncedSearch = useDebounce(search, 300);
 
-  const {
-    data,
-    isFetching,
-  } = api.vaccinationsValues.findMany.useQuery(
-    {
-      where: {
-        value: {
-          contains: debouncedSearch,
+  const { data, isFetching } = useQuery(
+    trpc.vaccinationsValues.findMany.queryOptions(
+      {
+        where: {
+          value: {
+            contains: debouncedSearch,
+          },
         },
       },
-    },
-    {
-      enabled: debouncedSearch.length > 2,
-      placeholderData: (prev) => prev,
-    },
+      {
+        enabled: debouncedSearch.length > 2,
+        placeholderData: (prev) => prev,
+      },
+    ),
   );
 
-  const { mutateAsync: createVaccination } =
-    api.vaccinationsValues.create.useMutation({
+  const { mutateAsync: createVaccination } = useMutation(
+    trpc.vaccinationsValues.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success("Vacina criada com sucesso!");
       },
       onError: (error) => {
         toast.error("Erro ao criar vacina. Tente novamente.");
       },
-    });
+    }),
+  );
 
   const formattedOptions =
     data?.map((item) => ({
@@ -54,16 +62,13 @@ export function VaccinationsField() {
       value: item.value,
     })) ?? [];
 
-
   return (
     <FormField
       control={control}
       name="vaccinations"
       render={({ field, fieldState }) => (
         <FormItem>
-          <FormLabel required>
-            Vacinação
-          </FormLabel>
+          <FormLabel required>Vacinação</FormLabel>
           <FormControl>
             <MultipleSelector
               {...field}
@@ -103,11 +108,9 @@ export function VaccinationsField() {
                 }
               }}
               placeholder="Pesquisar vacinas..."
-              loadingIndicator={
-                <Skeleton className="w-full h-10" />
-              }
+              loadingIndicator={<Skeleton className="h-10 w-full" />}
               emptyIndicator={
-                <p className="text-muted-foreground text-sm w-full text-center leading-10">
+                <p className="text-muted-foreground w-full text-center text-sm leading-10">
                   Nenhuma vacina encontrada.
                 </p>
               }
@@ -124,5 +127,3 @@ export function VaccinationsField() {
     />
   );
 }
-
-

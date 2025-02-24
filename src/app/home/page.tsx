@@ -1,38 +1,46 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { useSession } from "~/server/auth";
-import { OrganizationList } from "./_components/organization-list";
+import { Suspense } from "react";
+import { H3 } from "~/components/ui/typography";
 import { UserMenu } from "~/components/user/user-menu";
-import {  H3 } from "~/components/ui/typography";
-import { api } from "~/trpc/server";
+import { auth } from "~/server/auth";
+import { prefetch, trpc } from "~/trpc/server";
+import { OrganizationList } from "./_components/organization-list";
 
 export default async function HomePage() {
-  const authSession = await useSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!authSession?.user) {
+  if (!session) {
     return redirect("/login");
   }
 
-  const organizations = await api.organization.findMany({
-    where: {
-      members: {
-        some: {
-          userId: authSession.user.id,
+  prefetch(
+    trpc.organization.findMany.queryOptions({
+      where: {
+        members: {
+          some: {
+            userId: session.user.id,
+          },
         },
       },
-    },
-  });
+    }),
+  );
 
   return (
     <div className="container mx-auto space-y-8 p-4 pt-8">
       <div className="flex items-center justify-between">
         <div>
-          <H3 className="mt-0">Bem-vindo, {authSession.user.name ?? "usuário"}</H3>
+          <H3 className="mt-0">Bem-vindo, {session.user.name ?? "usuário"}</H3>
         </div>
         <div className="flex items-center space-x-2">
           <UserMenu />
         </div>
       </div>
-      <OrganizationList organizations={organizations} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <OrganizationList userId={session.user.id} />
+      </Suspense>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 "use no memo";
 
-import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
+import { useTRPC } from "~/trpc/react";
 
 import type { Patient } from "@zenstackhq/runtime/models";
 
@@ -15,7 +16,6 @@ import {
   type ColumnFiltersState,
   type PaginationState,
 } from "@tanstack/react-table";
-import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { useMemo, useState } from "react";
@@ -36,7 +36,15 @@ import { Input } from "~/components/ui/input";
 import { DataTableRowAction } from "~/types";
 import { getColumns } from "./patients-table-columns";
 
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+
 export function PatientsTable() {
+  const trpc = useTRPC();
+  const router = useRouter();
   const [rowAction, setRowAction] =
     useState<DataTableRowAction<Patient> | null>(null);
 
@@ -49,17 +57,21 @@ export function PatientsTable() {
     pageSize: 10,
   });
 
-  const [patients] = api.patient.findMany.useSuspenseQuery({
-    // take: pagination.pageSize,
-    // skip: pagination.pageIndex * pagination.pageSize,
-    orderBy: [
-      {
-        createdAt: "desc",
-      },
-    ],
-  });
+  const { data: patients } = useSuspenseQuery(
+    trpc.patient.findMany.queryOptions({
+      // take: pagination.pageSize,
+      // skip: pagination.pageIndex * pagination.pageSize,
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+    }),
+  );
 
-  const [patientCount] = api.patient.count.useSuspenseQuery();
+  const { data: patientCount } = useSuspenseQuery(
+    trpc.patient.count.queryOptions(),
+  );
 
   const rowCount = patientCount;
 
@@ -70,27 +82,39 @@ export function PatientsTable() {
     },
   ]);
 
-  const utils = api.useUtils();
-  const { mutate: deletePatient, isPending: isDeleting } =
-    api.patient.delete.useMutation({
+  const queryClient = useQueryClient();
+
+  const { mutate: deletePatient, isPending: isDeleting } = useMutation(
+    trpc.patient.delete.mutationOptions({
       onMutate: () => {
-        toast.loading("Excluindo paciente...", { id: "delete-patient" });
+        const loadingTimeout = setTimeout(() => {
+          toast.loading("Excluindo paciente...", { id: "delete-patient" });
+        }, 300);
+        return loadingTimeout;
       },
-      onSettled: () => {
+      onSettled: (_, __, ___, context) => {
+        if (context) {
+          clearTimeout(context);
+        }
         toast.dismiss("delete-patient");
       },
-      onSuccess: async () => {
+      onSuccess: async (data) => {
         await Promise.all([
-          utils.patient.findMany.invalidate(),
-          utils.patient.count.invalidate(),
+          queryClient.invalidateQueries({
+            queryKey: trpc.patient.findMany.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.patient.count.queryKey(),
+          }),
         ]);
-        toast.success("Paciente excluído com sucesso");
+        toast.success(`Paciente ${data?.name} excluído com sucesso`);
         setRowAction(null);
       },
       onError: (error) => {
         toast.error(`Erro ao excluir paciente: ${error.message}`);
       },
-    });
+    }),
+  );
 
   const table = useReactTable({
     data: patients,
@@ -113,6 +137,11 @@ export function PatientsTable() {
     // manualFiltering: true,
     // onColumnFiltersChange: setColumnFilters,
     debugTable: true,
+    meta: {
+      onRowClick: (row: Patient) => {
+        router.push(`/patients/${row.id}`);
+      },
+    },
   });
 
   return (
@@ -127,11 +156,8 @@ export function PatientsTable() {
           className="max-w-sm"
         />
 
-        <Button asChild className="dark:bg-white dark:text-black">
-          <Link href="/patients/new">
-            <PlusIcon className="h-4 w-4" />
-            Novo paciente
-          </Link>
+        <Button asChild>
+          <Link href="/patients/new">Novo paciente</Link>
         </Button>
       </div>
 
@@ -146,13 +172,14 @@ export function PatientsTable() {
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-              paciente {rowAction?.row.original.name} e todos os dados
-              associados.
+              paciente <strong>{rowAction?.row.original.name}</strong> e todos
+              os dados associados.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
+              variant="destructive"
               disabled={isDeleting}
               onClick={() => {
                 if (rowAction?.row.original.id) {

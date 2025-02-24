@@ -1,0 +1,13 @@
+---
+description: Best practices for using tRPC for remote procedure calls
+globs: **/**.{ts,tsx}
+---
+- Structure routers and procedures logically, grouping by data entity and operation type.
+- Use Zod for input validation to ensure type safety across client-server interactions.
+- Implement global error handlers and custom middleware for robust error management.
+- Integrate tRPC effectively with React Query for managing queries, mutations, and subscriptions.
+- Optimize performance through SSR/SSG, request batching, caching, and dynamic imports.
+- Use the version 11
+- Define your router structure carefully to reflect your application's API.
+- Implement proper error handling and logging for tRPC procedures.
+- Utilize tRPC's built-in support for React Query for seamless integration.

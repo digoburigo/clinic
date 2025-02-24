@@ -1,45 +1,40 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "~/components/app-sidebar";
 import { Breadcrumbs } from "~/components/breadcrumbs";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb";
 import { Separator } from "~/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "~/components/ui/sidebar";
-import { useSession } from "~/server/auth";
-import { api } from "~/trpc/server";
+import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const authSession = await useSession();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (!authSession?.user) {
+  if (!session?.user) {
     return redirect("/login");
   }
 
-  if (!authSession?.user?.emailVerified) {
+  if (!session?.user?.emailVerified) {
     return redirect("/verify-email");
   }
 
-  if (authSession?.user?.role === "admin") {
+  if (session?.user?.role === "admin") {
     return redirect("/admin");
   }
 
-  const member = await api.member.findFirst({
+  const member = await db.member.findFirst({
     where: {
-      userId: authSession.user.id,
+      userId: session.user.id,
     },
   });
 
@@ -47,23 +42,38 @@ export default async function Layout({
     return redirect("/patient-area");
   }
 
-  if (!authSession?.session.activeOrganizationId) {
+  if (!session?.session.activeOrganizationId) {
     return redirect("/home");
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar memberRole={member?.role} />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumbs />
-          </div>
-        </header>
+    // <SidebarProvider>
+    //   <AppSidebar />
+    //   <SidebarInset>
+    //     <header className="flex h-16 shrink-0 items-center gap-2">
+    //       <div className="flex items-center gap-2 px-4">
+    //         <SidebarTrigger className="-ml-1" />
+    //         <Separator orientation="vertical" className="mr-2 h-4" />
+    //         <Breadcrumbs />
+    //       </div>
+    //     </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+    //     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+    //   </SidebarInset>
+    // </SidebarProvider>
+
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="bg-background sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-[orientation=vertical]:h-4"
+          />
+          <Breadcrumbs />
+        </header>
+        <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -45,6 +45,30 @@ export type PatientEntity = Prisma.PatientGetPayload<
   typeof patientEntityInclude
 >;
 
+const patientEntityNewAppointmentInclude = {
+  include: {
+    allergies: {
+      include: {
+        allergiesValues: true,
+      },
+    },
+    medications: {
+      include: {
+        medicationsValues: true,
+      },
+    },
+    comorbidities: {
+      include: {
+        comorbiditiesValues: true,
+      },
+    },
+  },
+} satisfies Prisma.PatientDefaultArgs;
+
+export type PatientEntityNewAppointment = Prisma.PatientGetPayload<
+  typeof patientEntityNewAppointmentInclude
+>;
+
 const patientWithAppointmentsEntityInclude = {
   include: {
     appointments: true,

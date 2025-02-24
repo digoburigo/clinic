@@ -1,12 +1,11 @@
 "use client";
 "use no memo";
 
+import { type ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, Ellipsis } from "lucide-react";
 import * as React from "react";
 import { type DataTableRowAction } from "~/types";
-import { type ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Ellipsis, EyeIcon } from "lucide-react";
 
-import { formatDate, textFormatter } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -16,9 +15,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { formatDate, textFormatter } from "~/lib/utils";
 
 import type { Patient } from "@zenstackhq/runtime/models";
-import Link from "next/link";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
@@ -68,13 +67,7 @@ export function getColumns({
           </Button>
         );
       },
-      cell: ({ row }) => (
-        <Button variant="link">
-          <Link href={`/patients/${row.original.id}`}>
-            {row.getValue("name")}
-          </Link>
-        </Button>
-      ),
+      cell: ({ row }) => <div>{row.getValue("name")}</div>,
       sortingFn: "text",
       minSize: 30,
     },
@@ -129,28 +122,34 @@ export function getColumns({
     {
       id: "actions",
       cell: function Cell({ row }) {
-        const [isUpdatePending, startUpdateTransition] = React.useTransition();
         return (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
               <Button
                 aria-label="Open menu"
                 variant="ghost"
                 className="data-[state=open]:bg-muted flex size-8 p-0"
+                onClick={(e) => e.stopPropagation()}
               >
                 <Ellipsis className="size-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem
-                onSelect={() => setRowAction({ row, type: "update" })}
+                onSelect={(e) => {
+                  setRowAction({ row, type: "update" });
+                  e.stopPropagation();
+                }}
               >
                 Editar
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-500"
-                onSelect={() => setRowAction({ row, type: "delete" })}
+                onSelect={(e) => {
+                  setRowAction({ row, type: "delete" });
+                  e.stopPropagation();
+                }}
               >
                 Excluir
               </DropdownMenuItem>

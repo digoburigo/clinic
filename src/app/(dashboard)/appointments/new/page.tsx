@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
+import { SelectPatient } from "./_components/select-patient";
 
-export const metadata: Metadata = {
-  title: "Adicionar Consulta",
-  description: "Adicione uma nova consulta",
-};
-
-export default function Page() {
-  return <div>Adicionar Consulta</div>;
+export default async function Page() {
+  return <SelectPatient />;
 }

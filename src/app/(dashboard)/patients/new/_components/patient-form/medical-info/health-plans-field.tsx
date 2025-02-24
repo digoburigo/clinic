@@ -1,44 +1,55 @@
+import { useDebounce } from "@uidotdev/usehooks";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { FormDescription, FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
-import MultipleSelector, { type Option } from "~/components/ui/multiple-selector";
-import { api } from "~/trpc/react";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import MultipleSelector, {
+  type Option,
+} from "~/components/ui/multiple-selector";
+import { useTRPC } from "~/trpc/react";
 import type { MedicalInfoForm } from "./types";
-import { useDebounce } from "@uidotdev/usehooks";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function HealthPlansField() {
+  const trpc = useTRPC();
   const { control, setValue } = useFormContext<MedicalInfoForm>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data, isFetching } = api.healthPlansValues.findMany.useQuery(
-    {
-      where: {
-        value: {
-          contains: debouncedSearch,
+  const { data, isFetching } = useQuery(
+    trpc.healthPlansValues.findMany.queryOptions(
+      {
+        where: {
+          value: {
+            contains: debouncedSearch,
+          },
         },
       },
-    },
-    {
-      enabled: debouncedSearch.length > 2,
-    },
+      {
+        enabled: debouncedSearch.length > 2,
+      },
+    ),
   );
 
-  const { mutateAsync: createHealthPlan } =
-    api.healthPlansValues.create.useMutation({
+  const { mutateAsync: createHealthPlan } = useMutation(
+    trpc.healthPlansValues.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success("Plano de saúde criado com sucesso!");
       },
       onError: (error) => {
         toast.error("Erro ao criar medicamento. Tente novamente.");
       },
-    });
+    }),
+  );
 
   const formattedOptions =
     data?.map((item) => ({
@@ -53,12 +64,11 @@ export function HealthPlansField() {
       name="healthPlans"
       render={({ field, fieldState }) => (
         <FormItem>
-          <FormLabel required>Planos de saúde</FormLabel>
+          <FormLabel>Planos de saúde</FormLabel>
           <FormControl>
             <MultipleSelector
               {...field}
               isFetching={isFetching}
-
               options={formattedOptions}
               onSearchSync={(value) => {
                 setSearch(value);

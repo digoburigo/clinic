@@ -1,11 +1,17 @@
 "use client";
 
-import { api } from "~/trpc/react";
 import { DataTable } from "~/components/ui/data-table";
+import { useTRPC } from "~/trpc/react";
 
 import type { Member } from "@zenstackhq/runtime/models";
 
-import { ColumnDef, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  ColumnDef,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+import { useQuery } from "@tanstack/react-query";
 
 export const columns: ColumnDef<Member>[] = [
   {
@@ -22,19 +28,26 @@ export const columns: ColumnDef<Member>[] = [
   },
 ];
 
-export default function MembersList({ organizationId }: { organizationId: string | null | undefined }) {
-  const { data: members, isPending } = api.member.findMany.useQuery(
-    {
-      where: {
-        organizationId: organizationId as string,
+export default function MembersList({
+  organizationId,
+}: {
+  organizationId: string | null | undefined;
+}) {
+  const trpc = useTRPC();
+  const { data: members, isPending } = useQuery(
+    trpc.member.findMany.queryOptions(
+      {
+        where: {
+          organizationId: organizationId as string,
+        },
+        include: {
+          user: true,
+        },
       },
-      include: {
-        user: true,
+      {
+        enabled: !!organizationId,
       },
-    },
-    {
-      enabled: !!organizationId,
-    },
+    ),
   );
 
   const table = useReactTable<Member>({
@@ -46,7 +59,6 @@ export default function MembersList({ organizationId }: { organizationId: string
   if (isPending) return <div>Loading...</div>;
 
   if (!members) return <div>Nenhum membro encontrado</div>;
-  
 
   return <DataTable table={table} emptyMessage="Nenhum membro encontrado" />;
 }

@@ -2,22 +2,23 @@
 
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { db } from "~/server/db";
 import { nextCookies } from "better-auth/next-js";
-import { headers } from "next/headers";
 import { admin, organization } from "better-auth/plugins";
+import { headers } from "next/headers";
+import { env } from "~/env";
+import { db } from "~/server/db";
 import { sendEmail } from "../email";
+import EmailVerificationEmail from "../email/templates/EmailVerificationEmail";
+import OrganizationInvitationEmail from "../email/templates/OrganizationInvitationEmail";
+import PatientRegistrationEmail from "../email/templates/PatientRegistrationEmail";
+import ResetPasswordEmail from "../email/templates/ResetPasswordEmail";
 import {
   ac,
-  customOwnerAc,
   customAdminAc,
+  customOwnerAc,
   cutomMemberAc,
   patientAc,
 } from "./permissions";
-import OrganizationInvitationEmail from "../email/templates/OrganizationInvitationEmail";
-import EmailVerificationEmail from "../email/templates/EmailVerificationEmail";
-import ResetPasswordEmail from "../email/templates/ResetPasswordEmail";
-import PatientRegistrationEmail from "../email/templates/PatientRegistrationEmail";
 
 export const auth = betterAuth({
   database: prismaAdapter(db, {
@@ -114,20 +115,21 @@ export const auth = betterAuth({
             },
           });
 
-          const domain = process.env.BETTER_AUTH_URL as string;
-          const inviteLinkUrl = new URL(domain);
+          const inviteLinkUrl = new URL(env.NEXT_PUBLIC_BETTER_AUTH_URL);
 
           const isPatient = data.role === "patient";
-          const pathname = isPatient ? "/patient-registration" : "/accept-invitation";
+          const pathname = isPatient
+            ? "/patient-registration"
+            : "/accept-invitation";
           inviteLinkUrl.pathname = `${pathname}/${data.id}`;
-          
+
           const hasUser = Boolean(user);
           inviteLinkUrl.searchParams.set("has", hasUser ? "true" : "false");
 
           const emailTemplate = isPatient
             ? PatientRegistrationEmail
             : OrganizationInvitationEmail;
-          
+
           const subject = isPatient
             ? "Você foi cadastrado como paciente"
             : "Você foi convidado para entrar em uma organização";

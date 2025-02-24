@@ -1,44 +1,54 @@
+import { useDebounce } from "@uidotdev/usehooks";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { FormDescription, FormMessage } from "~/components/ui/form";
-import { FormControl } from "~/components/ui/form";
-import { FormLabel } from "~/components/ui/form";
-import { FormField } from "~/components/ui/form";
-import { FormItem } from "~/components/ui/form";
-import MultipleSelector, { type Option } from "~/components/ui/multiple-selector";
-import { api } from "~/trpc/react";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import MultipleSelector, {
+  type Option,
+} from "~/components/ui/multiple-selector";
+import { useTRPC } from "~/trpc/react";
 import type { MedicalInfoForm } from "./types";
-import { useDebounce } from "@uidotdev/usehooks";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function SurgeriesField() {
+  const trpc = useTRPC();
   const { control, setValue } = useFormContext<MedicalInfoForm>();
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data, isFetching } = api.surgeriesValues.findMany.useQuery(
-    {
-      where: {
-        value: {
-          contains: debouncedSearch,
+  const { data, isFetching } = useQuery(
+    trpc.surgeriesValues.findMany.queryOptions(
+      {
+        where: {
+          value: {
+            contains: debouncedSearch,
+          },
         },
       },
-    },
-    {
-      enabled: debouncedSearch.length > 2,
-    },
+      {
+        enabled: debouncedSearch.length > 2,
+      },
+    ),
   );
 
-  const { mutateAsync: createSurgery } = api.surgeriesValues.create.useMutation(
-    {
+  const { mutateAsync: createSurgery } = useMutation(
+    trpc.surgeriesValues.create.mutationOptions({
       onSuccess: async (data) => {
         toast.success("Cirurgia criada com sucesso!");
       },
       onError: (error) => {
         toast.error("Erro ao criar cirurgia. Tente novamente.");
       },
-    },
+    }),
   );
 
   const formattedOptions =
