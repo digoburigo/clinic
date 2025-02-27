@@ -6,7 +6,7 @@
 // @ts-nocheck
 
 import type { AnyTRPCRouter as AnyRouter } from "@trpc/server";
-import type { PrismaClient } from "@zenstackhq/runtime/models";
+import type { PrismaClient } from "../../../../zenstack/models";
 import { createTRPCRouter } from "../../trpc";
 import createPostRouter from "./Post.router";
 import createUserRouter from "./User.router";

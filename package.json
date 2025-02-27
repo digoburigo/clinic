@@ -29,6 +29,7 @@
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "zen:init": "zenstack init",
+    "zen:generate:output": "zenstack generate --output ./src/zenstack",
     "zen:generate": "zenstack generate",
     "zen:push": "zenstack generate && prisma db push",
     "pkgs:check": "pnpx npm-check-updates --deep --concurrency 16",
