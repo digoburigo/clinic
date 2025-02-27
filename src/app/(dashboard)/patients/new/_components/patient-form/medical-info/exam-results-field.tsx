@@ -1,6 +1,6 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { CalendarIcon, Trash } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -50,6 +50,12 @@ export function ExamResultsField() {
     control,
     name: "examResults",
   });
+  console.log(`ExamResultsField fields:`, JSON.stringify(fields, null, 2));
+  console.log(`New exam structure from append:`, {
+    type: [],
+    result: "",
+    date: new Date(),
+  });
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
@@ -79,12 +85,15 @@ export function ExamResultsField() {
     }),
   );
 
-  const formattedOptions =
-    data?.map((item) => ({
-      id: item.id,
-      label: item.value,
-      value: item.value,
-    })) ?? [];
+  const formattedOptions = useMemo(
+    () =>
+      data?.map((item) => ({
+        id: item.id,
+        label: item.value,
+        value: item.value,
+      })) ?? [],
+    [data],
+  );
 
   return (
     <FormItem className="space-y-4">
@@ -155,6 +164,7 @@ export function ExamResultsField() {
                       creatable
                       maxSelected={1}
                       onChange={async (value) => {
+                        console.log("MultipleSelector onChange value:", value);
                         const withoutId = value.find((item) => !item.id);
                         if (withoutId) {
                           const withId = await createResultsExam({
@@ -176,6 +186,16 @@ export function ExamResultsField() {
                             value: withId.value,
                           } as Option;
 
+                          console.log(
+                            "Setting value with new formatted option:",
+                            [
+                              ...value.filter(
+                                (item) => item.value !== formattedWithId.value,
+                              ),
+                              formattedWithId,
+                            ],
+                          );
+
                           setValue(`examResults.${index}.type`, [
                             ...value.filter(
                               (item) => item.value !== formattedWithId.value,
@@ -183,6 +203,7 @@ export function ExamResultsField() {
                             formattedWithId,
                           ]);
                         } else {
+                          console.log("Setting existing value:", [...value]);
                           setValue(`examResults.${index}.type`, [...value]);
                         }
                       }}

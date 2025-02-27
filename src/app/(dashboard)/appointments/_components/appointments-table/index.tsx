@@ -115,7 +115,7 @@ export function AppointmentsTable() {
           className="max-w-sm"
         />
 
-        <Button asChild className="dark:bg-white dark:text-black">
+        <Button asChild>
           <Link href="/appointments/new">Nova consulta</Link>
         </Button>
       </div>

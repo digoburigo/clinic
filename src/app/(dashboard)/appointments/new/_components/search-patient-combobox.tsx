@@ -11,7 +11,6 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { SearchPatient } from "./search-patient";
-
 const POPOVER_WIDTH = "w-[250px]";
 
 export function SearchPatientCombobox({
@@ -37,7 +36,7 @@ export function SearchPatientCombobox({
         <Button
           variant="outline"
           role="combobox"
-          className={cn("justify-between", POPOVER_WIDTH)}
+          className={cn("mb-4 justify-between", POPOVER_WIDTH)}
         >
           {displayName}
 

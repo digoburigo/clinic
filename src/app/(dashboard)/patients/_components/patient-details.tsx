@@ -27,15 +27,19 @@ import {
   socialInfoSchema,
 } from "../new/_components/patient-form/social-info";
 
+import { Prisma } from "@zenstackhq/runtime/models";
+
 import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+import { AllPatientFields } from "../new/_components/new-patient-form";
 
 type PatientTabs = "medical" | "personal" | "address" | "social";
 
 function formatPatient(patient: PatientEntity) {
+  console.log(` patient:`, patient);
   return {
     ...patient,
     vaccinations:
@@ -64,11 +68,16 @@ function formatPatient(patient: PatientEntity) {
       })) || [],
     examResults:
       patient?.examResults?.map((examResult) => ({
-        ...examResult.examResultsValues,
-        label: examResult.examResultsValues.value,
-        exists: true,
+        type: [
+          {
+            id: examResult.examResultsValues.id,
+            value: examResult.examResultsValues.value,
+            label: examResult.examResultsValues.value,
+          },
+        ],
         result: examResult.result,
         date: examResult.date,
+        exists: true,
       })) || [],
     surgeries:
       patient?.surgeries?.map((surgery) => ({
@@ -233,7 +242,7 @@ export function PatientDetails({ patientId }: { patientId: string }) {
   );
 
   async function onSubmit(values: z.infer<(typeof schemas)[typeof tab]>) {
-    const v = form.getValues();
+    const v = form.getValues() as AllPatientFields;
 
     await updatePatientAsync({
       where: {
@@ -305,51 +314,53 @@ export function PatientDetails({ patientId }: { patientId: string }) {
         genderIdentity: v.genderIdentity,
         vaccinations: {
           createMany: {
-            data: v.vaccinations.map((v: { id: string }) => ({
+            data: v.vaccinations.map((v) => ({
               vaccinationsValuesId: v.id,
-            })),
+            })) as Prisma.VaccinationsCreateManyPatientInput[],
           },
         },
         allergies: {
           createMany: {
-            data: v.allergies.map((a: { id: string }) => ({
+            data: v.allergies?.map((a) => ({
               allergiesValuesId: a.id,
-            })),
+            })) as Prisma.AllergiesCreateManyPatientInput[],
           },
         },
         medications: {
           createMany: {
-            data: v.medications.map((m: { id: string }) => ({
+            data: v.medications?.map((m) => ({
               medicationsValuesId: m.id,
-            })),
+            })) as Prisma.MedicationsCreateManyPatientInput[],
           },
         },
         examResults: {
           createMany: {
-            data: v.examResults.map((r: { id: string }) => ({
-              examResultsValuesId: r.id,
-            })),
+            data: v.examResults?.map((r) => ({
+              examResultsValuesId: r.type[0]?.id,
+              result: r.result,
+              date: r.date,
+            })) as Prisma.ExamResultsCreateManyPatientInput[],
           },
         },
         comorbidities: {
           createMany: {
-            data: v.comorbidities.map((c: { id: string }) => ({
+            data: v.comorbidities?.map((c) => ({
               comorbiditiesValuesId: c.id,
-            })),
+            })) as Prisma.ComorbiditiesCreateManyPatientInput[],
           },
         },
         surgeries: {
           createMany: {
-            data: v.surgeries.map((s: { id: string }) => ({
+            data: v.surgeries?.map((s) => ({
               surgeriesValuesId: s.id,
-            })),
+            })) as Prisma.SurgeriesCreateManyPatientInput[],
           },
         },
         healthPlans: {
           createMany: {
-            data: v.healthPlans.map((h: { id: string }) => ({
+            data: v.healthPlans?.map((h) => ({
               healthPlansValuesId: h.id,
-            })),
+            })) as Prisma.HealthPlansCreateManyPatientInput[],
           },
         },
       },

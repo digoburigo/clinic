@@ -24,7 +24,7 @@ export function AppSidebar({
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="text-primary-foreground bg-primary">
         {isPending ? (
           <SidebarMenu>
             <SidebarMenuItem>
@@ -40,10 +40,10 @@ export function AppSidebar({
         )}
         <Separator />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="text-primary-foreground bg-primary">
         <NavMain />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="bg-primary text-primary-foreground">
         <Separator />
         <NavUser />
       </SidebarFooter>

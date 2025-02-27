@@ -77,16 +77,16 @@ async function main() {
       data: {
         organizationId: organization1?.id as string,
         text: `
-                BEG, LOC, MUC, AAA
-                Via área pérvia orofaringe sem particularidade
-                Oroscopia: Amigdalas presente sem hiperemia e sem hipertrofias, sem exsudatos, sem lesões aparentes.
-                Otoscopia: Membranas bilaterais presentes sem abaulamento, sem perfurações, cone luminoso presente, conduto bilateral sem hiperemia e sem lesões aparentes.
-                AP: MV+ Bilateral SRA
-                AC: BNF RR 2T SSA sem arritmias 
-                PA:
-                Neurológico sem particularidade, pupilas isofotorreagente, ECG 15
-                ABD: Plano, Globoso, Em avental, Pouco globoso em aventar, sem cicatrizes, RHA+, Indolor a palpação, sem sinais de pritonismo
-                MMII: Sem edemas, Com edemas +/++++, com caçifo +1/+4, Pulsos palpáveis, amplos e simétricos, sem deformidades, extremidades quentes, TEC < 3s
+                BEG, LOC, MUC, AAA\n
+                Via área pérvia orofaringe sem particularidade\n
+                Oroscopia: Amigdalas presente sem hiperemia e sem hipertrofias, sem exsudatos, sem lesões aparentes.\n
+                Otoscopia: Membranas bilaterais presentes sem abaulamento, sem perfurações, cone luminoso presente, conduto bilateral sem hiperemia e sem lesões aparentes.\n
+                AP: MV+ Bilateral SRA\n
+                AC: BNF RR 2T SSA sem arritmias\n
+                PA: \n
+                Neurológico sem particularidade, pupilas isofotorreagente, ECG 15\n
+                ABD: Plano, Globoso, Em avental, Pouco globoso em aventar, sem cicatrizes, RHA+, Indolor a palpação, sem sinais de pritonismo\n
+                MMII: Sem edemas, Com edemas +/++++, com caçifo +1/+4, Pulsos palpáveis, amplos e simétricos, sem deformidades, extremidades quentes, TEC < 3s\n
               `,
       },
     }),

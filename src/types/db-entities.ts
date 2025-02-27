@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@zenstackhq/runtime/models";
 
 // PATIENT ENTITY
 const patientEntityInclude = {

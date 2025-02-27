@@ -187,7 +187,7 @@ export function PatientAppointmentsList({ patientId }: { patientId: string }) {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Consultas
-          <Button>
+          <Button asChild>
             <Link href={`/patients/${patientId}/appointments/new`}>
               Nova Consulta
             </Link>

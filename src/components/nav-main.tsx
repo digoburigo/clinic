@@ -79,27 +79,24 @@ export function NavMain() {
     <SidebarGroup>
       {MENU_ITEMS.map((menu, index) => (
         <div className="flex flex-col gap-1" key={menu.label}>
-          <SidebarGroupLabel className="text-muted-foreground/60 uppercase">
+          <SidebarGroupLabel className="text-primary-foreground/50 text-xs uppercase">
             {menu.label}
           </SidebarGroupLabel>
           <SidebarMenu>
             {menu.routes.map((route) => (
               <SidebarMenuItem key={route.href}>
-                <SidebarMenuButton
-                  asChild
-                  className="group/menu-button hover:from-sidebar-accent hover:to-sidebar-accent/40 data-[active=true]:from-primary/20 data-[active=true]:to-primary/5 h-9 gap-3 rounded-lg bg-gradient-to-r font-medium hover:bg-transparent [&>svg]:size-auto"
-                >
+                <SidebarMenuButton asChild className="h-9 [&>svg]:size-auto">
                   <Link
                     href={route.href}
                     className={
                       isActive(route.href)
-                        ? "text-primary hover:text-primary! [&>svg]:text-primary"
+                        ? "bg-primary-foreground hover:!bg-primary-foreground/80 text-primary/100 [&>svg]:text-primary/100 font-semibold"
                         : ""
                     }
                   >
                     {route.icon ? (
                       <route.icon
-                        className="text-muted-foreground/60 group-data-[active=true]/menu-button:text-primary"
+                        className="text-primary-foreground/80 group-data-[active=true]/menu-button:text-primary"
                         width={20}
                         height={20}
                         aria-hidden="true"

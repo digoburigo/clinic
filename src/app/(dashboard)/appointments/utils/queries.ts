@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@zenstackhq/runtime/models";
 
 export const withPatientName = {
   include: {

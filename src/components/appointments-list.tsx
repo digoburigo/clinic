@@ -1,7 +1,6 @@
 "use client";
 "use no memo";
 
-import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,10 +13,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import * as React from "react";
 
 import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Input } from "~/components/ui/input";
 import {
   Table,
   TableBody,
@@ -35,7 +35,6 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 
 // Define the Appointment type
 export type Appointment = {
@@ -196,7 +195,7 @@ export function AppointmentsList({ patientId }: { patientId: string }) {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Consultas
-          <Button>
+          <Button asChild>
             <Link href={`/patients/${patientId}/appointments/new`}>
               Nova Consulta
             </Link>
